@@ -138,34 +138,44 @@ input[type="text"], input[type="password"] {
   <style>body { box-sizing: border-box; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full" style="font-family: 'Plus Jakarta Sans', sans-serif;"><!-- SCREEN 1: LOGIN -->
+ <body class="h-full" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+  <!-- SCREEN 1: LOGIN -->
   <div id="screen-login" class="screen active h-full">
-   <div class="h-full w-full bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 anim-gradient flex items-center justify-center px-fluid py-fluid relative overflow-hidden"><!-- Background pattern -->
+   <div class="h-full w-full bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 anim-gradient flex items-center justify-center px-fluid py-fluid relative overflow-hidden">
+    <!-- Background pattern -->
     <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
     <div class="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl opacity-10 -translate-x-1/2 -translate-y-1/2"></div>
     <div class="absolute bottom-0 right-0 w-80 h-80 bg-indigo-500 rounded-full filter blur-3xl opacity-10 translate-x-1/3 translate-y-1/3"></div>
     <div class="w-full max-w-md relative z-10">
-     <div class="login-card bg-white/5 border border-white/10 rounded-xl py-5 md:py-6 px-4 md:px-5 anim-scale-in"><!-- Logo area -->
+     <div class="login-card bg-white/5 border border-white/10 rounded-xl py-5 md:py-6 px-4 md:px-5 anim-scale-in">
+      <!-- Logo area -->
       <div class="text-center mb-4 md:mb-5">
        <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2.5 md:mb-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 anim-pulse-glow">
-        <svg width="32" height="32" viewbox="0 0 40 40" fill="none" class="md:w-9 md:h-9"><path d="M20 4L36 12V28L20 36L4 28V12L20 4Z" stroke="white" stroke-width="2" fill="none" /> <path d="M20 10L30 16V26L20 32L10 26V16L20 10Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1.5" /> <circle cx="20" cy="20" r="4" fill="white" />
+        <svg width="32" height="32" viewbox="0 0 40 40" fill="none" class="md:w-9 md:h-9">
+         <path d="M20 4L36 12V28L20 36L4 28V12L20 4Z" stroke="white" stroke-width="2" fill="none" /> <path d="M20 10L30 16V26L20 32L10 26V16L20 10Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1.5" /> <circle cx="20" cy="20" r="4" fill="white" />
         </svg>
        </div>
        <h1 id="login-school" class="text-white text-lg md:text-xl font-800 tracking-tight leading-tight">PKBM Ristek Nusantara Jaya</h1>
        <p id="login-exam-title" class="text-blue-300/80 text-xs md:text-sm mt-1 md:mt-1.5 font-500">Ujian Pendidikan Kesetaraan (UPK)</p>
-       <div class="mt-2 md:mt-2.5 inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full px-2.5 py-0.5"><span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> <span class="text-green-300 text-xs font-500">Sistem Aktif</span>
+       <div class="mt-2 md:mt-2.5 inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full px-2.5 py-0.5">
+        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> <span class="text-green-300 text-xs font-500">Sistem Aktif</span>
        </div>
       </div><!-- Form -->
       <div class="space-y-2 md:space-y-2.5">
-       <div><label class="text-white/60 text-xs md:text-sm font-600 uppercase tracking-wider mb-0.5 block">Nama Lengkap</label>
-        <div class="relative"><i data-lucide="user" class="absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:16px;height:16px;"></i> <input id="input-name" type="text" placeholder="Nama lengkap..." class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 md:pl-9 pr-2.5 md:pr-3 py-2 md:py-2.5 text-white placeholder-white/30 text-xs md:text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all">
+       <div>
+        <label class="text-white/60 text-xs md:text-sm font-600 uppercase tracking-wider mb-0.5 block">Nama Lengkap</label>
+        <div class="relative">
+         <i data-lucide="user" class="absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:16px;height:16px;"></i> <input id="input-name" type="text" placeholder="Nama lengkap..." class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 md:pl-9 pr-2.5 md:pr-3 py-2 md:py-2.5 text-white placeholder-white/30 text-xs md:text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all">
         </div>
        </div>
-       <div><label class="text-white/60 text-xs md:text-sm font-600 uppercase tracking-wider mb-0.5 block">Token Ujian</label>
-        <div class="relative"><i data-lucide="key-round" class="absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:16px;height:16px;"></i> <input id="input-token" type="text" placeholder="Token dari pengawas..." class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 md:pl-9 pr-2.5 md:pr-3 py-2 md:py-2.5 text-white placeholder-white/30 text-xs md:text-sm tracking-widest font-mono uppercase focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all" maxlength="10">
+       <div>
+        <label class="text-white/60 text-xs md:text-sm font-600 uppercase tracking-wider mb-0.5 block">Token Ujian</label>
+        <div class="relative">
+         <i data-lucide="key-round" class="absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:16px;height:16px;"></i> <input id="input-token" type="text" placeholder="Token dari pengawas..." class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 md:pl-9 pr-2.5 md:pr-3 py-2 md:py-2.5 text-white placeholder-white/30 text-xs md:text-sm tracking-widest font-mono uppercase focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all" maxlength="10">
         </div>
        </div>
-       <div id="login-error" class="hidden text-red-400 text-xs md:text-sm text-center bg-red-500/10 border border-red-500/20 rounded-lg p-2 md:p-2.5 anim-shake"><span id="login-error-text"></span>
+       <div id="login-error" class="hidden text-red-400 text-xs md:text-sm text-center bg-red-500/10 border border-red-500/20 rounded-lg p-2 md:p-2.5 anim-shake">
+        <span id="login-error-text"></span>
        </div><button id="btn-login" onclick="handleLogin()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-700 py-2.5 md:py-3 rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-blue-500/25 text-xs md:text-sm flex items-center justify-center gap-2"> <i data-lucide="log-in" style="width:16px;height:16px;"></i> Masuk Ujian </button>
       </div>
       <p class="text-white/20 text-xs text-center mt-4 md:mt-5">Exambro Security System v3.0</p>
@@ -178,14 +188,16 @@ input[type="text"], input[type="password"] {
     <div class="absolute inset-0 anim-warning-pulse"></div>
     <div class="relative z-10 w-full max-w-lg text-center">
      <div class="anim-scale-in">
-      <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center"><i data-lucide="shield-alert" class="text-red-400" style="width:48px;height:48px;"></i>
+      <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center">
+       <i data-lucide="shield-alert" class="text-red-400" style="width:48px;height:48px;"></i>
       </div>
       <h2 class="text-white text-2xl sm:text-3xl font-800 mb-3">⚠️ PERATURAN UJIAN</h2>
       <p class="text-red-300/70 text-sm mb-8 font-500">Baca dengan seksama sebelum memulai</p>
      </div>
      <div class="space-y-3 text-left mb-8">
       <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.1s;opacity:0;">
-       <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><i data-lucide="monitor-off" class="text-red-400" style="width:16px;height:16px;"></i>
+       <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+        <i data-lucide="monitor-off" class="text-red-400" style="width:16px;height:16px;"></i>
        </div>
        <div>
         <p class="text-white text-sm font-600">Dilarang Keluar dari Halaman Ujian</p>
@@ -193,7 +205,8 @@ input[type="text"], input[type="password"] {
        </div>
       </div>
       <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.2s;opacity:0;">
-       <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><i data-lucide="copy-x" class="text-orange-400" style="width:16px;height:16px;"></i>
+       <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+        <i data-lucide="copy-x" class="text-orange-400" style="width:16px;height:16px;"></i>
        </div>
        <div>
         <p class="text-white text-sm font-600">Dilarang Copy-Paste &amp; Screenshot</p>
@@ -201,7 +214,8 @@ input[type="text"], input[type="password"] {
        </div>
       </div>
       <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.3s;opacity:0;">
-       <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><i data-lucide="timer" class="text-yellow-400" style="width:16px;height:16px;"></i>
+       <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+        <i data-lucide="timer" class="text-yellow-400" style="width:16px;height:16px;"></i>
        </div>
        <div>
         <p class="text-white text-sm font-600">Waktu Ujian Terbatas</p>
@@ -209,7 +223,8 @@ input[type="text"], input[type="password"] {
        </div>
       </div>
       <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.4s;opacity:0;">
-       <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><i data-lucide="lock" class="text-blue-400" style="width:16px;height:16px;"></i>
+       <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+        <i data-lucide="lock" class="text-blue-400" style="width:16px;height:16px;"></i>
        </div>
        <div>
         <p class="text-white text-sm font-600">Pelanggaran = Login Ulang</p>
@@ -217,34 +232,47 @@ input[type="text"], input[type="password"] {
        </div>
       </div>
      </div>
-     <div class="anim-fade-up" style="animation-delay:0.6s;opacity:0;"><label class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4 cursor-pointer mb-4 hover:bg-white/8 transition-colors"> <input type="checkbox" id="agree-check" class="w-5 h-5 rounded accent-blue-500 flex-shrink-0" onchange="toggleStartBtn()"> <span class="text-white/80 text-sm">Saya memahami dan menyetujui seluruh peraturan ujian di atas</span> </label> <button id="btn-start-exam" disabled onclick="startExam()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-700 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 text-sm flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"> <i data-lucide="play" style="width:18px;height:18px;"></i> Mulai Ujian Sekarang </button>
+     <div class="anim-fade-up" style="animation-delay:0.6s;opacity:0;">
+      <label class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4 cursor-pointer mb-4 hover:bg-white/8 transition-colors"> <input type="checkbox" id="agree-check" class="w-5 h-5 rounded accent-blue-500 flex-shrink-0" onchange="toggleStartBtn()"> <span class="text-white/80 text-sm">Saya memahami dan menyetujui seluruh peraturan ujian di atas</span> </label> <button id="btn-start-exam" disabled onclick="startExam()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-700 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 text-sm flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"> <i data-lucide="play" style="width:18px;height:18px;"></i> Mulai Ujian Sekarang </button>
      </div>
     </div>
    </div>
   </div><!-- SCREEN 3: EXAM -->
   <div id="screen-exam" class="screen h-full">
-   <div class="h-full w-full bg-slate-950 flex flex-col"><!-- Top bar -->
+   <div class="h-full w-full bg-slate-950 flex flex-col">
+    <!-- Top bar -->
     <header class="flex-shrink-0 bg-slate-900/80 border-b border-white/5 px-4 py-3">
-     <div class="flex items-center justify-start max-w-4xl mx-auto">
+     <div class="flex items-center justify-between max-w-4xl mx-auto w-full">
       <div class="flex items-center gap-2 min-w-0">
-       <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0"><i data-lucide="graduation-cap" class="text-white" style="width:16px;height:16px;"></i>
+       <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+        <i data-lucide="graduation-cap" class="text-white" style="width:16px;height:16px;"></i>
        </div>
        <div class="min-w-0">
         <p id="exam-student-name" class="text-white text-sm font-600 truncate"></p>
         <p class="text-white/40 text-xs">UPK 2025</p>
        </div>
       </div>
+      <div id="timer-display" class="flex-shrink-0 border border-white/10 rounded-lg px-3 py-2 bg-white/5">
+       <p class="text-xs text-white/40 font-500 uppercase tracking-wider mb-0.5">Waktu</p>
+       <p id="timer-text" class="text-white text-base md:text-lg font-800 font-mono">60:00</p>
+      </div>
      </div>
     </header><!-- Question area -->
     <div class="flex-1 overflow-y-auto p-4">
-     <div class="max-w-3xl mx-auto"><!-- Progress -->
+     <div class="max-w-3xl mx-auto">
+      <!-- Progress -->
       <div class="mb-4">
+       <div class="flex items-center justify-between mb-2">
+        <p class="text-white/50 text-xs md:text-sm font-600">Progress</p>
+        <p id="progress-text" class="text-blue-400 text-xs md:text-sm font-700">0/30</p>
+       </div>
        <div class="flex-1 bg-white/5 rounded-full h-2 overflow-hidden">
         <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500" style="width:0%"></div>
        </div>
       </div><!-- Question card -->
       <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-       <div class="bg-blue-600/10 border-b border-white/5 px-5 py-3 flex items-center justify-between"><span id="q-number" class="text-blue-300 text-sm font-700">Soal 1</span> <span id="q-subject" class="text-white/40 text-xs bg-white/5 rounded-full px-2.5 py-0.5"></span>
+       <div class="bg-blue-600/10 border-b border-white/5 px-5 py-3 flex items-center justify-between">
+        <span id="q-number" class="text-blue-300 text-sm font-700">Soal 1</span> <span id="q-subject" class="text-white/40 text-xs bg-white/5 rounded-full px-2.5 py-0.5"></span>
        </div>
        <div class="p-5">
         <div id="q-text" class="text-white text-sm sm:text-base leading-relaxed mb-5 math-content break-words"></div>
@@ -254,7 +282,8 @@ input[type="text"], input[type="password"] {
      </div>
     </div><!-- Bottom nav -->
     <div class="flex-shrink-0 bg-slate-900/80 border-t border-white/5 px-4 py-3">
-     <div class="max-w-3xl mx-auto flex items-center justify-between gap-3"><button id="btn-prev" onclick="navQuestion(-1)" class="flex items-center gap-1.5 bg-white/5 border border-white/10 text-white/70 px-4 py-2.5 rounded-xl text-sm font-600 hover:bg-white/10 transition-all disabled:opacity-20" disabled> <i data-lucide="chevron-left" style="width:16px;height:16px;"></i> <span class="hidden sm:inline">Sebelumnya</span> </button> <!-- Question dots (scrollable) -->
+     <div class="max-w-3xl mx-auto flex items-center justify-between gap-3">
+      <button id="btn-prev" onclick="navQuestion(-1)" class="flex items-center gap-1.5 bg-white/5 border border-white/10 text-white/70 px-4 py-2.5 rounded-xl text-sm font-600 hover:bg-white/10 transition-all disabled:opacity-20" disabled> <i data-lucide="chevron-left" style="width:16px;height:16px;"></i> <span class="hidden sm:inline">Sebelumnya</span> </button> <!-- Question dots (scrollable) -->
       <div id="q-dots" class="hidden md:flex items-center gap-1.5 overflow-x-auto px-1 scrollbar-hide justify-center flex-wrap" style="max-height:auto;"></div><button id="btn-next" onclick="navQuestion(1)" class="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-700 hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20"> <span class="hidden sm:inline" id="btn-next-text">Selanjutnya</span> <span class="sm:hidden" id="btn-next-text-mobile">Lanjut</span> <i data-lucide="chevron-right" style="width:16px;height:16px;"></i> </button>
      </div>
     </div>
@@ -265,15 +294,18 @@ input[type="text"], input[type="password"] {
     <div class="absolute inset-0 anim-warning-pulse" style="background-color: rgba(220,38,38,0.05);"></div>
     <div class="absolute inset-0 opacity-5" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,0,0,0.1) 20px, rgba(255,0,0,0.1) 22px);"></div>
     <div class="relative z-10 w-full max-w-md text-center anim-scale-in">
-     <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-red-500/20 border-2 border-red-500/50 flex items-center justify-center"><i data-lucide="shield-x" class="text-red-400" style="width:48px;height:48px;"></i>
+     <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-red-500/20 border-2 border-red-500/50 flex items-center justify-center">
+      <i data-lucide="shield-x" class="text-red-400" style="width:48px;height:48px;"></i>
      </div>
      <h2 class="text-white text-2xl font-800 mb-2">🚫 UJIAN DIKUNCI</h2>
      <p class="text-red-300/70 text-sm mb-2">Terdeteksi pelanggaran keamanan ujian</p>
      <div id="violation-reason" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-6 text-red-300 text-sm font-500 whitespace-pre-wrap break-words"></div>
      <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-left space-y-4">
       <p class="text-white/60 text-sm text-center">Hubungi pengawas untuk mendapatkan <strong class="text-white">Kode Guru</strong></p>
-      <div><label class="text-white/50 text-xs font-600 uppercase tracking-wider mb-1.5 block">Kode Guru</label>
-       <div class="relative"><i data-lucide="key-round" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:18px;height:18px;"></i> <input id="input-teacher-code" type="password" placeholder="Masukkan kode guru..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-white/30 text-sm tracking-widest font-mono focus:outline-none focus:border-red-500/50 transition-all">
+      <div>
+       <label class="text-white/50 text-xs font-600 uppercase tracking-wider mb-1.5 block">Kode Guru</label>
+       <div class="relative">
+        <i data-lucide="key-round" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:18px;height:18px;"></i> <input id="input-teacher-code" type="password" placeholder="Masukkan kode guru..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-white/30 text-sm tracking-widest font-mono focus:outline-none focus:border-red-500/50 transition-all">
        </div>
       </div>
       <div id="teacher-error" class="hidden text-red-400 text-xs text-center bg-red-500/10 border border-red-500/20 rounded-lg p-2"></div><button onclick="handleTeacherUnlock()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-700 py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"> <i data-lucide="unlock" style="width:16px;height:16px;"></i> Buka Kunci Ujian </button>
@@ -285,22 +317,28 @@ input[type="text"], input[type="password"] {
   <div id="screen-submit" class="screen h-full">
    <div class="h-full w-full bg-slate-950 flex items-center justify-center p-6">
     <div class="w-full max-w-md text-center anim-scale-in">
-     <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center"><i data-lucide="send" class="text-amber-400" style="width:40px;height:40px;"></i>
+     <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center">
+      <i data-lucide="send" class="text-amber-400" style="width:40px;height:40px;"></i>
      </div>
      <h2 class="text-white text-2xl font-800 mb-2">Kirim Jawaban?</h2>
      <p class="text-white/50 text-sm mb-6">Pastikan semua jawaban sudah terisi</p>
      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 text-left space-y-3">
-      <div class="flex justify-between text-sm"><span class="text-white/50">Total Soal</span> <span id="summary-total" class="text-white font-700">20</span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Total Soal</span> <span id="summary-total" class="text-white font-700">20</span>
       </div>
-      <div class="flex justify-between text-sm"><span class="text-white/50">Terjawab</span> <span id="summary-answered" class="text-emerald-400 font-700">0</span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Terjawab</span> <span id="summary-answered" class="text-emerald-400 font-700">0</span>
       </div>
-      <div class="flex justify-between text-sm"><span class="text-white/50">Belum Dijawab</span> <span id="summary-unanswered" class="text-red-400 font-700">0</span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Belum Dijawab</span> <span id="summary-unanswered" class="text-red-400 font-700">0</span>
       </div>
-      <div class="flex justify-between text-sm"><span class="text-white/50">Pelanggaran</span> <span id="summary-violations" class="text-amber-400 font-700">0</span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Pelanggaran</span> <span id="summary-violations" class="text-amber-400 font-700">0</span>
       </div>
       <div id="summary-detail" class="border-t border-white/10 pt-3 mt-3"></div>
      </div>
-     <div class="flex gap-3"><button onclick="goBackToExam()" class="flex-1 bg-white/5 border border-white/10 text-white/70 py-3 rounded-xl text-sm font-600 hover:bg-white/10 transition-all"> Kembali </button> <button onclick="submitExam()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3 rounded-xl text-sm font-700 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20"> Kirim Jawaban </button>
+     <div class="flex gap-3">
+      <button onclick="goBackToExam()" class="flex-1 bg-white/5 border border-white/10 text-white/70 py-3 rounded-xl text-sm font-600 hover:bg-white/10 transition-all"> Kembali </button> <button onclick="submitExam()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3 rounded-xl text-sm font-700 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20"> Kirim Jawaban </button>
      </div>
     </div>
    </div>
@@ -312,18 +350,23 @@ input[type="text"], input[type="password"] {
      <div class="text-6xl mb-4">
       🎉
      </div>
-     <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center"><i data-lucide="check-circle" class="text-emerald-400" style="width:40px;height:40px;"></i>
+     <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center">
+      <i data-lucide="check-circle" class="text-emerald-400" style="width:40px;height:40px;"></i>
      </div>
      <h2 class="text-white text-2xl sm:text-3xl font-800 mb-2">Ujian Selesai!</h2>
      <p class="text-emerald-300/60 text-sm mb-6">Jawaban Anda telah berhasil dikirim</p>
      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 space-y-3 text-left">
-      <div class="flex justify-between text-sm"><span class="text-white/50">Peserta</span> <span id="finish-name" class="text-white font-600"></span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Peserta</span> <span id="finish-name" class="text-white font-600"></span>
       </div>
-      <div class="flex justify-between text-sm"><span class="text-white/50">Dijawab</span> <span id="finish-answered" class="text-emerald-400 font-700"></span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Dijawab</span> <span id="finish-answered" class="text-emerald-400 font-700"></span>
       </div>
-      <div class="flex justify-between text-sm"><span class="text-white/50">Waktu Digunakan</span> <span id="finish-time" class="text-blue-400 font-700"></span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Waktu Digunakan</span> <span id="finish-time" class="text-blue-400 font-700"></span>
       </div>
-      <div class="flex justify-between text-sm"><span class="text-white/50">Pelanggaran</span> <span id="finish-violations" class="text-amber-400 font-700"></span>
+      <div class="flex justify-between text-sm">
+       <span class="text-white/50">Pelanggaran</span> <span id="finish-violations" class="text-amber-400 font-700"></span>
       </div>
      </div>
      <p class="text-white/30 text-xs">PKBM Ristek Nusantara Jaya • Exambro Security System</p>
@@ -331,7 +374,8 @@ input[type="text"], input[type="password"] {
    </div>
   </div><!-- OVERLAY: Anti-cheat warning toast -->
   <div id="cheat-toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden">
-   <div class="bg-red-600 text-white text-sm font-600 px-5 py-3 rounded-xl shadow-2xl shadow-red-500/50 flex items-center gap-2 anim-slide-down"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i> <span id="cheat-toast-text">Peringatan!</span>
+   <div class="bg-red-600 text-white text-sm font-600 px-5 py-3 rounded-xl shadow-2xl shadow-red-500/50 flex items-center gap-2 anim-slide-down">
+    <i data-lucide="alert-triangle" style="width:16px;height:16px;"></i> <span id="cheat-toast-text">Peringatan!</span>
    </div>
   </div>
   <script>
@@ -824,103 +868,88 @@ function finishExam() {
   showScreen('screen-finished');
 }
 
-// ========== ANTI-CHEAT MONITORING ==========
+// ========== ANTI-CHEAT MONITORING (ENHANCED) ==========
 function startMonitoring() {
   state.monitoringActive = true;
-  state.iosLastActivityTime = Date.now();
   
-  // Track any user activity (click, touch, input) untuk iOS
-  const trackActivity = () => {
-    state.iosLastActivityTime = Date.now();
-  };
-  
-  // Untuk iOS: polling setiap 1 detik untuk deteksi inaktivitas & background
-  if (deviceInfo.isIOS) {
-    startIOSMonitoring(trackActivity);
-  }
-  
-  // Untuk semua device: track activity
-  document.addEventListener('click', trackActivity, true);
-  document.addEventListener('touchstart', trackActivity, true);
-  document.addEventListener('keydown', trackActivity, true);
-  document.addEventListener('input', trackActivity, true);
-}
+  // Blokir copy-paste intentional
+  document.addEventListener('copy', e => { 
+    if (state.examActive && !state.isLocked) { 
+      e.preventDefault(); 
+      showToast('📋 Copy-paste dilarang selama ujian');
+      recordViolation('Copy-paste detected');
+    }
+  });
 
-function startIOSMonitoring(trackActivity) {
-  // Polling setiap 500ms untuk deteksi
-  state.iosPollInterval = setInterval(() => {
+  document.addEventListener('paste', e => { 
+    if (state.examActive && !state.isLocked) { 
+      e.preventDefault(); 
+      showToast('📋 Copy-paste dilarang selama ujian');
+      recordViolation('Paste detected');
+    }
+  });
+
+  document.addEventListener('cut', e => { 
+    if (state.examActive && !state.isLocked) { 
+      e.preventDefault(); 
+      showToast('📋 Copy-paste dilarang selama ujian');
+      recordViolation('Cut detected');
+    }
+  });
+
+  // Deteksi visibility change (tab switch/minimize)
+  document.addEventListener('visibilitychange', () => {
+    if (state.examActive && !state.isLocked) {
+      if (document.hidden) {
+        showToast('⚠️ Anda keluar dari tab ujian! Jangan lakukan itu lagi.');
+        recordViolation('Tab switch detected');
+      }
+    }
+  });
+
+  // Deteksi blur (window focus loss)
+  window.addEventListener('blur', () => {
+    if (state.examActive && !state.isLocked) {
+      showToast('⚠️ Window tidak aktif - fokus kembali ke ujian');
+      recordViolation('Window blur detected');
+    }
+  });
+
+  // Deteksi fullscreen exit (jika browser support)
+  document.addEventListener('fullscreenchange', () => {
+    if (state.examActive && !state.isLocked && !document.fullscreenElement) {
+      showToast('⚠️ Anda keluar dari fullscreen');
+      recordViolation('Fullscreen exit detected');
+    }
+  });
+
+  // Monitoring periodik untuk deteksi developer tools & suspicious activity
+  state.iosMonitorInterval = setInterval(() => {
     if (!state.examActive || state.isLocked) {
-      clearInterval(state.iosPollInterval);
+      clearInterval(state.iosMonitorInterval);
       return;
     }
+
+    // Deteksi screen minimal (ketika minimal/virtual keyboard aktif)
+    const screenHeight = window.innerHeight;
+    const screenWidth = window.innerWidth;
     
-    const now = Date.now();
-    const timeSinceLastActivity = now - state.iosLastActivityTime;
-    
-    // Jika tidak ada activity > 5 detik = berarti user sedang di lain aplikasi (iOS background)
-    if (timeSinceLastActivity > state.iosInactivityTimeout) {
-      if (!state.iosBackgroundViolation) {
-        state.iosBackgroundViolation = true;
-        triggerViolation('🚨 Ujian berjalan di background. Anda harus fokus pada halaman ujian dan tidak boleh berpindah aplikasi lain.');
-      }
-    } else {
-      // Reset violation flag kalau user aktif kembali
-      state.iosBackgroundViolation = false;
+    // Jika screen height berkurang drastis = minimize atau virtual keyboard
+    if (screenHeight < 300) {
+      showToast('⚠️ Aplikasi miniatur terdeteksi. Fokus pada ujian!');
+      recordViolation('Screen minimized');
     }
-  }, 500);
+  }, 2000);
 }
 
-function triggerViolation(reason) {
-  if (!state.examActive || !state.monitoringActive || state.isLocked) return;
+function recordViolation(reason) {
   state.violations++;
-  state.isLocked = true;
-
-  document.getElementById('violation-badge').classList.remove('hidden');
-  document.getElementById('violation-badge').classList.add('flex');
-  document.getElementById('violation-count').textContent = state.violations;
-
-  state.lockReason = reason;
-  lockExam(reason);
-}
-
-function lockExam(reason) {
-  state.examActive = false;
-  clearInterval(state.timerInterval);
   
-  let detailedReason = reason;
-  if (reason.includes('berpindah tab') || reason.includes('kehilangan fokus')) {
-    detailedReason = `🚨 Anda terdeteksi meninggalkan halaman ujian dan terblokir oleh sistem keamanan.\n\nTekan "Buka Kunci Ujian" untuk melanjutkan.`;
-  }
+  showToast(`⚠️ Pelanggaran ke-${state.violations}`);
   
-  document.getElementById('violation-reason').textContent = detailedReason;
-  document.getElementById('locked-violation-count').textContent = state.violations;
-  document.getElementById('input-teacher-code').value = '';
-  document.getElementById('teacher-error').classList.add('hidden');
-  showScreen('screen-locked');
-}
-
-function handleTeacherUnlock() {
-  const code = document.getElementById('input-teacher-code').value.trim().toUpperCase();
-  const errEl = document.getElementById('teacher-error');
-
-  if (!code) {
-    errEl.textContent = 'Masukkan kode guru';
-    errEl.classList.remove('hidden');
-    return;
+  if (state.violations >= MAX_VIOLATIONS) {
+    lockExam(`Pelanggaran Keamanan: ${reason}`);
   }
-  if (code !== TEACHER_CODE) {
-    errEl.textContent = 'Kode guru salah. Hubungi pengawas ujian.';
-    errEl.classList.remove('hidden');
-    return;
-  }
-
-  errEl.classList.add('hidden');
-  state.isLocked = false;
-  state.examActive = true;
-  
-  showScreen('screen-exam');
-  renderQuestion();
-  startTimer();
 }
 
 function showToast(msg) {
@@ -930,163 +959,49 @@ function showToast(msg) {
   setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// ========== EVENT LISTENERS (Anti-Cheat) ==========
-let blurCount = 0;
-let lastBlurTime = 0;
+// ========== SCREEN LOCK ==========
+function lockExam(reason) {
+  state.examActive = false;
+  state.isLocked = true;
+  state.lockReason = reason;
+  state.monitoringActive = false;
+  clearInterval(state.timerInterval);
+  clearInterval(state.iosMonitorInterval);
 
-// Deteksi ALT+TAB / Berpindah Aplikasi (REAL violation)
-const violationMessages = {
-  tabSwitch: [
-    '🚨 PERINGATAN SERIUS: Anda terdeteksi keluar dari halaman ujian. Pelanggaran ini akan dicatat dan mempengaruhi nilai akhir Anda. Kejujuran adalah kunci kesuksesan!',
-    '⛔ TIDAK DIIZINKAN: Sistem keamanan mendeteksi Anda beralih ke aplikasi lain. Setiap pelanggaran akan dilaporkan kepada pengawas.',
-    '🔒 AKSES TERBLOKIR: Anda meninggalkan halaman ujian. Ini adalah bentuk kecurangan dan akan memiliki konsekuensi akademik yang serius.',
-    '⚠️ PELANGGARAN TERDETEKSI: Berhenti beralih tab atau aplikasi lain selama ujian berlangsung. Sistem kami mencatat semua aktivitas Anda.'
-  ],
-  minimized: [
-    '🚨 PERINGATAN: Tab ujian Anda disembunyikan/diminimalkan. Ini dianggap sebagai upaya curang dan telah direkam oleh sistem.',
-    '⛔ LARANGAN DILANGGAR: Jangan sembunyikan atau minimalkan tab ujian. Fokuskan seluruh perhatian Anda pada ujian ini dengan jujur dan profesional.',
-    '🔒 AKSES TERBLOKIR: Halaman ujian harus tetap aktif dan terlihat. Penyembunyian tab dianggap sebagai indikasi kecurangan.',
-    '⚠️ SISTEM KEAMANAN AKTIF: Anda mencoba menyembunyikan tab ujian. Tindakan curang semacam ini tidak akan ditoleransi dan akan dilaporkan.'
-  ],
-  screenCapture: [
-    '🚨 SCREENSHOT DILARANG: Anda mencoba mengambil tangkapan layar. Ini adalah pelanggaran serius dan bukti kecurangan yang akan dilaporkan.',
-    '⛔ AKSES DITOLAK: Pengambilan screenshot selama ujian TIDAK DIPERBOLEHKAN. Ini melanggar peraturan keamanan ujian.',
-    '🔒 PELANGGARAN TEREKAM: Sistem mendeteksi upaya screenshot. Setiap bukti kecurangan akan disampaikan kepada pimpinan sekolah.',
-    '⚠️ JANGAN MENCOBA CURANG: Screenshot dan pencetakan layar diblokir. Ujian ini menggunakan teknologi anti-kecurangan terdepan.'
-  ],
-  devTools: [
-    '🚨 DEVELOPER TOOLS TERLARANG: Anda membuka alat pengembang. Ini adalah bukti jelas kecurangan dan akan dicatat secara permanen.',
-    '⛔ AKSES TERLARANG: Jangan coba-coba membuka Developer Tools atau Inspect Element. Ini melanggar integritas ujian.',
-    '🔒 UPAYA CURANG TERDETEKSI: Sistem keamanan mendeteksi akses ke tools teknis. Ini akan dilaporkan dan dapat berakibat sanksi akademik.',
-    '⚠️ SISTEM KEAMANAN BERLAPIS: Jangan membuka F12, Developer Tools, atau Inspect Element. Sistem kami mencatat setiap upaya ini.'
-  ]
-};
+  document.getElementById('violation-reason').textContent = `${reason}\n\nUjian Anda telah dikunci. Hubungi pengawas untuk mendapatkan Kode Guru untuk membuka kembali.`;
+  document.getElementById('locked-violation-count').textContent = state.violations;
 
-function getRandomViolationMessage(type) {
-  const messages = violationMessages[type] || violationMessages.tabSwitch;
-  return messages[Math.floor(Math.random() * messages.length)];
+  showScreen('screen-locked');
 }
 
-// Untuk iOS: Deteksi Page Hide (ketika user minimize atau berpindah app)
-document.addEventListener('pagehide', () => {
-  if (state.examActive && !state.isLocked && deviceInfo.isIOS) {
-    triggerViolation(getRandomViolationMessage('minimized'));
-  }
-});
+function handleTeacherUnlock() {
+  const code = document.getElementById('input-teacher-code').value.trim().toUpperCase();
+  const errEl = document.getElementById('teacher-error');
 
-// Untuk Desktop & Android: Deteksi blur / visibility change
-window.addEventListener('blur', () => {
-  if (!state.examActive || state.isLocked || deviceInfo.isIOS) return;
-  
-  const now = Date.now();
-  if (now - lastBlurTime > 500) {
-    blurCount++;
-    lastBlurTime = now;
-    
-    if (blurCount >= 2) {
-      triggerViolation(getRandomViolationMessage('tabSwitch'));
-      blurCount = 0;
-    }
-  }
-});
-
-window.addEventListener('focus', () => {
-  if (state.examActive && !state.isLocked && blurCount === 1 && !deviceInfo.isIOS) {
-    blurCount = 0;
-  }
-});
-
-document.addEventListener('visibilitychange', () => {
-  if (!state.examActive || state.isLocked) return;
-  
-  if (document.hidden) {
-    setTimeout(() => {
-      if (document.hidden && state.examActive) {
-        triggerViolation(getRandomViolationMessage('minimized'));
-      }
-    }, 100);
-  }
-});
-
-// Blokir copy-paste INTENTIONAL
-document.addEventListener('copy', e => { 
-  if (state.examActive && !state.isLocked) { 
-    e.preventDefault(); 
-    showToast(getRandomViolationMessage('screenCapture'));
-  }
-});
-
-document.addEventListener('paste', e => { 
-  if (state.examActive && !state.isLocked) { 
-    e.preventDefault(); 
-    showToast(getRandomViolationMessage('screenCapture'));
-  }
-});
-
-document.addEventListener('cut', e => { 
-  if (state.examActive && !state.isLocked) { 
-    e.preventDefault(); 
-    showToast(getRandomViolationMessage('screenCapture'));
-  }
-});
-
-// Blokir screenshot dan developer tools
-document.addEventListener('keydown', e => {
-  if (!state.examActive || state.isLocked) return;
-  
-  // Blokir PrintScreen (screenshot)
-  if (e.key === 'PrintScreen') {
-    e.preventDefault();
-    showToast(getRandomViolationMessage('screenCapture'));
-    triggerViolation(getRandomViolationMessage('screenCapture'));
+  if (!code) {
+    errEl.classList.remove('hidden');
+    errEl.textContent = 'Kode guru wajib diisi';
     return;
   }
-  
-  // Blokir F12 (Developer Tools)
-  if (e.key === 'F12') {
-    e.preventDefault();
-    showToast(getRandomViolationMessage('devTools'));
-    triggerViolation(getRandomViolationMessage('devTools'));
-    return;
-  }
-  
-  // Blokir Ctrl+Shift+I (Inspect)
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'i') {
-    e.preventDefault();
-    showToast(getRandomViolationMessage('devTools'));
-    triggerViolation(getRandomViolationMessage('devTools'));
-    return;
-  }
-  
-  // Blokir Ctrl+Shift+K (Console)
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'k') {
-    e.preventDefault();
-    triggerViolation(getRandomViolationMessage('devTools'));
-    return;
-  }
-  
-  // Blokir Ctrl+Shift+J (Console Firefox)
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'j') {
-    e.preventDefault();
-    triggerViolation(getRandomViolationMessage('devTools'));
-    return;
-  }
-});
 
-// Blokir print screen
-window.addEventListener('beforeprint', e => { 
-  if (state.examActive && !state.isLocked) {
-    e.preventDefault();
-    showToast(getRandomViolationMessage('screenCapture'));
+  if (code !== TEACHER_CODE) {
+    errEl.classList.remove('hidden');
+    errEl.textContent = 'Kode guru salah. Silakan coba lagi.';
+    return;
   }
-});
 
-// Blokir drag untuk copy
-document.addEventListener('dragstart', e => { 
-  if (state.examActive && !state.isLocked) {
-    e.preventDefault();
-  }
-});
+  // Berhasil unlock
+  errEl.classList.add('hidden');
+  state.isLocked = false;
+  state.examActive = true;
+  state.monitoringActive = true;
+
+  document.getElementById('input-teacher-code').value = '';
+  showScreen('screen-exam');
+  renderQuestion();
+  startTimer();
+  startMonitoring();
+}
 
 
 // ========== ELEMENT SDK ==========
@@ -1140,5 +1055,5 @@ window.elementSdk.init({
 
 lucide.createIcons();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e91b4a296354ac3',t:'MTc3NTY1NTg1NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9222ccd5db3da7',t:'MTc3NTY2MDM2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

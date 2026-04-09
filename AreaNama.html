@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Header - Nama &amp; Token</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .grain { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); }
+    .token-input:focus { box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .anim-up { animation: slideUp 0.5s ease-out both; }
+    .anim-up-2 { animation: slideUp 0.5s ease-out 0.1s both; }
+    .anim-up-3 { animation: slideUp 0.5s ease-out 0.2s both; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-slate-50 grain">
+  <div id="app" class="h-full w-full flex items-center justify-center p-4">
+   <div class="w-full max-w-md"><!-- Logo/Brand -->
+    <div class="text-center mb-8 anim-up">
+     <img id="logo-img" src="https://i.imgur.com/J1mKppg.png" alt="Logo" class="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-lg shadow-indigo-200 object-cover" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.background='#e5e7eb'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center';">
+     <h1 id="page-title" class="text-2xl font-800 text-slate-900 tracking-tight">Ujian Pendidikan Kesetaraan</h1>
+     <p id="institution-name" class="text-sm text-slate-500 mt-1 font-medium">PKBM Ristek Nusantara Jaya</p>
+    </div><!-- Form Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5 anim-up-2">
+     <div><label for="nama" class="block text-xs font-700 text-slate-700 uppercase tracking-wider mb-2">Nama Lengkap</label>
+      <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="user" style="width:18px;height:18px"></i></span> <input id="nama" type="text" placeholder="Masukkan nama lengkap" class="token-input w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 transition">
+      </div>
+     </div>
+     <div><label for="token" class="block text-xs font-700 text-slate-700 uppercase tracking-wider mb-2">Token Ujian</label>
+      <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="key-round" style="width:18px;height:18px"></i></span> <input id="token" type="text" placeholder="Masukkan token" maxlength="20" class="token-input w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 transition tracking-widest uppercase">
+      </div>
+     </div><button id="btn-masuk" class="w-full py-3 rounded-xl font-700 text-sm text-white bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-md shadow-indigo-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled> <i data-lucide="log-in" style="width:18px;height:18px"></i> <span>Masuk Ujian</span> </button>
+     <p id="error-msg" class="text-xs text-red-500 font-medium text-center hidden"></p>
+    </div><!-- Info -->
+    <p class="text-center text-xs text-slate-400 mt-5 anim-up-3">Pastikan nama dan token sesuai yang diberikan pengawas</p>
+    <p class="text-center text-xs text-slate-300 mt-6 font-mono tracking-wide">Exam-RNJ v02.1.4</p>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      page_title: 'Ujian Pendidikan Kesetaraan',
+      institution_name: 'PKBM Ristek Nusantara Jaya',
+      primary_color: '#4f46e5',
+      surface_color: '#ffffff',
+      text_color: '#0f172a',
+      accent_color: '#6366f1',
+      muted_color: '#64748b',
+      font_family: 'Plus Jakarta Sans',
+      font_size: 14
+    };
+
+    function applyConfig(c) {
+      document.getElementById('page-title').textContent = c.page_title || defaultConfig.page_title;
+      document.getElementById('institution-name').textContent = c.institution_name || defaultConfig.institution_name;
+      const btn = document.getElementById('btn-masuk');
+      btn.style.backgroundColor = c.primary_color || defaultConfig.primary_color;
+      document.getElementById('page-title').style.color = c.text_color || defaultConfig.text_color;
+      document.getElementById('institution-name').style.color = c.muted_color || defaultConfig.muted_color;
+      const font = c.font_family || defaultConfig.font_family;
+      document.body.style.fontFamily = `${font}, sans-serif`;
+      const sz = c.font_size || defaultConfig.font_size;
+      document.getElementById('page-title').style.fontSize = `${sz * 1.7}px`;
+      document.getElementById('institution-name').style.fontSize = `${sz * 0.9}px`;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => applyConfig(config),
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            { get: () => config.primary_color || defaultConfig.primary_color, set: v => { config.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); } },
+            { get: () => config.surface_color || defaultConfig.surface_color, set: v => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+            { get: () => config.text_color || defaultConfig.text_color, set: v => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+            { get: () => config.accent_color || defaultConfig.accent_color, set: v => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } },
+            { get: () => config.muted_color || defaultConfig.muted_color, set: v => { config.muted_color = v; window.elementSdk.setConfig({ muted_color: v }); } }
+          ],
+          borderables: [],
+          fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: v => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+          fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: v => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['page_title', config.page_title || defaultConfig.page_title],
+          ['institution_name', config.institution_name || defaultConfig.institution_name]
+        ])
+      });
+    }
+
+    // Form logic
+    const namaInput = document.getElementById('nama');
+    const tokenInput = document.getElementById('token');
+    const btnMasuk = document.getElementById('btn-masuk');
+    const errorMsg = document.getElementById('error-msg');
+
+    function validateForm() {
+      btnMasuk.disabled = !(namaInput.value.trim().length >= 2 && tokenInput.value.trim().length >= 3);
+    }
+    namaInput.addEventListener('input', validateForm);
+    tokenInput.addEventListener('input', validateForm);
+
+    btnMasuk.addEventListener('click', (e) => {
+      e.preventDefault();
+      const nama = namaInput.value.trim();
+      const token = tokenInput.value.trim().toUpperCase();
+      // Store to sessionStorage for other pages to read
+      sessionStorage.setItem('exam_nama', nama);
+      sessionStorage.setItem('exam_token', token);
+      sessionStorage.setItem('exam_authenticated', 'true');
+      errorMsg.classList.add('hidden');
+      // Navigate to warning page — replace URL below with your GitHub Pages link
+      // window.open('warning.html', '_self'); // uncomment & adjust when deploying
+      errorMsg.textContent = '✅ Data tersimpan! Arahkan ke halaman warning.html';
+      errorMsg.classList.remove('hidden');
+      errorMsg.classList.remove('text-red-500');
+      errorMsg.classList.add('text-green-600');
+    });
+
+    lucide.createIcons();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9607c5144ffde3',t:'MTc3NTcwMTIwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

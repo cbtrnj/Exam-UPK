@@ -9,9 +9,17 @@
         body { 
             margin: 0; 
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #0f2818 100%);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(-45deg, #ff6b6b, #ffa94d, #4ecdc4, #45b7d1);
+            background-size: 400% 400%;
+            animation: gradientBg 15s ease infinite;
             min-height: 100vh;
+        }
+        
+        @keyframes gradientBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
@@ -22,29 +30,112 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f5132 0%, #1a7a4f 50%, #0d3d23 100%);
+            background: linear-gradient(-45deg, #ff6b6b, #ffa94d, #4ecdc4, #45b7d1);
+            background-size: 400% 400%;
+            animation: gradientBg 15s ease infinite;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-screen::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .login-screen::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            bottom: -50px;
+            left: -50px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(30px); }
         }
         
         .login-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 60px 45px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.25);
             width: 100%;
-            max-width: 400px;
+            max-width: 480px;
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 10;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: block;
+            filter: drop-shadow(0 6px 15px rgba(0,0,0,0.15));
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .login-card h1 {
             text-align: center;
-            color: #0f5132;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa94d 50%, #4ecdc4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 15px 0 10px 0;
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+        
+        .login-card .subtitle {
+            text-align: center;
+            color: #555;
             margin-bottom: 10px;
-            font-size: 28px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
         
         .login-card p {
             text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+            color: #888;
+            margin-bottom: 35px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
         }
         
         .form-group {
@@ -87,26 +178,35 @@
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #2d7a4a;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .btn-login {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #2d7a4a 0%, #1f5a36 100%);
+            padding: 16px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa94d 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(45, 122, 74, 0.3);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            font-weight: 800;
         }
         
         .btn-login:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 45px rgba(255, 107, 107, 0.6);
+            letter-spacing: 1px;
+        }
+        
+        .btn-login:active {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(45, 122, 74, 0.5);
         }
         
         /* Exam Screen */
@@ -115,15 +215,17 @@
         
         .exam-header {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
             text-align: center;
-            border: 2px solid #e8ecf1;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
         }
 
         .exam-header-top {
@@ -131,17 +233,17 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            gap: 15px;
+            gap: 20px;
             position: relative;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
         .exam-logo {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
         }
 
         .exam-center {
@@ -149,62 +251,71 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            min-width: 200px;
+            gap: 10px;
+            min-width: 250px;
         }
 
         .exam-school-name {
-            font-size: 20px;
-            font-weight: 800;
-            color: #1a3a52;
-            letter-spacing: 1px;
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             line-height: 1.2;
         }
 
         .exam-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
-            padding: 6px 12px;
-            border-radius: 25px;
-            font-size: 11px;
-            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.35);
+            letter-spacing: 0.8px;
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
         }
 
         .exam-timer {
             position: relative;
-            font-size: 20px;
-            font-weight: bold;
-            color: #e74c3c;
-            background: #fff3f3;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 2px solid #e74c3c;
-            min-width: 90px;
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 2px solid #f5576c;
+            min-width: 120px;
             text-align: center;
             margin-top: 10px;
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.2);
         }
 
         .exam-title {
             width: 100%;
-            padding-top: 15px;
-            border-top: 2px solid #e0e0e0;
+            padding-top: 20px;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
         }
 
         .exam-title h2 {
-            margin: 8px 0;
-            color: #2d7a4a;
-            font-size: 18px;
-            font-weight: 700;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 22px;
+            font-weight: 800;
         }
 
         .exam-title p {
-            margin: 5px 0;
-            font-size: 13px;
+            margin: 8px 0;
+            font-size: 14px;
             color: #555;
         }
 
@@ -283,16 +394,17 @@
         
         .exam-content {
             background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            margin-bottom: 25px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
         }
         
         .question-block {
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 35px;
+            padding-bottom: 35px;
+            border-bottom: 2px solid #f0f0f0;
         }
         
         .question-block:last-child {
@@ -300,84 +412,87 @@
         }
         
         .question-number {
-            color: #2d7a4a;
-            font-weight: bold;
-            margin-bottom: 10px;
+            color: #667eea;
+            font-weight: 800;
+            margin-bottom: 12px;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .question-text {
-            margin-bottom: 15px;
-            line-height: 1.6;
+            margin-bottom: 18px;
+            line-height: 1.8;
             color: #333;
+            font-size: 15px;
         }
         
         .option {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .option label {
             display: flex;
             align-items: center;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 14px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            background: #f8f9fa;
         }
         
         .option label:hover {
-            background-color: #f5f5f5;
+            background: #f0f4ff;
+            border-color: #667eea;
+            transform: translateX(4px);
         }
         
         .option input[type="radio"] {
-            margin-right: 10px;
+            margin-right: 12px;
             cursor: pointer;
+            accent-color: #667eea;
+            width: 18px;
+            height: 18px;
         }
         
         textarea {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .file-upload {
-            margin-top: 10px;
             padding: 15px;
-            border: 2px dashed #2d7a4a;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+            min-height: 120px;
+            font-size: 14px;
+            transition: border-color 0.3s;
         }
         
-        .file-upload:hover {
-            background-color: #f9f9f9;
-        }
-        
-        .file-upload input {
-            display: none;
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .btn-submit {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #2d7a4a 0%, #1f5a36 100%);
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(45, 122, 74, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            letter-spacing: 0.5px;
+            margin-top: 20px;
         }
         
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(45, 122, 74, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
         }
         
         /* Lock Screen */
@@ -683,16 +798,20 @@
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
- <body><!-- Login Screen -->
+ <body>
+  <!-- Login Screen -->
   <div id="loginScreen" class="login-screen">
-   <div class="login-card">
-    <h1>🎓 Ujian Online</h1>
-    <p>MTK Peminatan &amp; Umum</p>
+   <div class="login-card"><img src="https://i.imgur.com/J1mKppg.png" alt="Logo PKBM" class="login-logo">
+    <h1>Ujian Online</h1>
+    <p class="subtitle">📚 Ujian Pendidikan Kesetaraan</p>
+    <p style="color: #999; font-size: 13px; margin-bottom: 25px;">PKBM Ristek Nusantara Jaya</p>
     <form id="loginForm">
-     <div class="form-group"><label for="namaInput">Nama Lengkap</label> <input type="text" id="namaInput" placeholder="Masukkan nama Anda" required>
+     <div class="form-group">
+      <label for="namaInput">Nama Lengkap</label> <input type="text" id="namaInput" placeholder="Masukkan nama Anda" required>
      </div>
-     <div class="form-group"><label for="mapelSelect">Pilih Mapel</label> <select id="mapelSelect" required> <option value="">-- Pilih Mata Pelajaran --</option> <!-- HARI 1: Senin --> <optgroup label="📅 Senin, 20 April 2026"> <option value="BAHASA INDONESIA">09:00–10:30 | Bahasa Indonesia</option> <option value="SENI BUDAYA">10:30–12:00 | Seni Budaya</option> <option value="SEJARAH INDONESIA">12:30–14:00 | Sejarah Indonesia</option> </optgroup> <!-- HARI 2: Selasa --> <optgroup label="📅 Selasa, 21 April 2026"> <option value="MATEMATIKA UMUM">09:00–10:30 | Matematika Umum</option> <option value="FISIKA">10:30–12:00 | Fisika (IPA) / Geografi (IPS)</option> <option value="MATEMATIKA PEMINATAN">12:30–14:00 | Matematika Peminatan (IPA)</option> <option value="SEJARAH PEMINATAN">12:30–14:00 | Sejarah Peminatan (IPS)</option> </optgroup> <!-- HARI 3: Rabu --> <optgroup label="📅 Rabu, 22 April 2026"> <option value="BAHASA INGGRIS">09:00–10:30 | Bahasa Inggris</option> <option value="BIOLOGI">10:30–12:00 | Biologi (IPA) / Ekonomi (IPS)</option> <option value="PRAKARYA">12:30–14:00 | Prakarya</option> </optgroup> <!-- HARI 4: Kamis --> <optgroup label="📅 Kamis, 23 April 2026"> <option value="PKN">09:00–10:30 | PKN</option> <option value="KIMIA">10:30–12:00 | Kimia (IPA) / Sosiologi (IPS)</option> <option value="PJOK">12:30–14:00 | PJOK</option> </optgroup> </select>
-     </div><button type="submit" class="btn-login">Mulai Ujian</button>
+     <div class="form-group">
+      <label for="mapelSelect">Pilih Mapel</label> <select id="mapelSelect" required> <option value="">-- Pilih Mata Pelajaran --</option> <!-- HARI 1: Senin --> <optgroup label="📅 Senin, 20 April 2026"> <option value="BAHASA INDONESIA">09:00–10:30 | Bahasa Indonesia</option> <option value="SENI BUDAYA">10:30–12:00 | Seni Budaya</option> <option value="SEJARAH INDONESIA">12:30–14:00 | Sejarah Indonesia</option> </optgroup> <!-- HARI 2: Selasa --> <optgroup label="📅 Selasa, 21 April 2026"> <option value="MATEMATIKA UMUM">09:00–10:30 | Matematika Umum</option> <option value="FISIKA">10:30–12:00 | Fisika (IPA) / Geografi (IPS)</option> <option value="MATEMATIKA PEMINATAN">12:30–14:00 | Matematika Peminatan (IPA)</option> <option value="SEJARAH PEMINATAN">12:30–14:00 | Sejarah Peminatan (IPS)</option> </optgroup> <!-- HARI 3: Rabu --> <optgroup label="📅 Rabu, 22 April 2026"> <option value="BAHASA INGGRIS">09:00–10:30 | Bahasa Inggris</option> <option value="BIOLOGI">10:30–12:00 | Biologi (IPA) / Ekonomi (IPS)</option> <option value="PRAKARYA">12:30–14:00 | Prakarya</option> </optgroup> <!-- HARI 4: Kamis --> <optgroup label="📅 Kamis, 23 April 2026"> <option value="PKN">09:00–10:30 | PKN</option> <option value="KIMIA">10:30–12:00 | Kimia (IPA) / Sosiologi (IPS)</option> <option value="PJOK">12:30–14:00 | PJOK</option> </optgroup> </select>
+     </div><button type="submit" class="btn-login">Mulai Ujian ▶️</button>
     </form>
    </div>
   </div><!-- Exam Screen -->
@@ -701,7 +820,8 @@
     <div class="exam-header">
      <div class="exam-header-top">
       <div></div>
-      <div class="exam-center"><img src="https://i.imgur.com/J1mKppg.png" alt="Logo PKBM" class="exam-logo">
+      <div class="exam-center">
+       <img src="https://i.imgur.com/J1mKppg.png" alt="Logo PKBM" class="exam-logo">
        <div class="exam-school-name">
         PKBM RISTEK NUSANTARA JAYA
        </div>
@@ -719,16 +839,15 @@
      </div>
     </div>
     <div class="exam-content">
-     <form id="examForm"><!-- PG Questions Container -->
+     <form id="examForm">
+      <!-- PG Questions Container -->
       <div id="pgContainer"></div><!-- Uraian Questions Container -->
       <div id="uraianContainer"></div><!-- File Upload Section - Centralized -->
       <div id="fileUploadSection" style="display:none; background:#f0f9f6; padding:20px; border-radius:10px; margin:20px 0; border:2px dashed #2d7a4a;">
-       <div style="margin-bottom:15px;">
-        <strong style="color:#0f5132; font-size:16px;">📎 Upload Jawaban Uraian</strong>
+       <div style="margin-bottom:15px;"><strong style="color:#0f5132; font-size:16px;">📎 Upload Jawaban Uraian</strong>
         <p style="color:#666; margin:8px 0 0 0; font-size:14px;">Upload file jawaban uraian Anda dalam satu dokumen (PDF, DOC, JPG, PNG)</p>
        </div>
-       <div class="file-upload" style="border:2px dashed #2d7a4a; background:white;">
-        <label for="uploadFile" style="cursor:pointer; display:block;">
+       <div class="file-upload" style="border:2px dashed #2d7a4a; background:white;"><label for="uploadFile" style="cursor:pointer; display:block;">
          <div style="padding:20px;">
           <div style="font-size:24px; margin-bottom:8px;">
            📤
@@ -766,8 +885,8 @@
     </div>
    </div>
   </div><!-- Footer -->
-  <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #e0e0e0;">
-   <p style="margin: 0;">Exambro V.02.03.13 • RNJ IT TEAM</p>
+  <footer style="background: rgba(255, 255, 255, 0.95); padding: 25px; text-align: center; color: #666; font-size: 13px; border-top: 2px solid rgba(102, 126, 234, 0.15); margin-top: 40px; backdrop-filter: blur(10px);">
+   <p style="margin: 0; font-weight: 700; letter-spacing: 0.5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Exambro V.02.03.13 • RNJ IT Team Powered 🚀</p>
   </footer>
   <script>
         // Configuration - Multi Mapel (Sesuai Jadwal Ujian)
@@ -975,24 +1094,346 @@
             });
         }
 
-        // Trigger Lock
+        // ============================================
+        // 🚨 CHEATING DETECTION & PERMANENT LOCK SYSTEM
+        // ============================================
+        
+        // Trigger Lock - Sistem 2 Warning + Blokir Permanen
         function triggerLock() {
             if (cheatingDetected) return;
             
             cheatingDetected = true;
-            const unlockCode = generateUnlockCode();
             
-            lockedStudents[studentName] = {
-                mapel: selectedMapel,
-                timestamp: new Date().toISOString(),
-                unlockCode: unlockCode
-            };
+            // CEK APAKAH SUDAH PERNAH TERTANGKAP CHEATING
+            const studentKey = `cheating_${studentName}_${selectedMapel}`;
+            const cheatingCount = parseInt(localStorage.getItem(studentKey) || '0');
             
-            localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+            if (cheatingCount >= 1) {
+                // ❌ KEDUA KALI = BLOKIR PERMANEN
+                const unlockCode = generateUnlockCode();
+                
+                lockedStudents[studentName] = {
+                    mapel: selectedMapel,
+                    timestamp: new Date().toISOString(),
+                    unlockCode: unlockCode,
+                    status: 'PERMANEN', // 🔴 BLOKIR PERMANEN
+                    reason: 'Pelanggaran kedua kali (Cheating terdeteksi 2x)',
+                    cheatingCount: cheatingCount + 1
+                };
+                
+                localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+                
+                // Tampilkan PERMANENT LOCK MODAL
+                showPermanentLockModal(unlockCode, studentName, selectedMapel);
+            } else {
+                // ⚠️ PERTAMA KALI = WARNING + CONTINUE EXAM
+                localStorage.setItem(studentKey, '1');
+                
+                // Increment cheating count untuk next time
+                lockedStudents[studentName] = {
+                    mapel: selectedMapel,
+                    timestamp: new Date().toISOString(),
+                    status: 'WARNING', // 🟡 WARNING
+                    cheatingCount: 1,
+                    reason: 'Peringatan pertama - Jangan ulangi!'
+                };
+                
+                localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+                
+                // Tampilkan WARNING MODAL dengan opsi CONTINUE
+                showWarningModal();
+            }
+        }
+        
+        // 🟡 Show Warning Modal - Peringatan Pertama Kali (COMPACT)
+        function showWarningModal() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9998;
+                padding: 10px;
+                overflow-y: auto;
+            `;
             
-            document.getElementById('unlockCodeText').textContent = unlockCode;
-            document.getElementById('unlockCodeDisplay').textContent = unlockCode;
-            document.getElementById('lockScreen').classList.add('active');
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 16px;
+                padding: 25px 20px;
+                max-width: 420px;
+                width: 100%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+                text-align: center;
+                border: 3px solid #f39c12;
+                animation: slideUp 0.4s ease-out;
+                margin: auto;
+            `;
+            
+            const icon = document.createElement('div');
+            icon.textContent = '⚠️';
+            icon.style.cssText = `
+                font-size: 60px;
+                margin-bottom: 12px;
+            `;
+            
+            const title = document.createElement('h2');
+            title.textContent = 'PERINGATAN!';
+            title.style.cssText = `
+                color: #e74c3c;
+                margin: 0 0 10px 0;
+                font-size: 24px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            `;
+            
+            const message = document.createElement('p');
+            message.innerHTML = `
+                <strong style="font-size: 15px; color: #333;">Aktivitas mencurigakan terdeteksi!</strong>
+                <br>
+                <span style="font-size: 13px; color: #666; line-height: 1.6;">
+                    Pelanggaran pertama kali.<br>
+                    <strong style="color: #e74c3c;">JANGAN ULANGI!</strong><br>
+                    Ulangi lagi = 
+                    <strong style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">BLOKIR</strong>
+                </span>
+            `;
+            message.style.cssText = `
+                margin: 12px 0;
+                color: #666;
+            `;
+            
+            const warning = document.createElement('div');
+            warning.innerHTML = `
+                <div style="background: #fff3cd; border-left: 3px solid #f39c12; padding: 10px; margin: 12px 0; border-radius: 4px; text-align: left; font-size: 12px;">
+                    <strong style="color: #d68910;">Terlarang:</strong>
+                    <ul style="margin: 6px 0 0 0; color: #555; padding-left: 18px;">
+                        <li>DevTools (F12)</li>
+                        <li>Copy-Paste</li>
+                        <li>Tab Switching</li>
+                        <li>Keluar Fullscreen</li>
+                    </ul>
+                </div>
+            `;
+            
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                gap: 10px;
+                margin-top: 16px;
+                justify-content: center;
+            `;
+            
+            const continueBtn = document.createElement('button');
+            continueBtn.textContent = '✅ Lanjut Ujian';
+            continueBtn.style.cssText = `
+                background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+                color: white;
+                border: none;
+                padding: 10px 24px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s;
+                flex: 1;
+                min-width: 140px;
+            `;
+            
+            continueBtn.addEventListener('mouseover', () => {
+                continueBtn.style.transform = 'translateY(-2px)';
+                continueBtn.style.boxShadow = '0 6px 15px rgba(39, 174, 96, 0.4)';
+            });
+            
+            continueBtn.addEventListener('mouseout', () => {
+                continueBtn.style.transform = 'translateY(0)';
+                continueBtn.style.boxShadow = 'none';
+            });
+            
+            continueBtn.addEventListener('click', () => {
+                modal.remove();
+            });
+            
+            buttonContainer.appendChild(continueBtn);
+            
+            modalContent.appendChild(icon);
+            modalContent.appendChild(title);
+            modalContent.appendChild(message);
+            modalContent.appendChild(warning);
+            modalContent.appendChild(buttonContainer);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+        
+        // 🔴 Show Permanent Lock Modal - Blokir Permanen (COMPACT)
+        function showPermanentLockModal(unlockCode, name, mapel) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                padding: 10px;
+                overflow-y: auto;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+                border-radius: 16px;
+                padding: 30px 20px;
+                max-width: 420px;
+                width: 100%;
+                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+                text-align: center;
+                border: 3px solid #922b21;
+                animation: slideUp 0.4s ease-out;
+                margin: auto;
+            `;
+            
+            const icon = document.createElement('div');
+            icon.textContent = '🚫';
+            icon.style.cssText = `
+                font-size: 70px;
+                margin-bottom: 12px;
+                animation: pulse 1s infinite;
+            `;
+            
+            const title = document.createElement('h2');
+            title.textContent = 'AKSES DITOLAK';
+            title.style.cssText = `
+                color: white;
+                margin: 0 0 10px 0;
+                font-size: 22px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            `;
+            
+            const message = document.createElement('p');
+            message.innerHTML = `
+                <span style="font-size: 13px; color: #fff; line-height: 1.6;">
+                    <strong>Pelanggaran kedua kali!</strong>
+                    <br><br>
+                    Ujian <strong>${mapel}</strong><br>
+                    <strong style="background: rgba(0, 0, 0, 0.3); padding: 3px 6px; border-radius: 3px; font-size: 11px;">BLOKIR PERMANEN</strong>
+                    <br><br>
+                    Hubungi <strong>PENGAWAS</strong> untuk unlock.
+                </span>
+            `;
+            message.style.cssText = `
+                margin: 12px 0;
+                color: #ecf0f1;
+            `;
+            
+            const codeBox = document.createElement('div');
+            codeBox.style.cssText = `
+                background: white;
+                color: #c0392b;
+                padding: 14px;
+                border-radius: 10px;
+                margin: 14px 0;
+                border: 2px dashed #c0392b;
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+                font-weight: 700;
+                word-break: break-all;
+                letter-spacing: 0.5px;
+            `;
+            codeBox.textContent = unlockCode;
+            
+            const codeLabel = document.createElement('p');
+            codeLabel.textContent = 'Kode Unlock (Berikan ke Pengawas):';
+            codeLabel.style.cssText = `
+                color: #ecf0f1;
+                margin: 10px 0 0 0;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            `;
+            
+            const info = document.createElement('div');
+            info.innerHTML = `
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 6px; margin-top: 12px; color: #ecf0f1; font-size: 12px; line-height: 1.5;">
+                    <strong>📋 Info:</strong>
+                    <br>👤 ${name}
+                    <br>📚 ${mapel}
+                    <br>🔴 PERMANEN
+                </div>
+            `;
+            
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                gap: 8px;
+                margin-top: 16px;
+                justify-content: center;
+            `;
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.textContent = '📋 Copy';
+            copyBtn.style.cssText = `
+                background: white;
+                color: #c0392b;
+                border: none;
+                padding: 9px 18px;
+                border-radius: 7px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s;
+                flex: 1;
+                min-width: 100px;
+            `;
+            
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(unlockCode);
+                copyBtn.textContent = '✅ Tersalin!';
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Copy';
+                }, 2000);
+            });
+            
+            buttonContainer.appendChild(copyBtn);
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.08); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            modalContent.appendChild(icon);
+            modalContent.appendChild(title);
+            modalContent.appendChild(message);
+            modalContent.appendChild(codeLabel);
+            modalContent.appendChild(codeBox);
+            modalContent.appendChild(info);
+            modalContent.appendChild(buttonContainer);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Prevent closing modal
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    e.preventDefault();
+                }
+            });
         }
 
         // Generate Unlock Code
@@ -1024,22 +1465,31 @@
                     return;
                 }
                 
-                // Check if already locked for a different mapel
+                // 🔴 CEK STATUS BLOKIR - APAKAH SUDAH PERMANEN?
                 if (lockedStudents[studentName]) {
-                    const lockedMapel = lockedStudents[studentName].mapel;
-                    const unlockCode = lockedStudents[studentName].unlockCode;
+                    const lockedData = lockedStudents[studentName];
+                    const lockedMapel = lockedData.mapel;
+                    const unlockCode = lockedData.unlockCode;
+                    const status = lockedData.status;
                     
-                    // If trying to access different mapel, show lock
-                    if (lockedMapel !== selectedMapel) {
-                        document.getElementById('unlockCodeText').textContent = unlockCode;
-                        document.getElementById('unlockCodeDisplay').textContent = unlockCode;
-                        document.getElementById('lockScreen').classList.add('active');
+                    // ✅ JIKA STATUS PERMANEN = TOLAK AKSES
+                    if (status === 'PERMANEN') {
+                        showPermanentLockModal(unlockCode, studentName, lockedMapel);
                         return;
                     }
                     
-                    // If same mapel, allow retry
-                    startExam();
-                    return;
+                    // ⚠️ JIKA STATUS WARNING = BOLEH LANJUT (tapi dengan catatan)
+                    if (status === 'WARNING' && lockedMapel === selectedMapel) {
+                        // Boleh lanjut ujian (sudah di-warning sebelumnya)
+                        startExam();
+                        return;
+                    }
+                    
+                    // Jika berbeda mapel dan masih warning, boleh juga
+                    if (status === 'WARNING' && lockedMapel !== selectedMapel) {
+                        startExam();
+                        return;
+                    }
                 }
                 
                 // Lock other mapel by creating lock entry
@@ -1070,6 +1520,16 @@
 
         // Cek Waktu Ujian - 🔒 VALIDASI JAM UJIAN
         function checkWaktuUjian(mapelConfig) {
+            // 🔴 MODE TESTING - SELALU ALLOW TANPA CEK JAM
+            // Ganti jadi true/false untuk enable/disable jam validation
+            const TESTING_MODE = true;
+            
+            if (TESTING_MODE) {
+                // Dalam mode testing, semua ujian bisa diakses kapan saja
+                return { allowed: true };
+            }
+            
+            // Kode di bawah hanya berjalan kalau TESTING_MODE = false
             const now = new Date();
             const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
                                now.getMinutes().toString().padStart(2, '0');
@@ -1079,7 +1539,6 @@
             
             // Compare time strings
             if (currentTime < jamMulai) {
-                // ❌ BELUM WAKTUNYA
                 const [hMulai, mMulai] = jamMulai.split(':');
                 const [hSekarang, mSekarang] = currentTime.split(':');
                 
@@ -1107,14 +1566,12 @@
             }
             
             if (currentTime > jamAkhir) {
-                // ❌ SUDAH LEWAT
                 return {
                     allowed: false,
                     message: `❌ Ujian ${mapelConfig.jam_akhir} sudah ditutup.\n\nWaktu ujian telah berakhir.`
                 };
             }
             
-            // ✅ BISA UJIAN
             return { allowed: true };
         }
 
@@ -1618,6 +2075,18 @@
         async function submitExam() {
             clearInterval(examTimer);
             
+            // Validate semua jawaban wajib diisi
+            const validationResult = validateAllAnswers();
+            
+            if (!validationResult.isValid) {
+                showErrorModal(validationResult.message);
+                // Restart timer kalau masih ada waktu
+                if (timeRemaining > 0) {
+                    startTimer();
+                }
+                return;
+            }
+            
             // Collect answers
             const answers = collectAnswers();
             
@@ -1656,6 +2125,142 @@
             } finally {
                 uploadInProgress = false;
             }
+        }
+
+        // Validate All Answers - Pastikan semua soal terjawab
+        function validateAllAnswers() {
+            const form = document.getElementById('examForm');
+            const currentQuiz = window.quizData[selectedMapel];
+            const missingAnswers = [];
+            
+            // Check PG answers
+            currentQuiz.pg.forEach((q, index) => {
+                const selected = form.querySelector(`input[name="pg_${q.id}"]:checked`);
+                if (!selected) {
+                    missingAnswers.push(`Soal ${q.id} (Pilihan Ganda)`);
+                }
+            });
+            
+            // Check Uraian answers
+            currentQuiz.uraian.forEach((q, index) => {
+                const text = document.getElementById(`uraian_${q.id}`).value.trim();
+                if (!text) {
+                    missingAnswers.push(`Soal ${q.id} (Uraian)`);
+                }
+            });
+            
+            if (missingAnswers.length > 0) {
+                let message = `❌ ${missingAnswers.length} soal belum dijawab:\n\n`;
+                missingAnswers.slice(0, 5).forEach(ans => {
+                    message += `• ${ans}\n`;
+                });
+                if (missingAnswers.length > 5) {
+                    message += `\n... dan ${missingAnswers.length - 5} soal lainnya`;
+                }
+                message += `\n\nSilakan jawab semua soal sebelum mengirim!`;
+                
+                return { isValid: false, message: message };
+            }
+            
+            return { isValid: true };
+        }
+
+        // Show Error Modal - Tampilkan pesan error yang user-friendly
+        function showErrorModal(message) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                text-align: center;
+                animation: slideUp 0.3s ease-out;
+            `;
+            
+            const title = document.createElement('h2');
+            title.textContent = '⚠️ Peringatan';
+            title.style.cssText = `
+                color: #e74c3c;
+                margin-top: 0;
+                margin-bottom: 15px;
+                font-size: 22px;
+            `;
+            
+            const messageEl = document.createElement('p');
+            messageEl.textContent = message;
+            messageEl.style.cssText = `
+                color: #333;
+                line-height: 1.6;
+                margin-bottom: 20px;
+                white-space: pre-wrap;
+                text-align: left;
+                font-size: 14px;
+            `;
+            
+            const button = document.createElement('button');
+            button.textContent = '👍 Saya Mengerti';
+            button.style.cssText = `
+                background: linear-gradient(135deg, #2d7a4a 0%, #1f5a36 100%);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s;
+            `;
+            
+            button.addEventListener('mouseover', () => {
+                button.style.transform = 'translateY(-2px)';
+            });
+            
+            button.addEventListener('mouseout', () => {
+                button.style.transform = 'translateY(0)';
+            });
+            
+            button.addEventListener('click', () => {
+                modal.remove();
+            });
+            
+            modalContent.appendChild(title);
+            modalContent.appendChild(messageEl);
+            modalContent.appendChild(button);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideUp {
+                    from {
+                        transform: translateY(20px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         }
 
         // Collect Answers - Sesuai dengan mapel yang dipilih
@@ -1771,18 +2376,26 @@
             
             filteredEntries.forEach(([name, data]) => {
                 const li = document.createElement('li');
+                const statusColor = data.status === 'PERMANEN' ? '#c0392b' : '#f39c12';
+                const statusIcon = data.status === 'PERMANEN' ? '🔴' : '🟡';
+                const statusText = data.status === 'PERMANEN' ? 'BLOKIR PERMANEN' : 'WARNING';
+                
                 li.innerHTML = `
                     <div class="admin-student-info">
                         <strong>${name}</strong>
                         <small>Mapel: ${data.mapel}</small>
                         <br>
                         <small style="color: #999;">Waktu: ${new Date(data.timestamp).toLocaleString('id-ID')}</small>
-                        <div class="admin-status locked">🔒 TERKUNCI</div>
+                        <br>
+                        <small style="color: #555; font-size: 12px;">Alasan: ${data.reason}</small>
+                        <div class="admin-status" style="background: ${statusColor}20; color: ${statusColor}; border-left: 3px solid ${statusColor};">
+                            ${statusIcon} ${statusText}
+                        </div>
                     </div>
                     <div class="admin-actions">
+                        ${data.status === 'PERMANEN' ? `<button class="btn-lock" style="cursor: pointer;" onclick="copyUnlockCode('${data.unlockCode}')">📋 Kode Unlock</button>` : ''}
                         <button class="btn-unlock" onclick="unlockStudent('${name}')">🔓 Buka Kunci</button>
                         <button class="btn-delete" onclick="deleteStudent('${name}')">🗑️ Hapus</button>
-                        <button class="btn-lock" style="cursor: pointer;" onclick="copyUnlockCode('${data.unlockCode}')">📋 Copy Kode</button>
                     </div>
                 `;
                 listEl.appendChild(li);
@@ -1830,5 +2443,5 @@
             }
         });
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ea221509474e787',t:'MTc3NTgyODA3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ea2560434746cfe',t:'MTc3NTgzMDIzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

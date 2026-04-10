@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK - PKBM Ristek Nusantara Jaya</title>
+    
+    <!-- Fonts & MathJax -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-overall: #F1F4F9;
+            --bg-card: #FFFFFF;
+            --primary: #0A66C2;
+            --danger: #ef4444;
+            --text-dark: #1F2937;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark);
+            -webkit-user-select: none; user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* Layout Utama */
+        .container { 
+            max-width: 850px; 
+            margin: 20px auto; 
+            padding: 0 10px; 
+        }
+
+        /* Header Ujian Sticky */
+        .exam-header {
+            display: none; background: white; padding: 12px 15px;
+            position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Card Modern */
+        .card {
+            background: var(--bg-card); padding: 40px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+
+        /* Tab Management */
+        .tab-content { display: none; }
+        .active { display: block; }
+
+        /* School Branding */
+        .school-header { text-align: center; margin-bottom: 10px; }
+        .logo { width: 90px; height: auto; margin-bottom: 10px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+        .school-name { font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--text-dark); }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; }
+
+        /* Form Inputs (Token di bawah Nama) */
+        .input-vertical-group { display: flex; flex-direction: column; gap: 15px; margin: 30px 0; }
+        .input-wrapper label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; padding-left: 4px; }
+        input[type="text"] { 
+            width: 100%; padding: 16px; border: 2px solid var(--border); 
+            border-radius: 12px; font-size: 16px !important; background: #F9FAFB;
+            transition: 0.2s;
+        }
+        input[type="text"]:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(10,102,194,0.1); }
+
+        /* Buttons */
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: block; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn:active { transform: scale(0.98); }
+
+        /* Soal Styles */
+        .soal-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .soal-text { font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px; display: block; font-weight: 600; }
+        .opsi-item { display: flex; align-items: center; padding: 14px; border: 1px solid #f3f4f6; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .opsi-item:hover { background: #f0f7ff; border-color: var(--primary); }
+        .opsi-item input { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; }
+
+        /* Overlay Lock */
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index:10000; padding: 20vh 20px 0 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; font-family: monospace; }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            .container { padding: 0 8px; margin: 10px auto; }
+            .card { padding: 25px 18px; border-radius: 15px; }
+            .school-name { font-size: 1.2rem; }
+            .soal-text { font-size: 1rem; }
+            .opsi-item { padding: 12px; font-size: 0.95rem; }
+            .exam-header { padding: 10px; }
+        }
+
+        @media (max-width: 350px) {
+            .school-name { font-size: 1rem; }
+            .logo { width: 70px; }
+            .timer-badge { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ANTI-CHEAT OVERLAY -->
+<div id="overlay">
+    <div style="max-width: 400px; margin: auto;">
+        <h1 style="color: var(--danger); font-size: 1.8rem;">SISTEM TERKUNCI!</h1>
+        <p style="opacity: 0.8; font-size: 0.9rem;">Anda terdeteksi melakukan pelanggaran (Pindah aplikasi/Screenshot).</p>
+        <p>Hubungi pengawas untuk mendapatkan <b>KODE REGISTRASI GURU</b>.</p>
+        <input type="text" id="kodeGuruInput" placeholder="Ketik Kode Guru Di Sini" style="text-align:center; margin-bottom: 20px; background: #222; border: 1px solid #444; color: white; width: 100%;">
+        <button class="btn btn-primary" onclick="unlockExam()">BUKA AKSES UJIAN</button>
+    </div>
+</div>
+
+<!-- STICKY HEADER EXAM -->
+<div id="examHeader" class="exam-header">
+    <div style="overflow: hidden; padding-right: 10px;">
+        <div id="displayNama" style="font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95rem;">Nama Siswa</div>
+        <div style="font-size: 0.65rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">UPK MATEMATIKA PEMINATAN</div>
+    </div>
+    <div class="timer-badge" id="timer">90:00</div>
+</div>
+
+<div class="container">
+    
+    <!-- TAB 1: REGISTRASI (Token di bawah Nama) -->
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo" alt="Logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <span class="exam-badge">UPK MATEMATIKA UMUM</span>
+            </div>
+            
+            <hr style="border:0; height:1px; background:#eee; margin: 25px 0;">
+            
+            <div class="input-vertical-group">
+                <div class="input-wrapper">
+                    <label>Nama Lengkap Siswa</label>
+                    <input type="text" id="namaSiswa" placeholder="Masukkan nama sesuai absen">
+                </div>
+                <div class="input-wrapper">
+                    <label>Token Ujian</label>
+                    <input type="text" id="tokenUjian" placeholder="Masukkan token dari pengawas">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut ke Tata Tertib</button>
+            <p style="text-align: center; font-size: 0.7rem; color: #a1a7b3; margin-top: 20px; font-weight: 600;">TAHUN PELAJARAN 2025-2026</p>
+        <p style="text-align: center; font-size: 0.7rem; color: #7a0404; margin-top: 20px; font-weight: 600;">EXAMBRO_RNJ_SIBERSCURITY</p>
+        </div>
+    </div>
+
+    <!-- TAB 2: TATA TERTIB -->
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="color: var(--danger); margin-top: 0; font-size: 1.4rem;">Peringatan Keamanan</h2>
+            <div style="background: #fff5f5; border-left: 4px solid var(--danger); padding: 15px; margin-bottom: 25px; border-radius: 8px;">
+                <ul style="margin: 0; padding-left: 18px; line-height: 1.7; color: #b91c1c; font-size: 0.9rem;">
+                    <li><b>Dilarang</b> keluar dari halaman/tab ujian.</li>
+                    <li><b>Dilarang</b> membuka aplikasi lain (Chrome, Sosmed, dll).</li>
+                    <li><b>Dilarang</b> mengambil Screenshot atau rekaman layar.</li>
+                    <li>Layar akan <b>TERKUNCI</b> jika melanggar ketentuan di atas.</li>
+                </ul>
+            </div>
+            <button class="btn btn-primary" onclick="mulaiUjian()">SAYA MENGERTI & MULAI</button>
+        </div>
+    </div>
+
+    <!-- TAB 3: AREA SOAL -->
+<div id="tab3" class="tab-content">
+    <!-- Tempat Soal Pilihan Ganda Muncul -->
+    <div id="renderPG"></div>
+    
+    <!-- Bagian Soal Uraian (Teks Soal Saja) -->
+    <div class="card" style="background: #fff; border: 1px solid var(--border);">
+        <h3 style="color: var(--primary); margin-top:0;">Soal Uraian</h3>
+        <div id="renderUraianTeks"></div> <!-- Hanya teks soal -->
+    </div>
+
+    <!-- SATU TEMPAT UPLOAD UNTUK SEMUA -->
+    <div class="card" style="background: #f8fafc; border: 2px dashed var(--primary); padding: 25px; text-align: center;">
+        <h3 style="margin-top:0; color: var(--primary);">Upload Jawaban Uraian</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+            Foto lembar jawaban HVS Anda (untuk soal 1-5) dan unggah di sini:
+        </p>
+        <input type="file" accept="image/*" onclick="prepareUpload()" onchange="saveFileSingle(this)" style="font-size: 1rem; width: 100%; max-width: 300px;">
+        <div id="status_upload" style="color:#10b981; font-weight:700; margin-top:10px;">
+            <!-- Status upload muncul di sini -->
+        </div>
+    </div>
+    
+    <button class="btn btn-success" onclick="finishExam()" style="margin-top: 20px; margin-bottom: 60px;">KUMPULKAN SEMUA JAWABAN</button>
+</div>
+
+</div>
+
+<script>
+    const KODE_GURU = "Guru7890"; 
+    let timeLeft = 90 * 60;
+    let timerInterval;
+    let savedData = JSON.parse(localStorage.getItem("upk_session")) || {};
+
+let letsSoalPG = [
+    [
+        "Diketahui bahwa bilangan \\(x\\) memenuhi persamaan \\(4^{x^2-3x+3} = 4\\). Jika \\(x\\) juga memenuhi persamaan dari \\(^{x}\\log y = z\\), dan \\(y\\) bilangan positif, maka nilai \\(x\\) yang mungkin adalah ....",
+        ["1 dan 2", "-2 dan -1", "1", "2", "-2"]
+    ],
+
+    [
+        "Diketahui \\(^{3}\\log 6 = p\\), dan \\(^{3}\\log 2 = q\\). Nilai \\(^{24}\\log 288\\) adalah ....",
+        [
+            "\\(\\frac{2p+3q}{p+2q}\\)", 
+            "\\(\\frac{3p+2q}{p+2q}\\)", 
+            "\\(\\frac{p+2q}{2p+3q}\\)", 
+            "\\(\\frac{p+2q}{3p+2q}\\)", 
+            "\\(\\frac{q+2p}{2p+3q}\\)"
+        ]
+    ],
+
+    [
+        "Diketahui dua buah fungsi \\(f(x)\\) dan \\(g(x)\\) dengan \\(f(x) = 3x + 5\\) dan \\(g(x) = \\frac{x+3}{6x-5}, x \\neq \\frac{5}{6}\\). Apabila \\((g \\circ f)^{-1}(x)\\) merupakan invers dari \\((g \\circ f)(x)\\), rumus fungsi dari \\((g \\circ f)^{-1}(x)\\) adalah ....",
+        [
+            "\\(\\frac{25x+8}{3-18x}, x \\neq \\frac{1}{6}\\)", 
+            "\\(\\frac{25x-8}{3-18x}, x \\neq \\frac{1}{6}\\)", 
+            "\\(\\frac{3x+8}{18x+25}, x \\neq -\\frac{25}{18}\\)", 
+            "\\(\\frac{3x-8}{25-18x}, x \\neq \\frac{25}{18}\\)", 
+            "\\(\\frac{3x+8}{25-18x}, x \\neq \\frac{25}{18}\\)"
+        ]
+    ],
+
+    [
+        "Disajikan bentuk pertidaksamaan \\(\\sqrt{3-x} < 2\\). Himpunan nilai \\(x\\) yang memenuhi pertidaksamaan tersebut adalah....",
+        ["\\(\\{x | x \\le 3\\}\\)", "\\(\\{x | x \\ge 3\\}\\)", "\\(\\{x | -1 < x \\le 3\\}\\)", "\\(\\{x | x > -1\\}\\)", "\\(\\{x | x < -1\\}\\)"]
+    ],
+
+    [
+        "Syahroni adalah saudara kandungnya Wildan. Selisih usia mereka berdua tidak lebih dari 5 tahun. Jika Wildan sekarang berusia 8 tahun dan usia Syahroni adalah \\(x\\) tahun, maka kemungkinan usia Syahroni adalah....",
+        ["\\(3 < x < 13\\)", "\\(3 \\le x \\le 13\\)", "\\(-3 < x < 13\\)", "\\(-3 < x \\le 13\\)", "\\(-13 < x \\le 3\\)"]
+    ],
+
+    [
+        "Diketahui matrik \\(A = \\begin{pmatrix} 2 & 3 \\\\ x & y \\end{pmatrix}\\). Jika matriks \\(A^{-1}\\) adalah invers matriks \\(A\\) dan \\(A\\) adalah matrik tak singular dengan \\(|A| = x\\), maka \\(|A^{-1}| = \\dots\\)",
+        ["\\(\\frac{1}{x}\\)", "\\(\\frac{1}{y}\\)", "\\(\\frac{1}{xy}\\)", "\\(2x\\)", "\\(2y\\)"]
+    ],
+
+    [
+        "Luas daerah di bawah kurva normal standar dari \\(z = 0\\) sampai \\(z = 1\\) adalah sekitar....",
+        ["0,1587", "0,3413", "0,5000", "0,6826", "0,8413"]
+    ],
+
+    [
+        "Suatu deret geometri diketahui suku kedua bernilai -6 dan suku kelima bernilai 48. Suku kedelapan bernilai....",
+        ["-384", "-192", "-64", "384", "192"]
+    ],
+
+    [
+        "Sebuah bola dijatuhkan dari ketinggian 10 meter di atas lantai sehingga bola memantul kembali dengan pantulan pertamanya mencapai 6 meter. Jika setiap pantulan mempunyai rasio yang sama, maka panjang lintasan bola hingga berhenti adalah....",
+        ["30 meter", "35 meter", "40 meter", "50 meter", "100 meter"]
+    ],
+
+    [
+        "Sherin, Doni, dan Harry pergi ke suatu toko buku untuk membeli buku, pensil, dan pena. Sherin membeli 5 buku, 2 pensil, dan 3 pena seharga Rp50.000,00. Doni membeli 4 buku, 3 pensil, dan 2 pena seharga Rp42.500,00 dan Harry membeli 3 buku, 1 pensil, dan 2 pena seharga Rp30.500,00. Jika Budi membeli 4 buku, 2 pensil, dan 2 pena di toko yang sama, Budi harus membayar sebesar....",
+        ["Rp 52.000,00", "Rp 45.000,00", "Rp 42.000,00", "Rp 40.000,00", "Rp 39.000,00"]
+    ],
+
+    [
+        "Diketahui persamaan \\(x^2 + (p - 3)x + 9 = 0\\). Jika persamaan tersebut memiliki akar-akar kembar, maka nilai \\(p\\) yang memenuhi syarat adalah....",
+        [
+            "\\(p = 3\\) atau \\(p = -3\\)", 
+            "\\(p = 3\\) atau \\(p = 6\\)", 
+            "\\(p = -3\\) atau \\(p = -9\\)", 
+            "\\(p = -3\\) atau \\(p = 9\\)", 
+            "\\(p = 6\\) atau \\(p = 9\\)"
+        ]
+    ],
+
+    [
+        "Nilai dari \\(\\lim_{x \\to 1} \\left( \\frac{x^2 - 3x + 2}{x^2 - 4x + 3} \\right)\\) adalah....",
+        ["0,25", "0,33", "0,67", "0,50", "0,75"]
+    ],
+
+    [
+        "Nilai dari \\(\\lim_{x \\to \\infty} (\\sqrt{x^2 + 3x} - x + 1)\\) adalah....",
+        [
+            "\\(\\frac{1}{2}\\)", 
+            "\\(\\frac{3}{2}\\)", 
+            "\\(\\frac{5}{2}\\)", 
+            "\\(\\frac{2}{3}\\)", 
+            "\\(\\frac{2}{5}\\)"
+        ]
+    ],
+
+[
+        "Hasil \\(\\int 2x^2 \\sqrt{4x^3 - 5} \\, dx\\) adalah ....",
+        [
+            "\\(\\frac{1}{3}(4x^3 - 5)\\sqrt{4x^3 - 5} + C\\)", 
+            "\\(\\frac{1}{6}(4x^3 - 5)\\sqrt{4x^3 - 5} + C\\)", 
+            "\\(\\frac{1}{9}(4x^3 - 5)\\sqrt{4x^3 - 5} + C\\)", 
+            "\\(\\frac{1}{12}(4x^3 - 5)\\sqrt{4x^3 - 5} + C\\)", 
+            "\\(\\frac{1}{18}(4x^3 - 5)\\sqrt{4x^3 - 5} + C\\)"
+        ]
+    ],
+
+    [
+        "Grafik fungsi \\(f(x) = 4x^3 - 18x^2 - 48x - 1\\) naik pada interval ....",
+        [
+            "\\(-1 < x < 4\\)", 
+            "\\(-4 < x < 1\\)", 
+            "\\(x < -1\\) atau \\(x > 4\\)", 
+            "\\(x < -4\\) atau \\(x > 1\\)", 
+            "\\(x < -4\\) atau \\(x > -1\\)"
+        ]
+    ],
+
+    [
+        "Pak Eko ingin membuat kandang berbentuk persegipanjang untuk ayam peliharaannya seluas 324 m². Kandang tersebut akan dipagari dengan kawat duri seharga Rp12.000,00 per meter. Pernyataan berikut yang benar adalah ....",
+        [
+            "Jika lebar kandang 9 meter, biaya pemasangan kawat akan minimum.",
+            "Jika lebar kandang 22 meter, biaya pemasangan kawat akan minimum.",
+            "Jika panjang kandang 36 meter, biaya pemasangan kawat akan minimum.",
+            "Biaya pemasangan kawat minimum adalah Rp864.000,00.",
+            "Biaya pemasangan kawat minimum adalah Rp432.000,00."
+        ]
+    ],
+
+    [
+        "Luas daerah yang dibatasi oleh kurva \\(f(x) = (x - 1)^2 + 1\\), sumbu-\\(x\\), sumbu-\\(y\\), dan garis \\(x - 2 = 0\\) adalah....",
+        [
+            "\\(\\frac{2}{11}\\)", 
+            "\\(\\frac{3}{11}\\)", 
+            "\\(\\frac{3}{8}\\)", 
+            "\\(\\frac{8}{3}\\)", 
+            "\\(\\frac{11}{3}\\)"
+        ]
+    ],
+
+[
+        "Balok \\(ABCD.EFGH\\) mempunyai ukuran panjang \\(AB = 8\\) cm, lebar \\(AD = 6\\) cm, dan tinggi \\(AE = 5\\) cm. Nilai tangen sudut yang dibentuk oleh ruas garis \\(AD\\) dan ruas garis \\(BF\\) adalah....",
+        [
+            "\\(\\frac{5}{6}\\)", 
+            "\\(\\frac{3}{5}\\)", 
+            "\\(\\frac{1}{2}\\)", 
+            "1", 
+            "2"
+        ]
+    ],
+
+    [
+        "Diketahui kubus \\(ABCD.EFGH\\) dengan panjang rusuk 12 cm. Jarak dari titik \\(C\\) ke diagonal sisi \\(AH\\) adalah .... <br> <img src='https://i.imgur.com/ajQf2nR.png' width='200'>",
+        [
+            "\\(12\\sqrt{3}\\) cm", 
+            "\\(12\\sqrt{2}\\) cm", 
+            "12 cm", 
+            "\\(6\\sqrt{6}\\) cm", 
+            "\\(6\\sqrt{3}\\) cm"
+        ]
+    ],
+
+    [
+        "Terdapat segitiga sembarang \\(ABC\\). Ruas garis \\(AB = 6\\) cm, dan ruas garis \\(AC = 8\\) cm. Jika ruas garis \\(AB\\) dan ruas garis \\(AC\\) membentuk sudut \\(120^\\circ\\), maka panjang rusuk \\(BC\\) adalah....",
+        [
+            "\\(3\\sqrt{37}\\)", 
+            "\\(2\\sqrt{37}\\)", 
+            "\\(\\sqrt{37}\\)", 
+            "37", 
+            "148"
+        ]
+    ],
+
+    [
+        "Didefinisikan \\(f(x) = 2\\sin(x - 30^\\circ) + 2\\). Fungsi tersebut mempunyai nilai maksimum....",
+        ["6", "5", "4", "3", "2"]
+    ],
+
+[
+        "Amad menyandarkan tangga ke dinding rumahnya untuk mengganti genteng yang bocor. Panjang tangga tersebut adalah 3 m dan membentuk sudut sebesar \\(60^\\circ\\) dengan tanah. Jarak dasar tangga dengan dinding adalah ....",
+        [
+            "6 m", 
+            "\\(3\\sqrt{3}\\) m", 
+            "\\(3\\sqrt{2}\\) m", 
+            "\\(\\sqrt{3}\\) m", 
+            "\\(1\\frac{1}{2}\\) m"
+        ]
+    ],
+
+    [
+        "Kurva \\(y = x^2 + 1\\) refleksikan terhadap garis \\(x + y = 0\\). Bayangan kurva tersebut adalah....",
+        [
+            "\\(x^2 + y - 1 = 0\\)", 
+            "\\(x^2 + y + 1 = 0\\)", 
+            "\\(y^2 - x + 1 = 0\\)", 
+            "\\(y^2 + x - 1 = 0\\)", 
+            "\\(y^2 + x + 1 = 0\\)"
+        ]
+    ],
+
+    [
+        "Diketahui lingkaran dengan persamaan \\((x - 3)^2 + (y - 4)^2 = 10\\). Titik pusat dan jari-jari lingkaran tersebut berturut-turut adalah ....",
+        [
+            "\\((3, 4)\\) dan \\(\\sqrt{10}\\)", 
+            "\\((-3, 4)\\) dan \\(\\sqrt{10}\\)", 
+            "\\((3, -4)\\) dan \\(\\sqrt{10}\\)", 
+            "\\((3, 4)\\) dan 10", 
+            "\\((-3, -4)\\) dan 10"
+        ]
+    ],
+
+    [
+        "Diketahui data yang disajikan dalam bentuk tabel berikut:<br><table><tr><th>No.</th><th>Kelas Interval</th><th>Frekwensi</th></tr><tr><td>1</td><td>42 – 51</td><td>3</td></tr><tr><td>2</td><td>52 – 61</td><td>6</td></tr><tr><td>3</td><td>62 – 71</td><td>8</td></tr><tr><td>4</td><td>72 – 81</td><td>10</td></tr><tr><td>5</td><td>82 – 91</td><td>7</td></tr><tr><td>6</td><td>92 – 101</td><td>6</td></tr></table><br>Nilai quartil ketiga data tersebut adalah....",
+        ["62,75", "63,25", "94,50", "85,79", "86,29"]
+    ],
+
+    [
+        "Lima siswa mengikuti ujian susulan. Kelima tersebut mendapatkan nilai 4, 7, 7, 8, dan 9. Standar deviasi dari data nilai susulan kelima siswa tersebut adalah....",
+        [
+            "\\(\\sqrt{\\frac{6}{5}}\\)", 
+            "\\(\\sqrt{\\frac{7}{5}}\\)", 
+            "\\(\\sqrt{\\frac{14}{5}}\\)", 
+            "\\(\\sqrt{14}\\)", 
+            "14"
+        ]
+    ],
+
+    [
+        "Seorang petugas perpustakaan akan membuat label buku-buku koleksi baru perpustakaan itu. Karena buku-buku tersebut merupakan novel ia menggunakan kode N, dilanjutkan empat angka berbeda dari angka-angka 2, 3, 4, 5, 6, dan 7. Banyak label yang dapat disusun petugas perpustakaan tersebut adalah ....",
+        ["120", "180", "240", "250", "360"]
+    ],
+
+    [
+        "Banyak bilangan genap yang terdiri dari 3 angka berbeda yang dapat disusun dari angka 0, 2, 3, 4, 5, 6, dan 7 adalah ....",
+        ["210", "120", "105", "40.90", "75"]
+    ],
+
+    [
+        "Dari 8 siswa putra dan 4 siswa putri akan diambil secara acak 3 orang siswa untuk menjadi delegasi sekolah dalam suatu acara. Peluang terbentuknya delegasi yang ketiga anggotanya putra semua adalah ....",
+        [
+            "\\(\\frac{28}{55}\\)", 
+            "\\(\\frac{17}{55}\\)", 
+            "\\(\\frac{14}{55}\\)", 
+            "\\(\\frac{11}{55}\\)", 
+            "\\(\\frac{9}{55}\\)"
+        ]
+    ],
+
+    [
+        "Sebuah dadu dilempar sekali, nilai kemungkinan dadu menunjukkan angka 3 atau lebih adalah ....",
+        [
+            "\\(\\frac{1}{6}\\)", 
+            "\\(\\frac{1}{2}\\)", 
+            "\\(\\frac{2}{3}\\)", 
+            "\\(\\frac{1}{12}\\)", 
+            "\\(\\frac{1}{36}\\)"
+        ]
+    ],
+];
+
+let soalUraian = [
+    [
+        "31. Sebuah lingkaran dipotong menjadi 6 buah juring yang sudut-sudut pusatnya membentuk barisan aritmatika. Diketahui bahwa sudut pusat terbesarnya adalah empat kali sudut pusat terkecil. Tentukan besar sudut pusat terkecil dari juring tersebut! Buatlah langkah penyelesaiannya!",
+        "Jawaban Uraian"
+    ],
+
+    [
+        "32. Akar-akar persamaan kuadrat \\(x^2 + (a - 1)x + 2 = 0\\) adalah \\(x_1\\) dan \\(x_2\\) dimana keduanya positif. Jika \\(x_1 = 2x_2\\), tentukan nilai \\(a\\)!",
+        "Jawaban Uraian"
+    ],
+
+    [
+        "33. Pesawat penumpang mempunyai tempat duduk 48 kursi. Setiap penumpang kelas utama boleh membawa bagasi 60 kg, sedangkan kelas ekonomi 20 kg. Daya tampung maksimum bagasi 1.800 kg. Harga tiket kelas utama Rp150.000,00 dan kelas ekonomi Rp100.000,00. Jika semua kursi terisi penuh, maka berapa hasil penjualan tiket maksimum?",
+        "Jawaban Uraian"
+    ],
+
+    [
+        "34. Pusat lingkaran \\(L\\) terletak pada titik potong antara garis \\(3x + 2y - 21 = 0\\) dengan garis \\(y - 3 = 0\\). Jika lingkaran tersebut berjari-jari 5, tentukan persamaan lingkaran tersebut!",
+        "Jawaban Uraian"
+    ],
+
+    [
+        "35. Perhatikan tabel distribusi frekuensi berikut!<br><table><tr><th>No.</th><th>Nilai</th><th>Frekuensi</th></tr><tr><td>1</td><td>40 – 48</td><td>4</td></tr><tr><td>2</td><td>49 – 57</td><td>12</td></tr><tr><td>3</td><td>58 – 66</td><td>10</td></tr><tr><td>4</td><td>67 – 75</td><td>8</td></tr><tr><td>5</td><td>76 – 84</td><td>4</td></tr><tr><td>6</td><td>85 – 93</td><td>2</td></tr></table><br>Dari data tersebut, tentukan nilai modusnya!",
+        "Jawaban Uraian"
+    ]
+];
+
+// FUNGSI UNTUK MENYIMPAN JAWABAN SAAT DIKLIK
+function saveAns(key, val) {
+    savedData[key] = val; // Simpan ke variabel memory
+    localStorage.setItem("upk_session", JSON.stringify(savedData)); // Simpan ke memori HP agar tidak hilang saat refresh
+    console.log("Tersimpan:", key, "=", val); // Untuk cek di console
+}
+
+   // --- 1. FUNGSI NAVIGASI & TOKEN ---
+function goToTab(n) {
+    // Ambil input dari tab login
+    const inputNama = document.getElementById('namaSiswa').value;
+    const inputToken = document.getElementById('tokenUjian').value;
+
+    // Validasi saat ingin pindah dari Tab Login (n=1) ke Tab Instruksi (n=2)
+    if(n === 2) {
+        if(inputNama.trim() === "") {
+            alert("Nama Lengkap harus diisi!");
+            return;
+        }
+        // Token Ujian
+        if(inputToken !== "RISTEK2026") {
+            alert("Token Ujian Salah! Silakan tanya pengawas.");
+            return; 
+        }
+    }
+    
+    // Jalankan perpindahan tab
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    const targetTab = document.getElementById('tab' + n);
+    if(targetTab) targetTab.classList.add('active');
+    window.scrollTo(0,0);
+}
+
+function mulaiUjian() {
+    goToTab(3); // Pindah ke halaman soal
+    document.getElementById('examHeader').style.display = 'flex';
+    document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+    
+    renderSoal();
+    startTimer();
+    setupSecurity(); // Aktifkan sistem anti-contek
+}
+
+// --- 2. SISTEM KEAMANAN (ANTI-CONTEK) ---
+let isCameraActive = false;
+
+function setupSecurity() {
+    // Deteksi pindah tab atau keluar browser
+    window.onblur = function() {
+        if (!isCameraActive) {
+            document.getElementById('overlay').style.display = 'block';
+        }
+    };
+
+    // Deteksi layar HP dimatikan atau switch aplikasi
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden && !isCameraActive) {
+            document.getElementById('overlay').style.display = 'block';
+        }
+    });
+}
+
+function unlockExam() {
+    if(document.getElementById('kodeGuruInput').value === KODE_GURU) {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('kodeGuruInput').value = "";
+    } else {
+        alert("Kode Guru Salah!");
+    }
+}
+
+// --- 3. RENDER SOAL ---
+function renderSoal() {
+    // Render Pilihan Ganda
+    let pgHtml = "";
+    letsSoalPG.forEach((s, i) => {
+        let chk = savedData['pg' + i];
+        pgHtml += `<div class="soal-card"><span class="soal-text">${i + 1}. ${s[0]}</span>`;
+        s[1].forEach((opt, idx) => {
+            let isChecked = chk == idx ? 'checked' : '';
+            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" onclick="saveAns('pg${i}', ${idx})" ${isChecked}> <span>${opt}</span></label>`;
+        });
+        pgHtml += `</div>`;
+    });
+    document.getElementById('renderPG').innerHTML = pgHtml;
+
+    // Render Uraian
+    let urHtml = "";
+    soalUraian.forEach((s, i) => {
+        urHtml += `<div style="margin-bottom:15px; padding:10px; border-bottom:1px solid #eee;">
+            <p style="font-weight:700; margin:0 0 5px 0;">Soal Uraian ${i + 1}</p>
+            <p style="margin:0; font-size:0.95rem;">${s}</p>
+        </div>`;
+    });
+    document.getElementById('renderUraianTeks').innerHTML = urHtml;
+
+    updateStatusUpload();
+    if (typeof MathJax !== 'undefined') {
+        MathJax.typeset();
+    }
+}
+
+// --- 4. LOGIKA UPLOAD ---
+if (!savedData['filesUraian']) {
+    savedData['filesUraian'] = [];
+}
+
+function prepareUpload() {
+    isCameraActive = true; // Matikan sementara proteksi agar bisa buka galeri/kamera
+}
+
+function saveFileSingle(input) {
+    const file = input.files[0];
+    if (!file) { 
+        resetSecurity();
+        return; 
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("File terlalu besar! Maksimal 5MB.");
+        input.value = "";
+        resetSecurity();
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        savedData['filesUraian'].push(e.target.result);
+        localStorage.setItem("upk_session", JSON.stringify(savedData));
+        updateStatusUpload();
+        input.value = ""; 
+        resetSecurity();
+    };
+    reader.readAsDataURL(file);
+}
+
+function resetSecurity() {
+    // Beri toleransi waktu 3 detik untuk kembali ke browser sebelum proteksi aktif lagi
+    setTimeout(() => {
+        isCameraActive = false;
+    }, 3000);
+}
+
+function updateStatusUpload() {
+    const jml = savedData['filesUraian'] ? savedData['filesUraian'].length : 0;
+    const statusE1 = document.getElementById('status_upload');
+    if (statusE1) {
+        if (jml > 0) {
+            statusE1.innerHTML = `<b style="color:#059669;">✅ ${jml} Foto Tersimpan</b><br>
+            <button type="button" onclick="prepareUpload(); hapusSemuaFoto()" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.8rem; text-decoration:underline; margin-top:5px;">Hapus & foto ulang</button>`;
+        } else {
+            statusE1.innerText = "Belum ada foto.";
+        }
+    }
+}
+
+function hapusSemuaFoto() {
+    if(confirm("Hapus semua foto?")) {
+        savedData['filesUraian'] = [];
+        localStorage.setItem("upk_session", JSON.stringify(savedData));
+        updateStatusUpload();
+    }
+    resetSecurity();
+}
+
+// --- 5. TIMER & FINISH ---
+function startTimer() {
+    timerInterval = setInterval(() => {
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        let tEl = document.getElementById('timer');
+        if(tEl) tEl.innerText = `${m}:${s < 10 ? '0' + s : s}`;
+        
+        if (timeLeft <= 0) { 
+            clearInterval(timerInterval); 
+            alert("Waktu Ujian Habis!"); 
+            finishExam(); 
+        }
+        timeLeft--;
+    }, 1000);
+}
+
+function finishExam() {
+    // VAKSIN: Matikan proteksi sesaat agar alert tidak memicu lock
+    prepareUpload(); 
+
+    const nama = document.getElementById('namaSiswa').value;
+    if (!nama) { 
+        alert("Isi Nama Lengkap!"); 
+        resetSecurity(); // Aktifkan lagi dengan jeda 3 detik
+        return; 
+    }
+
+    let kosong = [];
+    for (let i = 0; i < letsSoalPG.length; i++) {
+        if (savedData['pg' + i] === undefined) kosong.push(i + 1);
+    }
+
+    if (kosong.length > 0) { 
+        alert("Soal PG belum lengkap nomor: " + kosong.join(", ")); 
+        resetSecurity(); // PENTING: Supaya tidak lock setelah klik OK
+        return; 
+    }
+
+    if (!savedData['filesUraian'] || savedData['filesUraian'].length === 0) { 
+        alert("Upload foto jawaban!"); 
+        resetSecurity(); 
+        return; 
+    }
+
+    // Konfirmasi Kirim
+    if (confirm("Kirim jawaban sekarang?")) {
+        alert("Sedang mengirim... Jangan tutup halaman ini!");
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwJIAb3xN2cfy9bTzHSdkSUklvWpFPGwId-y5wGKXMFLZAfQmdWE1VA2IpxD6p_aVL6nw/exec';
+        const payload = {
+            nama: nama,
+            mapel: "MATEMATIKA UMUM", 
+            jawaban: savedData,
+            fileUraian: savedData['filesUraian'].join("|SPLIT|") 
+        };
+
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+        .then(() => {
+            alert("✅ TERKIRIM! Terima kasih.");
+            localStorage.removeItem("upk_session");
+            location.reload();
+        })
+        .catch(e => {
+            alert("Gagal mengirim, periksa koneksi internet Anda!");
+            resetSecurity();
+        });
+    } else {
+        // Jika user klik 'Cancel' pada konfirmasi kirim
+        resetSecurity();
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Hari Senin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: block;
+      width: 80%;
+      max-width: 250px;
+      margin: 10px auto;
+      padding: 14px;
+      background-color: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+      transform: scale(1.02);
+    }
+    .locked {
+      background-color: #ccc;
+      color: #666;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Pilih Mata Pelajaran - Hari Senin</h1>
+    <p>Silahkan pilih mata pelajaran ujian:</p>
+
+    <!-- Bahasa Indonesia aktif -->
+    <a href="UPK B.Indonesia.pc.html" class="btn">Bahasa Indonesia</a>
+
+    <!-- Contoh pelajaran lain (bisa kamu aktifkan/lock manual) -->
+    <a href="UPK Senibudaya.html" class="btn">Seni Budaya</a>
+    <a href="UPK html" class="btn locked">Istirahat Sejenak</a>
+    <a href="UPK Sejarah Indonesia.html" class="btn">Sejarah Indonesia</a>
+  </div>
+
+</body>
+</html>

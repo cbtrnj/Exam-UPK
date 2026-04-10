@@ -1,1059 +1,722 @@
-<!doctype html>
-<html lang="id" class="h-full">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UPK - PKBM Ristek Nusantara Jaya</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script id="mathjax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="/_sdk/element_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Space+Mono:wght@700&amp;display=swap" rel="stylesheet">
-  <style>
-* { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-html, body { height: 100%; margin: 0; overflow: hidden; }
-
-/* MathJax styling - no underline */
-.math-content a, .math-content u { text-decoration: none !important; }
-.mjx-container { text-decoration: none !important; }
-mjx-container { display: inline-block; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); }
-  50% { box-shadow: 0 0 40px rgba(59,130,246,0.6); }
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-8px); }
-  40%, 80% { transform: translateX(8px); }
-}
-@keyframes countPulse {
-  from { transform: scale(1.4); opacity: 0.5; }
-  to { transform: scale(1); opacity: 1; }
-}
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes borderGlow {
-  0%, 100% { border-color: rgba(59,130,246,0.3); }
-  50% { border-color: rgba(59,130,246,0.8); }
-}
-@keyframes warningPulse {
-  0%, 100% { background-color: rgba(239,68,68,0.1); }
-  50% { background-color: rgba(239,68,68,0.2); }
-}
-
-.anim-fade-up { animation: fadeUp 0.6s ease-out forwards; }
-.anim-scale-in { animation: scaleIn 0.5s ease-out forwards; }
-.anim-pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
-.anim-slide-down { animation: slideDown 0.4s ease-out forwards; }
-.anim-shake { animation: shake 0.5s ease-in-out; }
-.anim-count-pulse { animation: countPulse 0.3s ease-out; }
-.anim-gradient { background-size: 200% 200%; animation: gradientShift 8s ease infinite; }
-.anim-border-glow { animation: borderGlow 2s ease-in-out infinite; }
-.anim-warning-pulse { animation: warningPulse 1.5s ease-in-out infinite; }
-
-.login-card { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-.option-btn { transition: all 0.2s ease; }
-.option-btn:active { transform: scale(0.97); }
-.option-btn.selected { border-color: #3b82f6; background: rgba(59,130,246,0.1); }
-
-.screen { display: none; height: 100%; overflow-y: auto; }
-.screen.active { display: flex; flex-direction: column; }
-
-input[type="text"], input[type="password"] {
-  -webkit-user-select: text; user-select: text;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-
-/* RESPONSIVE UTILITIES */
-@media (max-width: 480px) {
-  .text-fluid-xl { font-size: clamp(1.125rem, 5vw, 1.5rem); }
-  .text-fluid-lg { font-size: clamp(0.875rem, 4vw, 1.125rem); }
-  .text-fluid-md { font-size: clamp(0.75rem, 3vw, 0.875rem); }
-  .text-fluid-sm { font-size: clamp(0.625rem, 2.5vw, 0.75rem); }
-  .px-fluid { padding-left: clamp(0.75rem, 4vw, 1.5rem); padding-right: clamp(0.75rem, 4vw, 1.5rem); }
-  .py-fluid { padding-top: clamp(0.75rem, 3vw, 1.5rem); padding-bottom: clamp(0.75rem, 3vw, 1.5rem); }
-  .gap-fluid { gap: clamp(0.5rem, 3vw, 1rem); }
-  .rounded-fluid { border-radius: clamp(0.75rem, 3vw, 1.5rem); }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  .text-fluid-xl { font-size: 1.5rem; }
-  .text-fluid-lg { font-size: 1.125rem; }
-  .text-fluid-md { font-size: 0.875rem; }
-  .text-fluid-sm { font-size: 0.75rem; }
-  .px-fluid { padding-left: 1.5rem; padding-right: 1.5rem; }
-  .py-fluid { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-  .gap-fluid { gap: 1rem; }
-  .rounded-fluid { border-radius: 1.25rem; }
-}
-
-@media (min-width: 769px) {
-  .text-fluid-xl { font-size: 1.875rem; }
-  .text-fluid-lg { font-size: 1.25rem; }
-  .text-fluid-md { font-size: 1rem; }
-  .text-fluid-sm { font-size: 0.875rem; }
-  .px-fluid { padding-left: 2rem; padding-right: 2rem; }
-  .py-fluid { padding-top: 2rem; padding-bottom: 2rem; }
-  .gap-fluid { gap: 1.5rem; }
-  .rounded-fluid { border-radius: 1.5rem; }
-}
-
-/* Touch-friendly spacing for mobile */
-@media (max-width: 768px) {
-  button { min-height: 44px; min-width: 44px; }
-  input { min-height: 44px; padding: 0.75rem 1rem; }
-}
-
-/* Safe area support for notched devices */
-@supports (padding: max(0px)) {
-  body { padding-top: max(0px, env(safe-area-inset-top)); }
-  header { padding-top: max(0.75rem, env(safe-area-inset-top)); padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); }
-}
-
-/* Hide question indicators on mobile */
-@media (max-width: 768px) {
-  #q-dots { display: none !important; }
-}
-  </style>
-  <style>body { box-sizing: border-box; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
- </head>
- <body class="h-full" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-  <!-- SCREEN 1: LOGIN -->
-  <div id="screen-login" class="screen active h-full">
-   <div class="h-full w-full bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 anim-gradient flex items-center justify-center px-fluid py-fluid relative overflow-hidden">
-    <!-- Background pattern -->
-    <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
-    <div class="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl opacity-10 -translate-x-1/2 -translate-y-1/2"></div>
-    <div class="absolute bottom-0 right-0 w-80 h-80 bg-indigo-500 rounded-full filter blur-3xl opacity-10 translate-x-1/3 translate-y-1/3"></div>
-    <div class="w-full max-w-md relative z-10">
-     <div class="login-card bg-white/5 border border-white/10 rounded-xl py-5 md:py-6 px-4 md:px-5 anim-scale-in">
-      <!-- Logo area -->
-      <div class="text-center mb-4 md:mb-5">
-       <div class="w-14 h-14 md:w-16 md:h-16 mx-auto mb-2.5 md:mb-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 anim-pulse-glow">
-        <svg width="32" height="32" viewbox="0 0 40 40" fill="none" class="md:w-9 md:h-9">
-         <path d="M20 4L36 12V28L20 36L4 28V12L20 4Z" stroke="white" stroke-width="2" fill="none" /> <path d="M20 10L30 16V26L20 32L10 26V16L20 10Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1.5" /> <circle cx="20" cy="20" r="4" fill="white" />
-        </svg>
-       </div>
-       <h1 id="login-school" class="text-white text-lg md:text-xl font-800 tracking-tight leading-tight">PKBM Ristek Nusantara Jaya</h1>
-       <p id="login-exam-title" class="text-blue-300/80 text-xs md:text-sm mt-1 md:mt-1.5 font-500">Ujian Pendidikan Kesetaraan (UPK)</p>
-       <div class="mt-2 md:mt-2.5 inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full px-2.5 py-0.5">
-        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> <span class="text-green-300 text-xs font-500">Sistem Aktif</span>
-       </div>
-      </div><!-- Form -->
-      <div class="space-y-2 md:space-y-2.5">
-       <div>
-        <label class="text-white/60 text-xs md:text-sm font-600 uppercase tracking-wider mb-0.5 block">Nama Lengkap</label>
-        <div class="relative">
-         <i data-lucide="user" class="absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:16px;height:16px;"></i> <input id="input-name" type="text" placeholder="Nama lengkap..." class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 md:pl-9 pr-2.5 md:pr-3 py-2 md:py-2.5 text-white placeholder-white/30 text-xs md:text-sm focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all">
-        </div>
-       </div>
-       <div>
-        <label class="text-white/60 text-xs md:text-sm font-600 uppercase tracking-wider mb-0.5 block">Token Ujian</label>
-        <div class="relative">
-         <i data-lucide="key-round" class="absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:16px;height:16px;"></i> <input id="input-token" type="text" placeholder="Token dari pengawas..." class="w-full bg-white/5 border border-white/10 rounded-lg pl-8 md:pl-9 pr-2.5 md:pr-3 py-2 md:py-2.5 text-white placeholder-white/30 text-xs md:text-sm tracking-widest font-mono uppercase focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all" maxlength="10">
-        </div>
-       </div>
-       <div id="login-error" class="hidden text-red-400 text-xs md:text-sm text-center bg-red-500/10 border border-red-500/20 rounded-lg p-2 md:p-2.5 anim-shake">
-        <span id="login-error-text"></span>
-       </div><button id="btn-login" onclick="handleLogin()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-700 py-2.5 md:py-3 rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-blue-500/25 text-xs md:text-sm flex items-center justify-center gap-2"> <i data-lucide="log-in" style="width:16px;height:16px;"></i> Masuk Ujian </button>
-      </div>
-      <p class="text-white/20 text-xs text-center mt-4 md:mt-5">Exambro Security System v3.0</p>
-     </div>
-    </div>
-   </div>
-  </div><!-- SCREEN 2: WARNING -->
-  <div id="screen-warning" class="screen h-full">
-   <div class="h-full w-full bg-slate-950 flex flex-col items-center justify-center p-6 relative">
-    <div class="absolute inset-0 anim-warning-pulse"></div>
-    <div class="relative z-10 w-full max-w-lg text-center">
-     <div class="anim-scale-in">
-      <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center">
-       <i data-lucide="shield-alert" class="text-red-400" style="width:48px;height:48px;"></i>
-      </div>
-      <h2 class="text-white text-2xl sm:text-3xl font-800 mb-3">⚠️ PERATURAN UJIAN</h2>
-      <p class="text-red-300/70 text-sm mb-8 font-500">Baca dengan seksama sebelum memulai</p>
-     </div>
-     <div class="space-y-3 text-left mb-8">
-      <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.1s;opacity:0;">
-       <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-        <i data-lucide="monitor-off" class="text-red-400" style="width:16px;height:16px;"></i>
-       </div>
-       <div>
-        <p class="text-white text-sm font-600">Dilarang Keluar dari Halaman Ujian</p>
-        <p class="text-white/40 text-xs mt-0.5">Berpindah tab/aplikasi akan mengakhiri ujian Anda secara otomatis</p>
-       </div>
-      </div>
-      <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.2s;opacity:0;">
-       <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-        <i data-lucide="copy-x" class="text-orange-400" style="width:16px;height:16px;"></i>
-       </div>
-       <div>
-        <p class="text-white text-sm font-600">Dilarang Copy-Paste &amp; Screenshot</p>
-        <p class="text-white/40 text-xs mt-0.5">Semua fungsi salin, tempel, dan tangkap layar dinonaktifkan</p>
-       </div>
-      </div>
-      <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.3s;opacity:0;">
-       <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-        <i data-lucide="timer" class="text-yellow-400" style="width:16px;height:16px;"></i>
-       </div>
-       <div>
-        <p class="text-white text-sm font-600">Waktu Ujian Terbatas</p>
-        <p class="text-white/40 text-xs mt-0.5">Ujian akan berakhir otomatis saat waktu habis</p>
-       </div>
-      </div>
-      <div class="anim-fade-up bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3" style="animation-delay:0.4s;opacity:0;">
-       <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-        <i data-lucide="lock" class="text-blue-400" style="width:16px;height:16px;"></i>
-       </div>
-       <div>
-        <p class="text-white text-sm font-600">Pelanggaran = Login Ulang</p>
-        <p class="text-white/40 text-xs mt-0.5">Jika terdeteksi melanggar, Anda harus memasukkan <strong class="text-white/70">Kode Guru</strong> untuk kembali</p>
-       </div>
-      </div>
-     </div>
-     <div class="anim-fade-up" style="animation-delay:0.6s;opacity:0;">
-      <label class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-4 cursor-pointer mb-4 hover:bg-white/8 transition-colors"> <input type="checkbox" id="agree-check" class="w-5 h-5 rounded accent-blue-500 flex-shrink-0" onchange="toggleStartBtn()"> <span class="text-white/80 text-sm">Saya memahami dan menyetujui seluruh peraturan ujian di atas</span> </label> <button id="btn-start-exam" disabled onclick="startExam()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-700 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 text-sm flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"> <i data-lucide="play" style="width:18px;height:18px;"></i> Mulai Ujian Sekarang </button>
-     </div>
-    </div>
-   </div>
-  </div><!-- SCREEN 3: EXAM -->
-  <div id="screen-exam" class="screen h-full">
-   <div class="h-full w-full bg-slate-950 flex flex-col">
-    <!-- Top bar -->
-    <header class="flex-shrink-0 bg-slate-900/80 border-b border-white/5 px-4 py-3">
-     <div class="flex items-center justify-between max-w-4xl mx-auto w-full">
-      <div class="flex items-center gap-2 min-w-0">
-       <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <i data-lucide="graduation-cap" class="text-white" style="width:16px;height:16px;"></i>
-       </div>
-       <div class="min-w-0">
-        <p id="exam-student-name" class="text-white text-sm font-600 truncate"></p>
-        <p class="text-white/40 text-xs">UPK 2025</p>
-       </div>
-      </div>
-      <div id="timer-display" class="flex-shrink-0 border border-white/10 rounded-lg px-3 py-2 bg-white/5">
-       <p class="text-xs text-white/40 font-500 uppercase tracking-wider mb-0.5">Waktu</p>
-       <p id="timer-text" class="text-white text-base md:text-lg font-800 font-mono">60:00</p>
-      </div>
-     </div>
-    </header><!-- Question area -->
-    <div class="flex-1 overflow-y-auto p-4">
-     <div class="max-w-3xl mx-auto">
-      <!-- Progress -->
-      <div class="mb-4">
-       <div class="flex items-center justify-between mb-2">
-        <p class="text-white/50 text-xs md:text-sm font-600">Progress</p>
-        <p id="progress-text" class="text-blue-400 text-xs md:text-sm font-700">0/30</p>
-       </div>
-       <div class="flex-1 bg-white/5 rounded-full h-2 overflow-hidden">
-        <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500" style="width:0%"></div>
-       </div>
-      </div><!-- Question card -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-       <div class="bg-blue-600/10 border-b border-white/5 px-5 py-3 flex items-center justify-between">
-        <span id="q-number" class="text-blue-300 text-sm font-700">Soal 1</span> <span id="q-subject" class="text-white/40 text-xs bg-white/5 rounded-full px-2.5 py-0.5"></span>
-       </div>
-       <div class="p-5">
-        <div id="q-text" class="text-white text-sm sm:text-base leading-relaxed mb-5 math-content break-words"></div>
-        <div id="q-options" class="space-y-3 mt-6"></div>
-       </div>
-      </div>
-     </div>
-    </div><!-- Bottom nav -->
-    <div class="flex-shrink-0 bg-slate-900/80 border-t border-white/5 px-4 py-3">
-     <div class="max-w-3xl mx-auto flex items-center justify-between gap-3">
-      <button id="btn-prev" onclick="navQuestion(-1)" class="flex items-center gap-1.5 bg-white/5 border border-white/10 text-white/70 px-4 py-2.5 rounded-xl text-sm font-600 hover:bg-white/10 transition-all disabled:opacity-20" disabled> <i data-lucide="chevron-left" style="width:16px;height:16px;"></i> <span class="hidden sm:inline">Sebelumnya</span> </button> <!-- Question dots (scrollable) -->
-      <div id="q-dots" class="hidden md:flex items-center gap-1.5 overflow-x-auto px-1 scrollbar-hide justify-center flex-wrap" style="max-height:auto;"></div><button id="btn-next" onclick="navQuestion(1)" class="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-700 hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20"> <span class="hidden sm:inline" id="btn-next-text">Selanjutnya</span> <span class="sm:hidden" id="btn-next-text-mobile">Lanjut</span> <i data-lucide="chevron-right" style="width:16px;height:16px;"></i> </button>
-     </div>
-    </div>
-   </div>
-  </div><!-- SCREEN 4: LOCKED (Violation) -->
-  <div id="screen-locked" class="screen h-full">
-   <div class="h-full w-full bg-red-950 flex items-center justify-center p-6 relative">
-    <div class="absolute inset-0 anim-warning-pulse" style="background-color: rgba(220,38,38,0.05);"></div>
-    <div class="absolute inset-0 opacity-5" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,0,0,0.1) 20px, rgba(255,0,0,0.1) 22px);"></div>
-    <div class="relative z-10 w-full max-w-md text-center anim-scale-in">
-     <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-red-500/20 border-2 border-red-500/50 flex items-center justify-center">
-      <i data-lucide="shield-x" class="text-red-400" style="width:48px;height:48px;"></i>
-     </div>
-     <h2 class="text-white text-2xl font-800 mb-2">🚫 UJIAN DIKUNCI</h2>
-     <p class="text-red-300/70 text-sm mb-2">Terdeteksi pelanggaran keamanan ujian</p>
-     <div id="violation-reason" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-6 text-red-300 text-sm font-500 whitespace-pre-wrap break-words"></div>
-     <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-left space-y-4">
-      <p class="text-white/60 text-sm text-center">Hubungi pengawas untuk mendapatkan <strong class="text-white">Kode Guru</strong></p>
-      <div>
-       <label class="text-white/50 text-xs font-600 uppercase tracking-wider mb-1.5 block">Kode Guru</label>
-       <div class="relative">
-        <i data-lucide="key-round" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" style="width:18px;height:18px;"></i> <input id="input-teacher-code" type="password" placeholder="Masukkan kode guru..." class="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-white/30 text-sm tracking-widest font-mono focus:outline-none focus:border-red-500/50 transition-all">
-       </div>
-      </div>
-      <div id="teacher-error" class="hidden text-red-400 text-xs text-center bg-red-500/10 border border-red-500/20 rounded-lg p-2"></div><button onclick="handleTeacherUnlock()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-700 py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"> <i data-lucide="unlock" style="width:16px;height:16px;"></i> Buka Kunci Ujian </button>
-     </div>
-     <p class="text-white/20 text-xs mt-4">Pelanggaran ke-<span id="locked-violation-count">0</span> tercatat</p>
-    </div>
-   </div>
-  </div><!-- SCREEN 5: SUBMIT CONFIRM -->
-  <div id="screen-submit" class="screen h-full">
-   <div class="h-full w-full bg-slate-950 flex items-center justify-center p-6">
-    <div class="w-full max-w-md text-center anim-scale-in">
-     <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center">
-      <i data-lucide="send" class="text-amber-400" style="width:40px;height:40px;"></i>
-     </div>
-     <h2 class="text-white text-2xl font-800 mb-2">Kirim Jawaban?</h2>
-     <p class="text-white/50 text-sm mb-6">Pastikan semua jawaban sudah terisi</p>
-     <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 text-left space-y-3">
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Total Soal</span> <span id="summary-total" class="text-white font-700">20</span>
-      </div>
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Terjawab</span> <span id="summary-answered" class="text-emerald-400 font-700">0</span>
-      </div>
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Belum Dijawab</span> <span id="summary-unanswered" class="text-red-400 font-700">0</span>
-      </div>
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Pelanggaran</span> <span id="summary-violations" class="text-amber-400 font-700">0</span>
-      </div>
-      <div id="summary-detail" class="border-t border-white/10 pt-3 mt-3"></div>
-     </div>
-     <div class="flex gap-3">
-      <button onclick="goBackToExam()" class="flex-1 bg-white/5 border border-white/10 text-white/70 py-3 rounded-xl text-sm font-600 hover:bg-white/10 transition-all"> Kembali </button> <button onclick="submitExam()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-3 rounded-xl text-sm font-700 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20"> Kirim Jawaban </button>
-     </div>
-    </div>
-   </div>
-  </div><!-- SCREEN 6: FINISHED -->
-  <div id="screen-finished" class="screen h-full">
-   <div class="h-full w-full bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-950 anim-gradient flex items-center justify-center p-6 relative">
-    <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
-    <div class="relative z-10 w-full max-w-md text-center anim-scale-in">
-     <div class="text-6xl mb-4">
-      🎉
-     </div>
-     <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center">
-      <i data-lucide="check-circle" class="text-emerald-400" style="width:40px;height:40px;"></i>
-     </div>
-     <h2 class="text-white text-2xl sm:text-3xl font-800 mb-2">Ujian Selesai!</h2>
-     <p class="text-emerald-300/60 text-sm mb-6">Jawaban Anda telah berhasil dikirim</p>
-     <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 space-y-3 text-left">
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Peserta</span> <span id="finish-name" class="text-white font-600"></span>
-      </div>
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Dijawab</span> <span id="finish-answered" class="text-emerald-400 font-700"></span>
-      </div>
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Waktu Digunakan</span> <span id="finish-time" class="text-blue-400 font-700"></span>
-      </div>
-      <div class="flex justify-between text-sm">
-       <span class="text-white/50">Pelanggaran</span> <span id="finish-violations" class="text-amber-400 font-700"></span>
-      </div>
-     </div>
-     <p class="text-white/30 text-xs">PKBM Ristek Nusantara Jaya • Exambro Security System</p>
-    </div>
-   </div>
-  </div><!-- OVERLAY: Anti-cheat warning toast -->
-  <div id="cheat-toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden">
-   <div class="bg-red-600 text-white text-sm font-600 px-5 py-3 rounded-xl shadow-2xl shadow-red-500/50 flex items-center gap-2 anim-slide-down">
-    <i data-lucide="alert-triangle" style="width:16px;height:16px;"></i> <span id="cheat-toast-text">Peringatan!</span>
-   </div>
-  </div>
-  <script>
-// ========== DEVICE DETECTION ==========
-function detectDevice() {
-  const ua = navigator.userAgent.toLowerCase();
-  const isIOS = /iphone|ipad|ipod/.test(ua);
-  const isAndroid = /android/.test(ua);
-  const isDesktop = !isIOS && !isAndroid;
-  
-  return {
-    isIOS,
-    isAndroid,
-    isDesktop,
-    userAgent: ua,
-    deviceType: isIOS ? 'iOS' : isAndroid ? 'Android' : 'Desktop'
-  };
-}
-
-const deviceInfo = detectDevice();
-
-// ========== CONFIG & STATE ==========
-const VALID_TOKENS = ['UPK2026', 'RISTEK01', 'PKBM2025', 'UJIAN01'];
-const TEACHER_CODE = 'GURU7890';
-const MAX_VIOLATIONS = 1;
-const EXAM_DURATION_SECONDS = 3600;
-
-let state = {
-  studentName: '',
-  token: '',
-  sessionId: '',
-  currentQ: 0,
-  answers: {},
-  violations: 0,
-  isLocked: false,
-  lockReason: '',
-  timeLeft: EXAM_DURATION_SECONDS,
-  timerInterval: null,
-  examActive: false,
-  examStartTime: null,
-  monitoringActive: false,
-  dataRecord: null,
-  deviceType: deviceInfo.deviceType,
-  iosPollInterval: null,
-  iosBackgroundViolation: false,
-  iosLastActivityTime: Date.now(),
-  iosInactivityTimeout: 5000 // 5 detik, kalau tidak ada activity = terblokir
-};
-
-
-
-// ========== SOAL DATA ==========
-let soalIsian = [
-  "Jika diketahui fungsi f(x) = 2x² - 4x + 1, maka nilai f(3) adalah __________.",
-  "Turunan pertama dari fungsi f(x) = 3x³ - 5x² + 2x adalah __________.",
-  "Nilai limit dari lim (x → 2) (x² - 4)/(x - 2) adalah __________.",
-  "Jika diketahui matriks A = [[1,2],[3,4]], maka determinan matriks A adalah __________.",
-  "Jika sin θ = 1/2 dan θ berada di kuadran I, maka nilai cos θ adalah __________."
-];
-
-let soalPG = [
-  ["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....", ["x > 10","x < 10","x < 6","x > 4","x < 1"], 3],
-  ["Interval penyelesaian pertidaksamaan \\(\\left|x - 1\\right| < \\left|x + 2\\right|\\) adalah ...", ["x < \\(\\frac{-3}{4}\\)","x < \\(\\frac{-1}{4}\\)","x > \\(\\frac{-3}{4}\\)","x < \\(\\frac{-5}{4}\\)","x > 1"], 2],
-  ["Return adalah keuntungan dari suatu investasi. Sebagai contoh, jika investasi berupa tabungan di bank, return adalah bunga bank; jika investasi berupa kepemilikan saham pada suatu perusahaan, return dapat berupa kenaikan harga saham maupun hasil bagi keuntungan perusahaan. Jika return yang diperoleh diinvestasikan kembali, berlaku hubungan berikut: \\(1 + R = (1 + r)^t\\) dengan R adalah return selama jangka waktu t, dan r adalah tingkat return per-unit waktu. Ayah berinvestasi pada suatu perusahaan sebesar Rp10.000.000,00 dengan return 15% per tahun. Saat pembagian keuntungan di tiap akhir tahun, Ayah menginvestasikan kembali keuntungan tersebut. Di akhir tahun ke-t, investasi ayah di perusahaan tersebut bernilai Rp15.200.000,00 (pembulatan ke ratusan ribu terdekat). Diketahui \\(\\log 1{,}52 = 0{,}18\\) dan \\(\\log 1{,}15 = 0{,}06\\). Nilai t adalah ....", ["2","3","4","5","6"], 1],
-  ["Persamaan grafik fungsi seperti tampak pada gambar adalah .... <br><img src='https://i.imgur.com/YI2lKMX.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>", ["y = \\log_{3} x","y = \\log_{\\frac{1}{3}} x","y = \\left(-\\frac{1}{3}\\right)^x","y = (1-3)^x","y = 3^{-x}"], 0],
-  ["Diketahui \\((x-1)\\) salah satu faktor dari persamaan suku banyak: \\(x^3 - 2x^2 - 5x + b = 0\\). Salah satu faktor lainnya adalah ....", ["x - 3","x - 2","x + 1","x + 3","x + 6"], 2],
-  ["Alfin menabung sejumlah uang di bank, dan setelah dua tahun uangnya menjadi Rp5.292.000,00. Jika bunga majemuk 5% per tahun, maka jumlah awal uang yang ditabung adalah ....", ["Rp4.400.000,00","Rp4.500.000,00","Rp4.600.000,00","Rp4.700.000,00","Rp4.800.000,00"], 1],
-  ["Jumlah dua bilangan positif adalah 32. Jika jumlah dari kebalikan setiap bilangan tersebut \\(\\frac{12}{15}\\), maka selisih kedua bilangan tersebut adalah ....", ["16","12","10","8","7"], 3],
-  ["Nilai \\(\\displaystyle \\lim_{x \\to \\infty} \\left[\\sqrt{x(4x+5)} - \\sqrt{4x^2 - 3}\\right]\\) = ....", ["\\(\\frac{1}{2}\\)","\\(\\frac{2}{3}\\)","\\(\\frac{2}{5}\\)","\\(\\frac{5}{3}\\)","\\(\\frac{5}{4}\\)"], 3],
-  ["Turunan pertama fungsi \\(f(x) = \\frac{\\sin x + \\cos x}{\\cos x}\\) adalah ....", ["\\(1 - \\sec^2 x\\)","\\(\\sec^2 x\\)","\\(\\cot x + 1\\)","\\(\\cos ec^2 x\\)","\\(-\\sin x\\)"], 1],
-  ["Nilai \\(\\displaystyle \\lim_{x \\to 0} \\frac{\\sin 8x + \\sin 4x}{2x(\\cos 12x + \\cos 8x)}\\) = ....", ["-3","-\\(\\frac{3}{10}\\)","\\(\\frac{1}{5}\\)","\\(\\frac{3}{10}\\)","3"], 3],
-  ["Luas daerah yang diarsir berikut adalah .... <br><img src='https://i.imgur.com/Y9eX02O.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>", ["\\(17\\frac{1}{2}\\)","\\(15\\frac{1}{2}\\)","\\(13\\frac{1}{2}\\)","\\(10\\frac{1}{2}\\)","9"], 2],
-  ["Diketahui garis g menyinggung kurva \\(y = \\sin x + \\cos x\\) di titik yang berabsis \\(\\frac{\\pi}{3}\\). Gradien garis yang tegak lurus pada garis g adalah ....", ["\\(1 - \\sqrt{3}\\)","\\(1 + \\sqrt{3}\\)","1","\\(\\frac{1}{2}(\\sqrt{3} - 1)\\)","\\(\\frac{1}{2}(1 - \\sqrt{3})\\)"], 4],
-  ["Suatu mesin diprogram untuk menggerakkan sebuah alat penggores sedemikian hingga alat tersebut dinyatakan dengan \\(x = 3\\cos 4t\\) dan \\(y = 2\\cos 3t\\) (posisi dalam satuan cm dan waktu t satuan detik). Kecepatan gerak alat penggores pada saat t dinyatakan dengan \\(v = \\sqrt{\\left(\\frac{dx}{dt}\\right)^2 + \\left(\\frac{dy}{dt}\\right)^2}\\) dalam satuan cm/detik. Besar kecepatan gerak alat tersebut saat \\(t = \\frac{\\pi}{2}\\) detik adalah ....", ["2 cm/detik","\\(\\sqrt{13}\\) cm/detik","6 cm/detik","\\(6\\sqrt{5}\\) cm/detik","12 cm/detik"], 2],
-  ["Jika \\(x = 2\\sin t\\), \\(y = 4 + \\cos t\\), maka \\(\\frac{dy}{dx}\\) dalam t adalah ....", ["\\(-\\frac{2}{3}\\sin t\\)","\\(-\\frac{2}{3}\\tan t\\)","\\(\\frac{1}{2}\\tan t\\)","\\(-\\frac{1}{2}\\tan t\\)","\\(-\\frac{1}{2}\\sin t\\)"], 3],
-  ["Luas daerah yang dibatasi oleh kurva \\(y = 6x - x^2\\) dan \\(y = x^2 - 2x\\) adalah ....", ["\\(\\frac{20}{3}\\) satuan luas","16 satuan luas","21 satuan luas","\\(\\frac{64}{3}\\) satuan luas","32 satuan luas"], 3],
-  ["Sebuah kota selama \\(t\\) tahun perkiraan jumlah penduduknya dapat dinyatakan oleh fungsi \\(P = \\frac{12000}{(3+t)^2} + 35000\\). Perkiraan jumlah penduduknya dalam jangka waktu yang sangat lama di masa yang akan datang adalah ....", ["12.000","20.000","35.000","40.000","45.000"], 2],
-  ["Jika \\(\\sin \\alpha = \\frac{12}{13}\\), dengan \\(\\alpha\\) lancip, maka \\(\\sin 2\\alpha + \\cos 2\\alpha\\) = ....", ["\\(\\frac{3}{144}\\)","\\(\\frac{2}{144}\\)","-\\(\\frac{1}{144}\\)","\\(\\frac{1}{169}\\)","\\(\\frac{2}{169}\\)"], 4],
-  ["Persamaan lingkaran yang melalui titik potong lingkaran \\(L_1 \\equiv x^2 + y^2 + 2x + 2y - 2 = 0\\) dan \\(L_2 \\equiv x^2 + y^2 + 4x - 8y + 4 = 0\\) serta melalui titik asal adalah ....", ["\\(3x^2 + 3y^2 + 8x - 2y = 0\\)","\\(3x^2 + 3y^2 - 8x + 4y = 0\\)","\\(3x^2 + 3y^2 + 8x - 4y = 0\\)","\\(4x^2 + 4y^2 + 8x + 4y = 0\\)","\\(4x^2 + 4y^2 + 8x - 2y = 0\\)"], 2],
-  ["Himpunan penyelesaian persamaan \\(\\sin(3x + 30^\\circ) = \\frac{1}{2}\\sqrt{2}\\) pada interval \\(0^\\circ \\le x \\le 180^\\circ\\) adalah ....", ["\\(\\{5^\\circ, 35^\\circ\\}\\)","\\(\\{5^\\circ, 125^\\circ\\}\\)","\\(\\{5^\\circ, 35^\\circ, 65^\\circ, 95^\\circ\\}\\)","\\(\\{5^\\circ, 35^\\circ, 125^\\circ, 155^\\circ\\}\\)","\\(\\{5^\\circ, 35^\\circ, 95^\\circ, 155^\\circ\\}\\)"], 3],
-  ["Diketahui segitiga ABC siku-siku di B. Jika \\(\\sin A \\cdot \\sin C = \\frac{1}{10}\\) dan \\(\\sin(A - C) = \\frac{2}{5}x\\), maka nilai \\(x\\) adalah ....", ["-2","-\\(\\frac{1}{2}\\)","\\(\\frac{1}{4}\\)","\\(\\frac{1}{2}\\)","2"], 4],
-  ["Diketahui vektor \\(\\mathbf{a} = \\begin{pmatrix} x \\\\ 2 \\\\ -1 \\end{pmatrix}\\), \\(\\mathbf{b} = \\begin{pmatrix} 4 \\\\ -3 \\\\ 6 \\end{pmatrix}\\), dan \\(\\mathbf{c} = \\begin{pmatrix} 2 \\\\ 0 \\\\ 3 \\end{pmatrix}\\). Jika \\(\\mathbf{a}\\) tegak lurus \\(\\mathbf{b}\\), hasil dari \\((3\\mathbf{a} - \\mathbf{b}) + 2\\mathbf{c}\\) adalah ....", ["\\(\\begin{pmatrix} 9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)","\\(\\begin{pmatrix} 9 \\\\ 9 \\\\ -3 \\end{pmatrix}\\)","\\(\\begin{pmatrix} -9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)","\\(\\begin{pmatrix} 9 \\\\ 6 \\\\ 3 \\end{pmatrix}\\)","\\(\\begin{pmatrix} 9 \\\\ -9 \\\\ 3 \\end{pmatrix}\\)"], 0],
-  ["Alief, Abdul, dan Azzam sedang menerbangkan layang-layang, masing-masing berdiri pada koordinat \\((-1, 4, 8)\\), \\((1, 2, 3)\\), dan \\((5, y, z)\\) yang segaris. Maka posisi berdiri Azzam pada koordinat ....", ["(5, -7, -2)","(5, -5, -2)","(5, -2, -7)","(5, 2, 7)","(5, 7, 9)"], 0],
-  ["Diketahui vektor \\(\\vec{a} = -2\\mathbf{i} + 3\\mathbf{j} + \\mathbf{k}\\) dan \\(\\vec{b} = 4\\mathbf{i} + 4\\mathbf{j} + m\\mathbf{k}\\). Jika panjang proyeksi vektor \\(\\vec{a}\\) pada \\(\\vec{b}\\) adalah \\(\\frac{1}{3}\\), nilai \\(m\\) yang memenuhi adalah ....", ["-7","-5","2","5","7"], 4],
-  ["Balok KLMN.OPQR mempunyai panjang rusuk KL = 16 cm, LM = 12 cm, dan MQ = 10 cm. Jarak titik P ke titik N adalah ....", ["\\(10\\sqrt{6}\\ \\text{cm}\\)","\\(10\\sqrt{5}\\ \\text{cm}\\)","\\(10\\sqrt{3}\\ \\text{cm}\\)","\\(5\\sqrt{6}\\ \\text{cm}\\)","\\(5\\sqrt{5}\\ \\text{cm}\\)"], 0],
-  ["Perhatikan gambar kubus berikut:<br><img src='https://i.imgur.com/Afmchd1.png' style='max-width:100%;margin-top:10px;border-radius:10px;'><br><br>Diketahui titik P merupakan perpotongan antara diagonal BG dan CF. Cermati beberapa pernyataan berikut.<br><br>(i) Titik P terletak pada bidang ACGE<br>(ii) Titik P terletak di luar bidang BCHE<br>(iii) Titik P terletak pada bidang CDEF<br>(iv) Titik P terletak pada bidang BCGF<br>(v) Titik P terletak di luar bidang ABGH<br><br>Pernyataan yang benar adalah ....", ["(i), (ii), dan (iii)","(i), (iii), dan (v)","(i), (iv), dan (v)","(ii), (iii), dan (iv)","(ii), (iv), dan (v)"], 2],
-  ["Dalam suatu ujian seorang siswa diharuskan menjawab soal multiple choice sebanyak tiga kali. Peubah acak banyaknya jawaban benar adalah ....", ["\\(\\{0, 1\\}\\)","\\(\\{0, 1, 2\\}\\)","\\(\\{1, 2\\}\\)","\\(\\{1, 2, 3\\}\\)","\\(\\{0, 1, 2, 3\\}\\)"], 4],
-  ["Dua buah dadu diundi bersama-sama sebanyak tiga kali. Peluang mendapatkan dua kali mata dadu berjumlah 9 adalah ....", ["\\(\\frac{8}{81}\\)","\\(\\frac{16}{81}\\)","\\(\\frac{16}{243}\\)","\\(\\frac{8}{243}\\)","\\(\\frac{4}{243}\\)"], 2],
-  ["Sepasang suami istri merencanakan untuk mempunyai 4 orang anak. Jika variabel acak \\(X\\) menyatakan banyak anak perempuan, nilai dari \\(P(X \\ge 2)\\) adalah ....", ["\\(\\frac{4}{16}\\)","\\(\\frac{5}{16}\\)","\\(\\frac{6}{16}\\)","\\(\\frac{10}{16}\\)","\\(\\frac{11}{16}\\)"], 3],
-  ["Nilai ujian MTK yang diperoleh dalam satu kelas berdistribusi normal dengan rata-rata 70 dan simpangan baku 10. Jika remedial akan diberikan kepada 20% siswa dengan nilai terendah, nilai minimum siswa yang tidak mengikuti remedial adalah ....", ["57,5","58,5","59,2","62,5","65,0"], 3],
-];
-
-let soalUraian = [
-  "Tentukanlah interval penyelesaian pertidaksamaan \\(|x + 2| \\ge 2|x - 1|\\)!",
-  "Tentukan nilai dari \\(\\int (2x + 5)\\cos 2x \\, dx\\)!",
-  "Berapakah luas maksimum trapesium ABCD dengan AD = CD = BC = m cm, dan ∠DAB = ∠CBA = 2α (α sudut lancip)?",
-  "Tentukan batas-batas nilai a yang memenuhi agar titik P(8, -6) berada di dalam lingkaran \\(x^2 + y^2 = a^2\\)!",
-  "Suatu variabel acak x memiliki distribusi probabilitas P(X=0)=k, P(X=1)=k², P(X=2)=k²+k, P(X=3)=3k²+2k. Tentukan nilai k!"
-];
-
-const questions = [];
-soalIsian.forEach((text, i) => {
-  questions.push({ type: 'short', stage: 1, subject: 'Matematika Peminatan', text });
-});
-soalPG.forEach(([text, options, correct], i) => {
-  questions.push({ type: 'choice', stage: 2, subject: 'Matematika Peminatan', text, options, correct });
-});
-soalUraian.forEach((text, i) => {
-  questions.push({ type: 'essay', stage: 3, subject: 'Matematika Peminatan', text });
-});
-
-// ========== SCREEN MANAGEMENT ==========
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  lucide.createIcons();
-  // Render MathJax setelah screen berubah
-  if (window.MathJax) {
-    setTimeout(() => MathJax.typesetPromise().catch(err => console.error('MathJax error:', err)), 100);
-  }
-}
-
-// ========== LOGIN ==========
-function handleLogin() {
-  const name = document.getElementById('input-name').value.trim();
-  const token = document.getElementById('input-token').value.trim().toUpperCase();
-  const errEl = document.getElementById('login-error');
-  const errText = document.getElementById('login-error-text');
-
-  if (!name) { showLoginError('Nama lengkap wajib diisi'); return; }
-  if (name.length < 3) { showLoginError('Nama minimal 3 karakter'); return; }
-  if (!token) { showLoginError('Token ujian wajib diisi'); return; }
-  if (!VALID_TOKENS.includes(token)) { showLoginError('Token ujian tidak valid. Hubungi pengawas.'); return; }
-
-  errEl.classList.add('hidden');
-  state.studentName = name;
-  state.token = token;
-  state.sessionId = `${name}-${token}-${Date.now()}`;
-  
-  setTimeout(() => {
-    showScreen('screen-warning');
-    lucide.createIcons();
-  }, 100);
-}
-
-function checkExistingSession() {
-  return false;
-}
-
-function showLoginError(msg) {
-  const el = document.getElementById('login-error');
-  document.getElementById('login-error-text').textContent = msg;
-  el.classList.remove('hidden');
-  el.classList.remove('anim-shake');
-  void el.offsetWidth;
-  el.classList.add('anim-shake');
-}
-
-function toggleStartBtn() {
-  const isChecked = document.getElementById('agree-check').checked;
-  const btn = document.getElementById('btn-start-exam');
-  btn.disabled = !isChecked;
-}
-
-// ========== START EXAM ==========
-function startExam() {
-  state.examActive = true;
-  state.isLocked = false;
-  state.examStartTime = Date.now();
-  state.currentQ = 0;
-  state.violations = 0;
-  state.timeLeft = EXAM_DURATION_SECONDS;
-
-  document.getElementById('exam-student-name').textContent = state.studentName;
-  showScreen('screen-exam');
-  renderQuestion();
-  buildDots();
-  startTimer();
-  startMonitoring();
-}
-
-// ========== TIMER ==========
-function startTimer() {
-  clearInterval(state.timerInterval);
-  updateTimerDisplay();
-  state.timerInterval = setInterval(() => {
-    state.timeLeft--;
-    updateTimerDisplay();
-    if (state.timeLeft <= 0) {
-      clearInterval(state.timerInterval);
-      autoSubmit();
-    }
-  }, 1000);
-}
-
-function updateTimerDisplay() {
-  const m = Math.floor(state.timeLeft / 60);
-  const s = state.timeLeft % 60;
-  const el = document.getElementById('timer-text');
-  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  const display = document.getElementById('timer-display');
-  if (state.timeLeft <= 300) {
-    display.classList.remove('border-white/10');
-    display.classList.add('border-red-500/50');
-    el.classList.add('text-red-400');
-    el.classList.remove('text-white');
-  }
-}
-
-// ========== QUESTIONS RENDER ==========
-function renderQuestion() {
-  const q = questions[state.currentQ];
-  document.getElementById('q-number').textContent = `Soal ${state.currentQ + 1}`;
-  document.getElementById('q-subject').textContent = `${q.subject} • Tahap ${q.stage}`;
-  
-  const qTextEl = document.getElementById('q-text');
-  qTextEl.textContent = q.text;
-  
-  // Render MathJax untuk teks soal
-  if (window.MathJax) {
-    MathJax.typesetPromise([qTextEl]).catch(err => console.error('MathJax error:', err));
-  }
-
-  const optCont = document.getElementById('q-options');
-  optCont.innerHTML = '';
-
-  if (q.type === 'choice') {
-    const labels = ['A','B','C','D','E'];
-    q.options.forEach((opt, i) => {
-      const selected = state.answers[state.currentQ] === i;
-      const btn = document.createElement('button');
-      btn.className = `option-btn w-full text-left border rounded-lg md:rounded-xl p-3 md:p-4 flex items-start gap-3 md:gap-4 transition-all ${selected ? 'selected border-blue-500/60 bg-gradient-to-r from-blue-600/20 to-indigo-600/10' : 'border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/20'}`;
-      const optionHtml = `
-        <span class="w-8 h-8 md:w-9 md:h-9 rounded-lg ${selected ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30' : 'bg-white/10 text-white/60'} flex items-center justify-center text-sm md:text-base font-800 flex-shrink-0 transition-all">${labels[i]}</span>
-        <span class="text-fluid-md ${selected ? 'text-white font-600 leading-relaxed' : 'text-white/70 leading-relaxed'} break-words math-content">${opt}</span>
-      `;
-      btn.innerHTML = optionHtml;
-      btn.onclick = () => selectAnswer(i);
-      optCont.appendChild(btn);
-    });
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK - PKBM Ristek Nusantara Jaya</title>
     
-    // Render MathJax untuk opsi
-    if (window.MathJax) {
-      setTimeout(() => {
-        MathJax.typesetPromise(Array.from(optCont.querySelectorAll('.math-content'))).catch(err => console.error('MathJax error:', err));
-      }, 50);
-    }
+    <!-- Fonts & MathJax -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  } else if (q.type === 'short') {
-    const inputCont = document.createElement('div');
-    inputCont.className = 'space-y-2';
-    inputCont.innerHTML = `
-      <label class="text-white/50 text-xs md:text-sm font-600 uppercase tracking-wider">Jawaban Anda</label>
-      <textarea id="short-answer-${state.currentQ}" placeholder="Tulis jawaban singkat di sini..." class="w-full bg-white/5 border border-white/10 rounded-xl p-3 md:p-4 text-white placeholder-white/30 text-fluid-md focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all resize-none" rows="2" maxlength="200" onchange="updateShortAnswer(this.value)" oninput="updateCharCount(this)"></textarea>
-      <div class="flex justify-between text-xs text-white/40">
-        <span>Max 200 karakter</span>
-        <span id="char-count-${state.currentQ}">0/200</span>
-      </div>
-    `;
-    optCont.appendChild(inputCont);
+    <style>
+        :root {
+            --bg-overall: #F1F4F9;
+            --bg-card: #FFFFFF;
+            --primary: #0A66C2;
+            --danger: #ef4444;
+            --text-dark: #1F2937;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark);
+            -webkit-user-select: none; user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* Layout Utama */
+        .container { 
+            max-width: 850px; 
+            margin: 20px auto; 
+            padding: 0 10px; 
+        }
+
+        /* Header Ujian Sticky */
+        .exam-header {
+            display: none; background: white; padding: 12px 15px;
+            position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Card Modern */
+        .card {
+            background: var(--bg-card); padding: 40px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+
+        /* Tab Management */
+        .tab-content { display: none; }
+        .active { display: block; }
+
+        /* School Branding */
+        .school-header { text-align: center; margin-bottom: 10px; }
+        .logo { width: 90px; height: auto; margin-bottom: 10px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+        .school-name { font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--text-dark); }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; }
+
+        /* Form Inputs (Token di bawah Nama) */
+        .input-vertical-group { display: flex; flex-direction: column; gap: 15px; margin: 30px 0; }
+        .input-wrapper label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; padding-left: 4px; }
+        input[type="text"] { 
+            width: 100%; padding: 16px; border: 2px solid var(--border); 
+            border-radius: 12px; font-size: 16px !important; background: #F9FAFB;
+            transition: 0.2s;
+        }
+        input[type="text"]:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(10,102,194,0.1); }
+
+        /* Buttons */
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: block; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn:active { transform: scale(0.98); }
+
+        /* Soal Styles */
+        .soal-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .soal-text { font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px; display: block; font-weight: 600; }
+        .opsi-item { display: flex; align-items: center; padding: 14px; border: 1px solid #f3f4f6; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .opsi-item:hover { background: #f0f7ff; border-color: var(--primary); }
+        .opsi-item input { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; }
+
+        /* Overlay Lock */
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index:10000; padding: 20vh 20px 0 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; font-family: monospace; }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            .container { padding: 0 8px; margin: 10px auto; }
+            .card { padding: 25px 18px; border-radius: 15px; }
+            .school-name { font-size: 1.2rem; }
+            .soal-text { font-size: 1rem; }
+            .opsi-item { padding: 12px; font-size: 0.95rem; }
+            .exam-header { padding: 10px; }
+        }
+
+        @media (max-width: 350px) {
+            .school-name { font-size: 1rem; }
+            .logo { width: 70px; }
+            .timer-badge { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ANTI-CHEAT OVERLAY -->
+<div id="overlay">
+    <div style="max-width: 400px; margin: auto;">
+        <h1 style="color: var(--danger); font-size: 1.8rem;">SISTEM TERKUNCI!</h1>
+        <p style="opacity: 0.8; font-size: 0.9rem;">Anda terdeteksi melakukan pelanggaran (Pindah aplikasi/Screenshot).</p>
+        <p>Hubungi pengawas untuk mendapatkan <b>KODE REGISTRASI GURU</b>.</p>
+        <input type="text" id="kodeGuruInput" placeholder="Ketik Kode Guru Di Sini" style="text-align:center; margin-bottom: 20px; background: #222; border: 1px solid #444; color: white; width: 100%;">
+        <button class="btn btn-primary" onclick="unlockExam()">BUKA AKSES UJIAN</button>
+    </div>
+</div>
+
+<!-- STICKY HEADER EXAM -->
+<div id="examHeader" class="exam-header">
+    <div style="overflow: hidden; padding-right: 10px;">
+        <div id="displayNama" style="font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95rem;">Nama Siswa</div>
+        <div style="font-size: 0.65rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">UPK MATEMATIKA PEMINATAN</div>
+    </div>
+    <div class="timer-badge" id="timer">90:00</div>
+</div>
+
+<div class="container">
     
-    setTimeout(() => {
-      const textarea = document.getElementById(`short-answer-${state.currentQ}`);
-      if (textarea && state.answers[state.currentQ]) {
-        textarea.value = state.answers[state.currentQ];
-        updateCharCount(textarea);
-      }
-    }, 0);
-
-  } else if (q.type === 'essay') {
-    const essayCont = document.createElement('div');
-    essayCont.className = 'space-y-4';
-    essayCont.innerHTML = `
-      <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex gap-3">
-        <i data-lucide="info" class="text-blue-400 flex-shrink-0" style="width:20px;height:20px;"></i>
-        <div>
-          <p class="text-blue-300 text-sm font-600">Jawab di Kertas Biasa</p>
-          <p class="text-blue-300/70 text-xs mt-1">Tulis jawaban uraian Anda di kertas, kemudian ambil foto dan upload di sini.</p>
+    <!-- TAB 1: REGISTRASI (Token di bawah Nama) -->
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo" alt="Logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <span class="exam-badge">UPK MATEMATIKA PEMINATAN</span>
+            </div>
+            
+            <hr style="border:0; height:1px; background:#eee; margin: 25px 0;">
+            
+            <div class="input-vertical-group">
+                <div class="input-wrapper">
+                    <label>Nama Lengkap Siswa</label>
+                    <input type="text" id="namaSiswa" placeholder="Masukkan nama sesuai absen">
+                </div>
+                <div class="input-wrapper">
+                    <label>Token Ujian</label>
+                    <input type="text" id="tokenUjian" placeholder="Masukkan token dari pengawas">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut ke Tata Tertib</button>
+            <p style="text-align: center; font-size: 0.7rem; color: #a1a7b3; margin-top: 20px; font-weight: 600;">TAHUN PELAJARAN 2025-2026</p>
+        <p style="text-align: center; font-size: 0.7rem; color: #7a0404; margin-top: 20px; font-weight: 600;">EXAMBRO_RNJ_SIBERSCURITY</p>
         </div>
-      </div>
-      <div class="space-y-3">
-        <label class="text-white/50 text-xs md:text-sm font-600 uppercase tracking-wider">Upload Foto Jawaban</label>
-        <input type="file" id="essay-file-${state.currentQ}" accept="image/*" class="hidden" onchange="handleEssayUpload(event, ${state.currentQ})">
-        <button onclick="document.getElementById('essay-file-${state.currentQ}').click()" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-600 py-3 md:py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 text-sm md:text-base flex items-center justify-center gap-2">
-          <i data-lucide="upload-cloud" style="width:18px;height:18px;"></i> Pilih & Upload Foto
-        </button>
-        <div id="essay-preview-${state.currentQ}" class="space-y-2 hidden">
-          <p class="text-white/50 text-xs font-600">Foto yang diupload:</p>
-          <img id="essay-img-${state.currentQ}" src="" alt="Preview" class="w-full rounded-lg border border-white/10 max-h-64 object-contain bg-white/5">
-          <button onclick="clearEssayUpload(${state.currentQ})" class="w-full bg-red-600/20 border border-red-500/30 text-red-400 font-600 py-2 rounded-lg text-xs hover:bg-red-600/30 transition-all flex items-center justify-center gap-2">
-            <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Hapus Foto
-          </button>
+    </div>
+
+    <!-- TAB 2: TATA TERTIB -->
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="color: var(--danger); margin-top: 0; font-size: 1.4rem;">Peringatan Keamanan</h2>
+            <div style="background: #fff5f5; border-left: 4px solid var(--danger); padding: 15px; margin-bottom: 25px; border-radius: 8px;">
+                <ul style="margin: 0; padding-left: 18px; line-height: 1.7; color: #b91c1c; font-size: 0.9rem;">
+                    <li><b>Dilarang</b> keluar dari halaman/tab ujian.</li>
+                    <li><b>Dilarang</b> membuka aplikasi lain (Chrome, Sosmed, dll).</li>
+                    <li><b>Dilarang</b> mengambil Screenshot atau rekaman layar.</li>
+                    <li>Layar akan <b>TERKUNCI</b> jika melanggar ketentuan di atas.</li>
+                </ul>
+            </div>
+            <button class="btn btn-primary" onclick="mulaiUjian()">SAYA MENGERTI & MULAI</button>
         </div>
-      </div>
-    `;
-    optCont.appendChild(essayCont);
+    </div>
 
-    setTimeout(() => {
-      lucide.createIcons();
-      if (state.answers[state.currentQ] && typeof state.answers[state.currentQ] === 'object' && state.answers[state.currentQ].dataUrl) {
-        showEssayPreview(state.currentQ, state.answers[state.currentQ].dataUrl);
-      }
-    }, 0);
-  }
+    <!-- TAB 3: AREA SOAL -->
+<div id="tab3" class="tab-content">
+    <!-- Tempat Soal Pilihan Ganda Muncul -->
+    <div id="renderPG"></div>
+    
+    <!-- Bagian Soal Uraian (Teks Soal Saja) -->
+    <div class="card" style="background: #fff; border: 1px solid var(--border);">
+        <h3 style="color: var(--primary); margin-top:0;">Soal Uraian</h3>
+        <div id="renderUraianTeks"></div> <!-- Hanya teks soal -->
+    </div>
 
-  document.getElementById('btn-prev').disabled = state.currentQ === 0;
-  const isLast = state.currentQ === questions.length - 1;
-  document.getElementById('btn-next-text').textContent = isLast ? 'Selesai' : 'Selanjutnya';
-  document.getElementById('btn-next-text-mobile').textContent = isLast ? 'Selesai' : 'Lanjut';
-  document.getElementById('btn-next').onclick = isLast ? () => showSubmitScreen() : () => navQuestion(1);
+    <!-- SATU TEMPAT UPLOAD UNTUK SEMUA -->
+    <div class="card" style="background: #f8fafc; border: 2px dashed var(--primary); padding: 25px; text-align: center;">
+        <h3 style="margin-top:0; color: var(--primary);">Upload Jawaban Uraian</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+            Foto lembar jawaban HVS Anda (untuk soal 1-5) dan unggah di sini:
+        </p>
+        <input type="file" accept="image/*" onclick="prepareUpload()" onchange="saveFileSingle(this)" style="font-size: 1rem; width: 100%; max-width: 300px;">
+        <div id="status_upload" style="color:#10b981; font-weight:700; margin-top:10px;">
+            <!-- Status upload muncul di sini -->
+        </div>
+    </div>
+    
+    <button class="btn btn-success" onclick="finishExam()" style="margin-top: 20px; margin-bottom: 60px;">KUMPULKAN SEMUA JAWABAN</button>
+</div>
 
-  const answered = Object.keys(state.answers).length;
-  document.getElementById('progress-bar').style.width = `${(answered / questions.length) * 100}%`;
-  document.getElementById('progress-text').textContent = `${answered}/${questions.length}`;
+</div>
 
-  updateDots();
+<script>
+    const KODE_GURU = "Guru7890"; 
+    let timeLeft = 90 * 60;
+    let timerInterval;
+    let savedData = JSON.parse(localStorage.getItem("upk_session")) || {};
+
+    let letsSoalPG = [
+["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....",
+["x > 10","x < 10","x < 6","x > 4","x < 1"]],
+
+["Interval penyelesaian pertidaksamaan \\(\\left|x - 1\\right| < \\left|x + 2\\right|\\) adalah ...",
+["x < \\(\\frac{-3}{4}\\)","x < \\(\\frac{-1}{4}\\)","x > \\(\\frac{-3}{4}\\)","x < \\(\\frac{-5}{4}\\)","x > 1"]],
+
+["Return adalah keuntungan dari suatu investasi. Sebagai contoh, jika investasi berupa tabungan di bank, return adalah bunga bank; jika investasi berupa kepemilikan saham pada suatu perusahaan, return dapat berupa kenaikan harga saham maupun hasil bagi keuntungan perusahaan. Jika return yang diperoleh diinvestasikan kembali, berlaku hubungan berikut: \\(1 + R = (1 + r)^t\\) dengan R adalah return selama jangka waktu t, dan r adalah tingkat return per-unit waktu. Ayah berinvestasi pada suatu perusahaan sebesar Rp10.000.000,00 dengan return 15% per tahun. Saat pembagian keuntungan di tiap akhir tahun, Ayah menginvestasikan kembali keuntungan tersebut. Di akhir tahun ke-t, investasi ayah di perusahaan tersebut bernilai Rp15.200.000,00 (pembulatan ke ratusan ribu terdekat). Diketahui \\(\\log 1{,}52 = 0{,}18\\) dan \\(\\log 1{,}15 = 0{,}06\\). Nilai t adalah ....",
+["2","3","4","5","6"]],
+
+["Persamaan grafik fungsi seperti tampak pada gambar adalah .... <br><img src='https://i.imgur.com/YI2lKMX.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
+["\\( y = \\log_{3}x \\)", 
+        "\\( y = \\log_{\\frac{1}{3}}x \\)", 
+        "\\( y = \\left(-\\frac{1}{3}\\right)^x \\)", 
+        "\\( y = (1-3)^x \\)", 
+        "\\( y = 3^{-x} \\)"]],
+
+["Diketahui \\((x-1)\\) salah satu faktor dari persamaan suku banyak: \\(x^3 - 2x^2 - 5x + b = 0\\). Salah satu faktor lainnya adalah ....",
+["x - 3","x - 2","x + 1","x + 3","x + 6"]],
+
+["Alfin menabung sejumlah uang di bank, dan setelah dua tahun uangnya menjadi Rp5.292.000,00. Jika bunga majemuk 5\\% per tahun, maka jumlah awal uang yang ditabung adalah ....",
+["Rp4.400.000,00","Rp4.500.000,00","Rp4.600.000,00","Rp4.700.000,00","Rp4.800.000,00"]],
+
+["Jumlah dua bilangan positif adalah 32. Jika jumlah dari kebalikan setiap bilangan tersebut \\(\\frac{12}{15}\\), maka selisih kedua bilangan tersebut adalah ....",
+["16","12","10","8","7"]],
+
+["Nilai \\(\\displaystyle \\lim_{x \\to \\infty} \\left[\\sqrt{x(4x+5)} - \\sqrt{4x^2 - 3}\\right]\\) = ....",
+["\\(\\frac{1}{2}\\)",
+ "\\(\\frac{2}{3}\\)",
+ "\\(\\frac{2}{5}\\)",
+ "\\(\\frac{5}{3}\\)",
+ "\\(\\frac{5}{4}\\)"]],
+
+ ["Turunan pertama fungsi \\(f(x) = \\frac{\\sin x + \\cos x}{\\cos x}\\) adalah ....",
+["\\(1 - \\sec^2 x\\)",
+ "\\(\\sec^2 x\\)",
+ "\\(\\cot x + 1\\)",
+ "\\(\\cos ec^2 x\\)",
+ "\\(-\\sin x\\)"]],
+
+ ["Nilai \\(\\displaystyle \\lim_{x \\to 0} \\frac{\\sin 8x + \\sin 4x}{2x(\\cos 12x + \\cos 8x)}\\) = ....",
+["-3",
+ "-\\(\\frac{3}{10}\\)",
+ "\\(\\frac{1}{5}\\)",
+ "\\(\\frac{3}{10}\\)",
+ "3"]],
+
+ ["Luas daerah yang diarsir berikut adalah .... <br><img src='https://i.imgur.com/Y9eX02O.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
+["\\(17\\frac{1}{2}\\)",
+ "\\(15\\frac{1}{2}\\)",
+ "\\(13\\frac{1}{2}\\)",
+ "\\(10\\frac{1}{2}\\)",
+ "9"]],
+
+ ["Diketahui garis g menyinggung kurva \\(y = \\sin x + \\cos x\\) di titik yang berabsis \\(\\frac{\\pi}{3}\\). Gradien garis yang tegak lurus pada garis g adalah ....",
+["\\(1 - \\sqrt{3}\\)",
+ "\\(1 + \\sqrt{3}\\)",
+ "1",
+ "\\(\\frac{1}{2}(\\sqrt{3} - 1)\\)",
+ "\\(\\frac{1}{2}(1 - \\sqrt{3})\\)"]],
+
+ ["Suatu mesin diprogram untuk menggerakkan sebuah alat penggores sedemikian hingga alat tersebut dinyatakan dengan \\(x = 3\\cos 4t\\) dan \\(y = 2\\cos 3t\\) (posisi dalam satuan cm dan waktu t satuan detik). Kecepatan gerak alat penggores pada saat t dinyatakan dengan \\(v = \\sqrt{\\left(\\frac{dx}{dt}\\right)^2 + \\left(\\frac{dy}{dt}\\right)^2}\\) dalam satuan cm/detik. Besar kecepatan gerak alat tersebut saat \\(t = \\frac{\\pi}{2}\\) detik adalah ....",
+["2 cm/detik",
+ "\\(\\sqrt{13}\\) cm/detik",
+ "6 cm/detik",
+ "\\(6\\sqrt{5}\\) cm/detik",
+ "12 cm/detik"]],
+
+ ["Jika \\(x = 2\\sin t\\), \\(y = 4 + \\cos t\\), maka \\(\\frac{dy}{dx}\\) dalam t adalah ....",
+["\\(-\\frac{2}{3}\\sin t\\)",
+ "\\(-\\frac{2}{3}\\tan t\\)",
+ "\\(\\frac{1}{2}\\tan t\\)",
+ "\\(-\\frac{1}{2}\\tan t\\)",
+ "\\(-\\frac{1}{2}\\sin t\\)"]],
+
+ ["Luas daerah yang dibatasi oleh kurva \\(y = 6x - x^2\\) dan \\(y = x^2 - 2x\\) adalah ....",
+["\\(\\frac{20}{3}\\) satuan luas",
+ "16 satuan luas",
+ "21 satuan luas",
+ "\\(\\frac{64}{3}\\) satuan luas",
+ "32 satuan luas"]],
+
+ ["Sebuah kota selama \\(t\\) tahun perkiraan jumlah penduduknya dapat dinyatakan oleh fungsi \\(P = \\frac{12000}{(3+t)^2} + 35000\\). Perkiraan jumlah penduduknya dalam jangka waktu yang sangat lama di masa yang akan datang adalah ....",
+["12.000",
+ "20.000",
+ "35.000",
+ "40.000",
+ "45.000"]],
+
+ ["Jika \\(\\sin \\alpha = \\frac{12}{13}\\), dengan \\(\\alpha\\) lancip, maka \\(\\sin 2\\alpha + \\cos 2\\alpha\\) = ....",
+["\\(\\frac{3}{144}\\)",
+ "\\(\\frac{2}{144}\\)",
+ "-\\(\\frac{1}{144}\\)",
+ "\\(\\frac{1}{169}\\)",
+ "\\(\\frac{2}{169}\\)"]],
+
+["Persamaan lingkaran yang melalui titik potong lingkaran \\(L_1 \\equiv x^2 + y^2 + 2x + 2y - 2 = 0\\) dan \\(L_2 \\equiv x^2 + y^2 + 4x - 8y + 4 = 0\\) serta melalui titik asal adalah ....",
+["\\(3x^2 + 3y^2 + 8x - 2y = 0\\)",
+ "\\(3x^2 + 3y^2 - 8x + 4y = 0\\)",
+ "\\(3x^2 + 3y^2 + 8x - 4y = 0\\)",
+ "\\(4x^2 + 4y^2 + 8x + 4y = 0\\)",
+ "\\(4x^2 + 4y^2 + 8x - 2y = 0\\)"]],
+
+["Himpunan penyelesaian persamaan \\(\\sin(3x + 30^\\circ) = \\frac{1}{2}\\sqrt{2}\\) pada interval \\(0^\\circ \\le x \\le 180^\\circ\\) adalah ....",
+["\\(\\{5^\\circ, 35^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 125^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 65^\\circ, 95^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 125^\\circ, 155^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 95^\\circ, 155^\\circ\\}\\)"]],
+
+["Diketahui segitiga ABC siku-siku di B. Jika \\(\\sin A \\cdot \\sin C = \\frac{1}{10}\\) dan \\(\\sin(A - C) = \\frac{2}{5}x\\), maka nilai \\(x\\) adalah ....",
+["-2",
+ "-\\(\\frac{1}{2}\\)",
+ "\\(\\frac{1}{4}\\)",
+ "\\(\\frac{1}{2}\\)",
+ "2"]],
+
+ ["Diketahui vektor \\(\\begin{pmatrix} x \\\\ 2 \\\\ -1 \\end{pmatrix}\\), \\(\\mathbf{b} = \\begin{pmatrix} 4 \\\\ -3 \\\\ 6 \\end{pmatrix}\\), dan \\(\\mathbf{c} = \\begin{pmatrix} 2 \\\\ 0 \\\\ 3 \\end{pmatrix}\\). Jika \\(\\mathbf{a}\\) tegak lurus \\(\\mathbf{b}\\), hasil dari \\((3\\mathbf{a} - \\mathbf{b}) + 2\\mathbf{c}\\) adalah ....",
+["\\(\\begin{pmatrix} 9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ 9 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} -9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ 6 \\\\ 3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ -9 \\\\ 3 \\end{pmatrix}\\)"]],
+
+["Alief, Abdul, dan Azzam sedang menerbangkan layang-layang, masing-masing berdiri pada koordinat \\((-1, 4, 8)\\), \\((1, 2, 3)\\), dan \\((5, y, z)\\) yang segaris. Maka posisi berdiri Azzam pada koordinat ....",
+["(5, -7, -2)",
+ "(5, -5, -2)",
+ "(5, -2, -7)",
+ "(5, 2, 7)",
+ "(5, 7, 9)"]],
+
+["Diketahui vektor \\(\\vec{a} = -2\\mathbf{i} + 3\\mathbf{j} + \\mathbf{k}\\) dan \\(\\vec{b} = 4\\mathbf{i} + 4\\mathbf{j} + m\\mathbf{k}\\). Jika panjang proyeksi vektor \\(\\vec{a}\\) pada \\(\\vec{b}\\) adalah \\(\\frac{1}{3}\\), nilai \\(m\\) yang memenuhi adalah ....",
+["-7",
+ "-5",
+ "2",
+ "5",
+ "7"]],
+
+[
+"Balok KLMN.OPQR mempunyai panjang rusuk KL = 16 cm, LM = 12 cm, dan MQ = 10 cm. Jarak titik P ke titik N adalah ....",
+["\\(10\\sqrt{6}\\ \\text{cm}\\)",
+ "\\(10\\sqrt{5}\\ \\text{cm}\\)",
+ "\\(10\\sqrt{3}\\ \\text{cm}\\)",
+ "\\(5\\sqrt{6}\\ \\text{cm}\\)",
+ "\\(5\\sqrt{5}\\ \\text{cm}\\)"]
+],
+
+[
+"Perhatikan gambar kubus berikut:<br><img src='https://i.imgur.com/Afmchd1.png' style='max-width:100%;margin-top:10px;border-radius:10px;'><br><br>Diketahui titik P merupakan perpotongan antara diagonal BG dan CF. Cermati beberapa pernyataan berikut.<br><br>(i) Titik P terletak pada bidang ACGE<br>(ii) Titik P terletak di luar bidang BCHE<br>(iii) Titik P terletak pada bidang CDEF<br>(iv) Titik P terletak pada bidang BCGF<br>(v) Titik P terletak di luar bidang ABGH<br><br>Pernyataan yang benar adalah ....",
+["(i), (ii), dan (iii)",
+ "(i), (iii), dan (v)",
+ "(i), (iv), dan (v)",
+ "(ii), (iii), dan (iv)",
+ "(ii), (iv), dan (v)"]
+],
+
+[
+"Dalam suatu ujian seorang siswa diharuskan menjawab soal multiple choice sebanyak tiga kali. Peubah acak banyaknya jawaban benar adalah ....",
+["\\(\\{0, 1\\}\\)",
+ "\\(\\{0, 1, 2\\}\\)",
+ "\\(\\{1, 2\\}\\)",
+ "\\(\\{1, 2, 3\\}\\)",
+ "\\(\\{0, 1, 2, 3\\}\\)"]
+],
+
+[
+"Dua buah dadu diundi bersama-sama sebanyak tiga kali. Peluang mendapatkan dua kali mata dadu berjumlah 9 adalah ....",
+["\\(\\frac{8}{81}\\)",
+ "\\(\\frac{16}{81}\\)",
+ "\\(\\frac{16}{243}\\)",
+ "\\(\\frac{8}{243}\\)",
+ "\\(\\frac{4}{243}\\)"]
+],
+
+[
+"Sepasang suami istri merencanakan untuk mempunyai 4 orang anak. Jika variabel acak \\(X\\) menyatakan banyak anak perempuan, nilai dari \\(P(X \\ge 2)\\) adalah ....",
+["\\(\\frac{4}{16}\\)",
+ "\\(\\frac{5}{16}\\)",
+ "\\(\\frac{6}{16}\\)",
+ "\\(\\frac{10}{16}\\)",
+ "\\(\\frac{11}{16}\\)"]
+],
+
+[
+`Sebuah toko sepatu mencatat jumlah sepatu yang terjual setiap hari. Misalkan \\(x\\) = jumlah sepatu yang terjual dalam sehari selama bulan November 2018 sebagai berikut:<br><br>
+
+<table style="border-collapse:collapse;margin:auto;">
+<tr><th style="border:1px solid #333;padding:6px 12px;">X</th><th style="border:1px solid #333;padding:6px 12px;">Jumlah hari</th></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">1</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">6</td></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">3</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">12</td></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">4</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">9</td></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">5</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">3</td></tr>
+</table>
+
+<br>Distribusi peluang variabel acak \\(x\\) adalah ...`,
+
+[
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,4</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,1</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,4</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,1</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,3</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,1</td><td style="border:1px solid #333;padding:4px;">0,4</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,2</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,1</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,2</td></tr>
+</table>`
+]
+],
+
+[
+"Nilai ujian MTK yang diperoleh dalam satu kelas berdistribusi normal dengan rata-rata 70 dan simpangan baku 10. Jika remedial akan diberikan kepada 20% siswa dengan nilai terendah, nilai minimum siswa yang tidak mengikuti remedial adalah ....",
+["57,5",
+ "58,5",
+ "59,2",
+ "62,5",
+ "65,0"]
+],
+  
+];
+
+let soalUraian= [
+"Tentukanlah interval penyelesaian pertidaksamaan \\(|x + 2| \\ge 2|x - 1|\\)!",
+
+"Tentukan nilai dari \\(\\int (2x + 5)\\cos 2x \\, dx\\)!",
+
+`Gambar di bawah adalah sebuah trapesium ABCD dengan AD = CD = BC = m cm, dan ∠DAB = ∠CBA = 2α (α adalah sudut lancip).<br><br>
+
+<img src="https://i.imgur.com/Afmchd1.png" style="max-width:100%;margin:10px 0;border-radius:10px;"><br>
+
+Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah penyelesaiannya!`,
+
+"Tentukan batas-batas nilai a yang memenuhi agar titik P(8, -6) berada di dalam lingkaran \\(x^2 + y^2 = a^2\\)!",
+
+`Suatu variabel acak x memiliki distribusi probabilitas sebagai berikut:<br><br>
+
+<table style="border-collapse:collapse;margin:auto;">
+<tr>
+<td style="border:1px solid #333;padding:6px;">X = x</td>
+<td style="border:1px solid #333;padding:6px;">0</td>
+<td style="border:1px solid #333;padding:6px;">1</td>
+<td style="border:1px solid #333;padding:6px;">2</td>
+<td style="border:1px solid #333;padding:6px;">3</td>
+</tr>
+<tr>
+<td style="border:1px solid #333;padding:6px;">P(X = x)</td>
+<td style="border:1px solid #333;padding:6px;">k</td>
+<td style="border:1px solid #333;padding:6px;">k²</td>
+<td style="border:1px solid #333;padding:6px;">k² + k</td>
+<td style="border:1px solid #333;padding:6px;">3k² + 2k</td>
+</tr>
+</table>
+
+<br>Dengan k adalah konstanta. Tentukan nilai k!`
+
+];
+
+// FUNGSI UNTUK MENYIMPAN JAWABAN SAAT DIKLIK
+function saveAns(key, val) {
+    savedData[key] = val; // Simpan ke variabel memory
+    localStorage.setItem("upk_session", JSON.stringify(savedData)); // Simpan ke memori HP agar tidak hilang saat refresh
+    console.log("Tersimpan:", key, "=", val); // Untuk cek di console
 }
 
-function selectAnswer(idx) {
-  state.answers[state.currentQ] = idx;
-  renderQuestion();
+   // --- 1. FUNGSI NAVIGASI & TOKEN ---
+function goToTab(n) {
+    // Ambil input dari tab login
+    const inputNama = document.getElementById('namaSiswa').value;
+    const inputToken = document.getElementById('tokenUjian').value;
+
+    // Validasi saat ingin pindah dari Tab Login (n=1) ke Tab Instruksi (n=2)
+    if(n === 2) {
+        if(inputNama.trim() === "") {
+            alert("Nama Lengkap harus diisi!");
+            return;
+        }
+        // Token Ujian
+        if(inputToken !== "RISTEK2026") {
+            alert("Token Ujian Salah! Silakan tanya pengawas.");
+            return; 
+        }
+    }
+    
+    // Jalankan perpindahan tab
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    const targetTab = document.getElementById('tab' + n);
+    if(targetTab) targetTab.classList.add('active');
+    window.scrollTo(0,0);
 }
 
-function updateShortAnswer(value) {
-  state.answers[state.currentQ] = value;
+function mulaiUjian() {
+    goToTab(3); // Pindah ke halaman soal
+    document.getElementById('examHeader').style.display = 'flex';
+    document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+    
+    renderSoal();
+    startTimer();
+    setupSecurity(); // Aktifkan sistem anti-contek
 }
 
-function handleEssayUpload(event, questionIndex) {
-  const file = event.target.files[0];
-  if (!file) return;
+// --- 2. SISTEM KEAMANAN (ANTI-CONTEK) ---
+let isCameraActive = false;
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
-    state.answers[questionIndex] = {
-      type: 'photo',
-      fileName: file.name,
-      dataUrl: dataUrl,
-      uploadedAt: new Date().toISOString()
+function setupSecurity() {
+    // Deteksi pindah tab atau keluar browser
+    window.onblur = function() {
+        if (!isCameraActive) {
+            document.getElementById('overlay').style.display = 'block';
+        }
     };
-    showEssayPreview(questionIndex, dataUrl);
-    renderQuestion();
-  };
-  reader.readAsDataURL(file);
+
+    // Deteksi layar HP dimatikan atau switch aplikasi
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden && !isCameraActive) {
+            document.getElementById('overlay').style.display = 'block';
+        }
+    });
 }
 
-function showEssayPreview(questionIndex, dataUrl) {
-  const preview = document.getElementById(`essay-preview-${questionIndex}`);
-  const img = document.getElementById(`essay-img-${questionIndex}`);
-  if (preview && img) {
-    img.src = dataUrl;
-    preview.classList.remove('hidden');
-  }
-}
-
-function clearEssayUpload(questionIndex) {
-  state.answers[questionIndex] = undefined;
-  const preview = document.getElementById(`essay-preview-${questionIndex}`);
-  const input = document.getElementById(`essay-file-${questionIndex}`);
-  if (preview) preview.classList.add('hidden');
-  if (input) input.value = '';
-  renderQuestion();
-}
-
-function updateCharCount(textarea) {
-  const maxLength = textarea.maxLength;
-  const currentLength = textarea.value.length;
-  const countEl = document.getElementById(`char-count-${state.currentQ}`);
-  if (countEl) countEl.textContent = `${currentLength}/${maxLength}`;
-}
-
-function navQuestion(dir) {
-  const next = state.currentQ + dir;
-  if (next >= 0 && next < questions.length) {
-    state.currentQ = next;
-    renderQuestion();
-  }
-}
-
-function buildDots() {
-  const cont = document.getElementById('q-dots');
-  cont.innerHTML = '';
-  questions.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'w-6 h-6 md:w-6 md:h-6 rounded-md text-xs font-700 flex-shrink-0 transition-all';
-    dot.textContent = i + 1;
-    dot.onclick = () => { state.currentQ = i; renderQuestion(); };
-    dot.id = `dot-${i}`;
-    cont.appendChild(dot);
-  });
-  updateDots();
-}
-
-function updateDots() {
-  questions.forEach((_, i) => {
-    const dot = document.getElementById(`dot-${i}`);
-    if (!dot) return;
-    const isCurrent = i === state.currentQ;
-    const isAnswered = state.answers[i] !== undefined;
-    dot.className = `w-6 h-6 rounded-md text-xs font-700 flex-shrink-0 transition-all ${
-      isCurrent ? 'bg-blue-600 text-white scale-105 shadow-lg shadow-blue-500/30' :
-      isAnswered ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/30' :
-      'bg-white/5 text-white/40 border border-white/10'
-    }`;
-  });
-}
-
-// ========== SUBMIT ==========
-function showSubmitScreen() {
-  const answered = Object.keys(state.answers).length;
-  const unanswered = questions.length - answered;
-  
-  if (unanswered > 0) {
-    const firstUnanswered = questions.findIndex((_, i) => state.answers[i] === undefined);
-    showToast(`⚠️ ${unanswered} soal belum dijawab. Silakan lengkapi semua soal terlebih dahulu.`);
-    state.currentQ = firstUnanswered;
-    renderQuestion();
-    showScreen('screen-exam');
-    
-    const dot = document.getElementById(`dot-${firstUnanswered}`);
-    if (dot) {
-      dot.classList.add('anim-pulse-glow');
-      dot.style.backgroundColor = '#ef4444';
+function unlockExam() {
+    if(document.getElementById('kodeGuruInput').value === KODE_GURU) {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('kodeGuruInput').value = "";
+    } else {
+        alert("Kode Guru Salah!");
     }
-    return;
-  }
-  
-  const stage1 = questions.slice(0, 5).filter((q, i) => state.answers[i] !== undefined).length;
-  const stage2 = questions.slice(5, 15).filter((q, i) => state.answers[i+5] !== undefined).length;
-  const stage3 = questions.slice(15, 20).filter((q, i) => state.answers[i+15] !== undefined).length;
-  
-  document.getElementById('summary-total').textContent = questions.length;
-  document.getElementById('summary-answered').textContent = answered;
-  document.getElementById('summary-unanswered').textContent = 0;
-  document.getElementById('summary-violations').textContent = state.violations;
-  
-  let summaryHTML = `
-    <div class="space-y-2 text-sm">
-      <div class="flex justify-between">
-        <span class="text-white/50">Tahap 1 (Isian Singkat)</span>
-        <span class="text-emerald-400 font-700">${stage1}/5</span>
-      </div>
-      <div class="flex justify-between">
-        <span class="text-white/50">Tahap 2 (Pilihan Ganda)</span>
-        <span class="text-emerald-400 font-700">${stage2}/10</span>
-      </div>
-      <div class="flex justify-between">
-        <span class="text-white/50">Tahap 3 (Uraian)</span>
-        <span class="text-emerald-400 font-700">${stage3}/5</span>
-      </div>
-    </div>
-  `;
-  
-  const summaryEl = document.getElementById('summary-detail');
-  if (summaryEl) summaryEl.innerHTML = summaryHTML;
-  
-  showScreen('screen-submit');
 }
 
-function goBackToExam() {
-  showScreen('screen-exam');
-  renderQuestion();
+// --- 3. RENDER SOAL ---
+function renderSoal() {
+    // Render Pilihan Ganda
+    let pgHtml = "";
+    letsSoalPG.forEach((s, i) => {
+        let chk = savedData['pg' + i];
+        pgHtml += `<div class="soal-card"><span class="soal-text">${i + 1}. ${s[0]}</span>`;
+        s[1].forEach((opt, idx) => {
+            let isChecked = chk == idx ? 'checked' : '';
+            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" onclick="saveAns('pg${i}', ${idx})" ${isChecked}> <span>${opt}</span></label>`;
+        });
+        pgHtml += `</div>`;
+    });
+    document.getElementById('renderPG').innerHTML = pgHtml;
+
+    // Render Uraian
+    let urHtml = "";
+    soalUraian.forEach((s, i) => {
+        urHtml += `<div style="margin-bottom:15px; padding:10px; border-bottom:1px solid #eee;">
+            <p style="font-weight:700; margin:0 0 5px 0;">Soal Uraian ${i + 1}</p>
+            <p style="margin:0; font-size:0.95rem;">${s}</p>
+        </div>`;
+    });
+    document.getElementById('renderUraianTeks').innerHTML = urHtml;
+
+    updateStatusUpload();
+    if (typeof MathJax !== 'undefined') {
+        MathJax.typeset();
+    }
 }
 
-function submitExam() {
-  finishExam();
+// --- 4. LOGIKA UPLOAD ---
+if (!savedData['filesUraian']) {
+    savedData['filesUraian'] = [];
 }
 
-function autoSubmit() {
-  state.examActive = false;
-  showToast('Waktu habis! Jawaban dikirim otomatis.');
-  finishExam();
+function prepareUpload() {
+    isCameraActive = true; // Matikan sementara proteksi agar bisa buka galeri/kamera
+}
+
+function saveFileSingle(input) {
+    const file = input.files[0];
+    if (!file) { 
+        resetSecurity();
+        return; 
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("File terlalu besar! Maksimal 5MB.");
+        input.value = "";
+        resetSecurity();
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        savedData['filesUraian'].push(e.target.result);
+        localStorage.setItem("upk_session", JSON.stringify(savedData));
+        updateStatusUpload();
+        input.value = ""; 
+        resetSecurity();
+    };
+    reader.readAsDataURL(file);
+}
+
+function resetSecurity() {
+    // Beri toleransi waktu 3 detik untuk kembali ke browser sebelum proteksi aktif lagi
+    setTimeout(() => {
+        isCameraActive = false;
+    }, 3000);
+}
+
+function updateStatusUpload() {
+    const jml = savedData['filesUraian'] ? savedData['filesUraian'].length : 0;
+    const statusE1 = document.getElementById('status_upload');
+    if (statusE1) {
+        if (jml > 0) {
+            statusE1.innerHTML = `<b style="color:#059669;">✅ ${jml} Foto Tersimpan</b><br>
+            <button type="button" onclick="prepareUpload(); hapusSemuaFoto()" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.8rem; text-decoration:underline; margin-top:5px;">Hapus & foto ulang</button>`;
+        } else {
+            statusE1.innerText = "Belum ada foto.";
+        }
+    }
+}
+
+function hapusSemuaFoto() {
+    if(confirm("Hapus semua foto?")) {
+        savedData['filesUraian'] = [];
+        localStorage.setItem("upk_session", JSON.stringify(savedData));
+        updateStatusUpload();
+    }
+    resetSecurity();
+}
+
+// --- 5. TIMER & FINISH ---
+function startTimer() {
+    timerInterval = setInterval(() => {
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        let tEl = document.getElementById('timer');
+        if(tEl) tEl.innerText = `${m}:${s < 10 ? '0' + s : s}`;
+        
+        if (timeLeft <= 0) { 
+            clearInterval(timerInterval); 
+            alert("Waktu Ujian Habis!"); 
+            finishExam(); 
+        }
+        timeLeft--;
+    }, 1000);
 }
 
 function finishExam() {
-  state.examActive = false;
-  state.monitoringActive = false;
-  clearInterval(state.timerInterval);
+    // VAKSIN: Matikan proteksi sesaat agar alert tidak memicu lock
+    prepareUpload(); 
 
-  const answered = Object.keys(state.answers).length;
-  const elapsed = Math.floor((Date.now() - state.examStartTime) / 1000);
-  const em = Math.floor(elapsed / 60);
-  const es = elapsed % 60;
+    const nama = document.getElementById('namaSiswa').value;
+    if (!nama) { 
+        alert("Isi Nama Lengkap!"); 
+        resetSecurity(); // Aktifkan lagi dengan jeda 3 detik
+        return; 
+    }
 
-  document.getElementById('finish-name').textContent = state.studentName;
-  document.getElementById('finish-answered').textContent = `${answered}/${questions.length}`;
-  document.getElementById('finish-time').textContent = `${em} menit ${es} detik`;
-  document.getElementById('finish-violations').textContent = state.violations;
+    let kosong = [];
+    for (let i = 0; i < letsSoalPG.length; i++) {
+        if (savedData['pg' + i] === undefined) kosong.push(i + 1);
+    }
 
-  showScreen('screen-finished');
+    if (kosong.length > 0) { 
+        alert("Soal PG belum lengkap nomor: " + kosong.join(", ")); 
+        resetSecurity(); // PENTING: Supaya tidak lock setelah klik OK
+        return; 
+    }
+
+    if (!savedData['filesUraian'] || savedData['filesUraian'].length === 0) { 
+        alert("Upload foto jawaban!"); 
+        resetSecurity(); 
+        return; 
+    }
+
+    // Konfirmasi Kirim
+    if (confirm("Kirim jawaban sekarang?")) {
+        alert("Sedang mengirim... Jangan tutup halaman ini!");
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwJIAb3xN2cfy9bTzHSdkSUklvWpFPGwId-y5wGKXMFLZAfQmdWE1VA2IpxD6p_aVL6nw/exec';
+        const payload = {
+            nama: nama,
+            mapel: "MATEMATIKA PEMINATAN", 
+            jawaban: savedData,
+            fileUraian: savedData['filesUraian'].join("|SPLIT|") 
+        };
+
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+        .then(() => {
+            alert("✅ TERKIRIM! Terima kasih.");
+            localStorage.removeItem("upk_session");
+            location.reload();
+        })
+        .catch(e => {
+            alert("Gagal mengirim, periksa koneksi internet Anda!");
+            resetSecurity();
+        });
+    } else {
+        // Jika user klik 'Cancel' pada konfirmasi kirim
+        resetSecurity();
+    }
 }
-
-// ========== ANTI-CHEAT MONITORING (ENHANCED) ==========
-function startMonitoring() {
-  state.monitoringActive = true;
-  
-  // Blokir copy-paste intentional
-  document.addEventListener('copy', e => { 
-    if (state.examActive && !state.isLocked) { 
-      e.preventDefault(); 
-      showToast('📋 Copy-paste dilarang selama ujian');
-      recordViolation('Copy-paste detected');
-    }
-  });
-
-  document.addEventListener('paste', e => { 
-    if (state.examActive && !state.isLocked) { 
-      e.preventDefault(); 
-      showToast('📋 Copy-paste dilarang selama ujian');
-      recordViolation('Paste detected');
-    }
-  });
-
-  document.addEventListener('cut', e => { 
-    if (state.examActive && !state.isLocked) { 
-      e.preventDefault(); 
-      showToast('📋 Copy-paste dilarang selama ujian');
-      recordViolation('Cut detected');
-    }
-  });
-
-  // Deteksi visibility change (tab switch/minimize)
-  document.addEventListener('visibilitychange', () => {
-    if (state.examActive && !state.isLocked) {
-      if (document.hidden) {
-        showToast('⚠️ Anda keluar dari tab ujian! Jangan lakukan itu lagi.');
-        recordViolation('Tab switch detected');
-      }
-    }
-  });
-
-  // Deteksi blur (window focus loss)
-  window.addEventListener('blur', () => {
-    if (state.examActive && !state.isLocked) {
-      showToast('⚠️ Window tidak aktif - fokus kembali ke ujian');
-      recordViolation('Window blur detected');
-    }
-  });
-
-  // Deteksi fullscreen exit (jika browser support)
-  document.addEventListener('fullscreenchange', () => {
-    if (state.examActive && !state.isLocked && !document.fullscreenElement) {
-      showToast('⚠️ Anda keluar dari fullscreen');
-      recordViolation('Fullscreen exit detected');
-    }
-  });
-
-  // Monitoring periodik untuk deteksi developer tools & suspicious activity
-  state.iosMonitorInterval = setInterval(() => {
-    if (!state.examActive || state.isLocked) {
-      clearInterval(state.iosMonitorInterval);
-      return;
-    }
-
-    // Deteksi screen minimal (ketika minimal/virtual keyboard aktif)
-    const screenHeight = window.innerHeight;
-    const screenWidth = window.innerWidth;
-    
-    // Jika screen height berkurang drastis = minimize atau virtual keyboard
-    if (screenHeight < 300) {
-      showToast('⚠️ Aplikasi miniatur terdeteksi. Fokus pada ujian!');
-      recordViolation('Screen minimized');
-    }
-  }, 2000);
-}
-
-function recordViolation(reason) {
-  state.violations++;
-  
-  showToast(`⚠️ Pelanggaran ke-${state.violations}`);
-  
-  if (state.violations >= MAX_VIOLATIONS) {
-    lockExam(`Pelanggaran Keamanan: ${reason}`);
-  }
-}
-
-function showToast(msg) {
-  const toast = document.getElementById('cheat-toast');
-  document.getElementById('cheat-toast-text').textContent = msg;
-  toast.classList.remove('hidden');
-  setTimeout(() => toast.classList.add('hidden'), 3000);
-}
-
-// ========== SCREEN LOCK ==========
-function lockExam(reason) {
-  state.examActive = false;
-  state.isLocked = true;
-  state.lockReason = reason;
-  state.monitoringActive = false;
-  clearInterval(state.timerInterval);
-  clearInterval(state.iosMonitorInterval);
-
-  document.getElementById('violation-reason').textContent = `${reason}\n\nUjian Anda telah dikunci. Hubungi pengawas untuk mendapatkan Kode Guru untuk membuka kembali.`;
-  document.getElementById('locked-violation-count').textContent = state.violations;
-
-  showScreen('screen-locked');
-}
-
-function handleTeacherUnlock() {
-  const code = document.getElementById('input-teacher-code').value.trim().toUpperCase();
-  const errEl = document.getElementById('teacher-error');
-
-  if (!code) {
-    errEl.classList.remove('hidden');
-    errEl.textContent = 'Kode guru wajib diisi';
-    return;
-  }
-
-  if (code !== TEACHER_CODE) {
-    errEl.classList.remove('hidden');
-    errEl.textContent = 'Kode guru salah. Silakan coba lagi.';
-    return;
-  }
-
-  // Berhasil unlock
-  errEl.classList.add('hidden');
-  state.isLocked = false;
-  state.examActive = true;
-  state.monitoringActive = true;
-
-  document.getElementById('input-teacher-code').value = '';
-  showScreen('screen-exam');
-  renderQuestion();
-  startTimer();
-  startMonitoring();
-}
-
-
-// ========== ELEMENT SDK ==========
-const defaultConfig = {
-  school_name: 'PKBM Ristek Nusantara Jaya',
-  exam_title: 'Ujian Pendidikan Kesetaraan (UPK)',
-  background_color: '#0f172a',
-  surface_color: '#1e293b',
-  text_color: '#ffffff',
-  primary_action_color: '#2563eb',
-  accent_color: '#10b981',
-  font_family: 'Plus Jakarta Sans',
-  font_size: 14
-};
-
-function applyConfig(config) {
-  const schoolName = config.school_name || defaultConfig.school_name;
-  const examTitle = config.exam_title || defaultConfig.exam_title;
-  const font = config.font_family || defaultConfig.font_family;
-  const baseSize = config.font_size || defaultConfig.font_size;
-
-  const loginSchool = document.getElementById('login-school');
-  if (loginSchool) loginSchool.textContent = schoolName;
-  const loginTitle = document.getElementById('login-exam-title');
-  if (loginTitle) loginTitle.textContent = examTitle;
-
-  document.body.style.fontFamily = `${font}, sans-serif`;
-  document.body.style.fontSize = `${baseSize}px`;
-}
-
-window.elementSdk.init({
-  defaultConfig,
-  onConfigChange: async (config) => { applyConfig(config); },
-  mapToCapabilities: (config) => ({
-    recolorables: [
-      { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); }},
-      { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); }},
-      { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); }},
-      { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: (v) => { config.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); }},
-      { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); }},
-    ],
-    borderables: [],
-    fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }},
-    fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }}
-  }),
-  mapToEditPanelValues: (config) => new Map([
-    ['school_name', config.school_name || defaultConfig.school_name],
-    ['exam_title', config.exam_title || defaultConfig.exam_title]
-  ])
-});
-
-lucide.createIcons();
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e9222ccd5db3da7',t:'MTc3NTY2MDM2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</script>
+</body>
 </html>

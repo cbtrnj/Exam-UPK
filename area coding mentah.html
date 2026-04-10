@@ -2,814 +2,1833 @@
 <html lang="id">
  <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="no">
-  <title>UPK - PKBM Ristek Nusantara Jaya</title><!-- Fonts & MathJax -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Ujian Online - MTK</title>
   <style>
-        :root {
-            --bg-overall: #F1F4F9;
-            --bg-card: #FFFFFF;
-            --primary: #0A66C2;
-            --danger: #ef4444;
-            --text-dark: #1F2937;
-            --text-muted: #6B7280;
-            --border: #E5E7EB;
-        }
-
         * { box-sizing: border-box; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-overall);
-            margin: 0; padding: 0; color: var(--text-dark);
-            -webkit-user-select: none; user-select: none;
-            overflow-x: hidden;
+        body { 
+            margin: 0; 
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #0f2818 100%);
+            min-height: 100vh;
         }
-
-        /* Layout Utama */
-        .container { 
-            max-width: 850px; 
-            margin: 20px auto; 
-            padding: 0 10px; 
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f5132 0%, #1a7a4f 50%, #0d3d23 100%);
         }
-
-        /* Header Ujian Sticky */
-        .exam-header {
-            display: none; background: white; padding: 12px 15px;
-            position: sticky; top: 0; z-index: 1000;
-            justify-content: space-between; align-items: center;
-            border-bottom: 3px solid var(--primary);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
         }
-
-        /* Card Modern */
-        .card {
-            background: var(--bg-card); padding: 40px;
-            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        
+        .login-card h1 {
+            text-align: center;
+            color: #0f5132;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .login-card p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
             margin-bottom: 20px;
         }
-
-        /* Tab Management */
-        .tab-content { display: none; }
-        .active { display: block; }
-
-        /* School Branding */
-        .school-header { text-align: center; margin-bottom: 10px; display: flex; flex-direction: column; align-items: center; }
-        .logo { width: 90px; height: 90px; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); flex-shrink: 0; display: block; }
-        .logo img { width: 100%; height: 100%; object-fit: contain; }
-        .school-name { font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--text-dark); }
-        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; }
-
-        /* Form Inputs */
-        .input-vertical-group { display: flex; flex-direction: column; gap: 15px; margin: 30px 0; }
-        .input-wrapper label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; padding-left: 4px; }
-        input[type="text"] { 
-            width: 100%; padding: 16px; border: 2px solid var(--border); 
-            border-radius: 12px; font-size: 16px !important; background: #F9FAFB;
-            transition: 0.2s;
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
         }
-        input[type="text"]:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(10,102,194,0.1); }
-
-        /* Buttons */
-        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: block; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn:active { transform: scale(0.98); }
-
-        /* Soal Styles */
-        .soal-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 15px; }
-        .soal-text { font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px; display: block; font-weight: 600; }
-        .opsi-item { display: flex; align-items: center; padding: 14px; border: 1px solid #f3f4f6; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
-        .opsi-item:hover { background: #f0f7ff; border-color: var(--primary); }
-        .opsi-item input { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; }
-
-        /* Overlay Lock */
-        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index:10000; padding: 20vh 20px 0 20px; }
-        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; font-family: monospace; }
-
-        /* Mobile Optimization */
-        @media (max-width: 600px) {
-            .container { padding: 0 8px; margin: 10px auto; }
-            .card { padding: 25px 18px; border-radius: 15px; }
-            .school-name { font-size: 1.2rem; }
-            .soal-text { font-size: 1rem; }
-            .opsi-item { padding: 12px; font-size: 0.95rem; }
-            .exam-header { padding: 10px; }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 20px;
+            padding-right: 35px;
+        }
+        
+        .form-group select option {
+            padding: 10px;
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 90vw;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2d7a4a;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #2d7a4a 0%, #1f5a36 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(45, 122, 74, 0.3);
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 122, 74, 0.5);
+        }
+        
+        /* Exam Screen */
+        .exam-screen { display: none; }
+        .exam-screen.active { display: block; }
+        
+        .exam-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            text-align: center;
+            border: 2px solid #e8ecf1;
         }
 
-        @media (max-width: 350px) {
-            .school-name { font-size: 1rem; }
-            .logo { width: 70px; }
-            .timer-badge { font-size: 0.9rem; }
+        .exam-header-top {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 15px;
+            position: relative;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
-        /* iPhone Block */
-        .iphone-block { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #fff; text-align: center; z-index: 99999; padding: 50px 20px; }
-        .iphone-block.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .iphone-block h1 { font-size: 2rem; margin-bottom: 20px; }
-        .iphone-block p { font-size: 1.1rem; line-height: 1.8; max-width: 500px; }
+        .exam-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+        }
+
+        .exam-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 200px;
+        }
+
+        .exam-school-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1a3a52;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .exam-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 25px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.35);
+        }
+
+        .exam-timer {
+            position: relative;
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fff3f3;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #e74c3c;
+            min-width: 90px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .exam-title {
+            width: 100%;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .exam-title h2 {
+            margin: 8px 0;
+            color: #2d7a4a;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .exam-title p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            
+            .exam-content {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .question-block {
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+            }
+            
+            .question-number {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .question-text {
+                margin-bottom: 12px;
+                font-size: 14px;
+            }
+            
+            .option label {
+                padding: 8px;
+                font-size: 13px;
+            }
+            
+            textarea {
+                min-height: 80px;
+                font-size: 14px;
+            }
+            
+            .file-upload {
+                padding: 12px;
+            }
+            
+            .btn-submit {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            #fileUploadSection {
+                padding: 15px !important;
+                margin: 15px 0 !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .exam-school-name {
+                font-size: 16px;
+            }
+            
+            .exam-badge {
+                font-size: 9px;
+                padding: 4px 8px;
+            }
+            
+            .question-number {
+                font-size: 12px;
+            }
+            
+            .question-text {
+                font-size: 12px;
+            }
+            
+            .option label {
+                padding: 6px;
+                font-size: 12px;
+            }
+        }
+        
+        .exam-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .question-block {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .question-block:last-child {
+            border-bottom: none;
+        }
+        
+        .question-number {
+            color: #2d7a4a;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .option {
+            margin-bottom: 10px;
+        }
+        
+        .option label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option label:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .file-upload {
+            margin-top: 10px;
+            padding: 15px;
+            border: 2px dashed #2d7a4a;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .file-upload:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2d7a4a 0%, #1f5a36 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(45, 122, 74, 0.3);
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 122, 74, 0.5);
+        }
+        
+        /* Lock Screen */
+        .lock-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .lock-screen.active {
+            display: flex;
+        }
+        
+        .lock-content {
+            background: #e74c3c;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 500px;
+        }
+        
+        .lock-content h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .lock-content p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .unlock-code {
+            background: white;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Admin Panel */
+        .admin-screen {
+            display: none;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #0f2818 100%);
+            min-height: 100vh;
+        }
+        
+        .admin-screen.active {
+            display: block;
+        }
+        
+        .admin-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .admin-card h2 {
+            color: #0f5132;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .admin-search {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-search input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .admin-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .admin-list li {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .admin-student-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .admin-student-info strong {
+            display: block;
+            color: #0f5132;
+            margin-bottom: 5px;
+        }
+        
+        .admin-student-info small {
+            color: #666;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-unlock {
+            background: #27ae60;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .btn-unlock:hover {
+            background: #229954;
+        }
+        
+        .btn-lock {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .btn-lock:hover {
+            background: #c0392b;
+        }
+        
+        .btn-delete {
+            background: #95a5a6;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .btn-delete:hover {
+            background: #7f8c8d;
+        }
+        
+        .admin-mapel-select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 200px;
+        }
+        
+        .btn-admin-primary {
+            background: linear-gradient(135deg, #2d7a4a 0%, #1f5a36 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-admin-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 122, 74, 0.5);
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn-back-admin {
+            background: #2d7a4a;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .btn-back-admin:hover {
+            background: #1f5a36;
+        }
+        
+        .admin-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+        
+        .admin-status.locked {
+            background: #ffe0e0;
+            color: #c0392b;
+        }
+        
+        .admin-status.unlocked {
+            background: #e0ffe0;
+            color: #27ae60;
+        }
+        
+        .admin-empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-list li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .admin-actions {
+                width: 100%;
+            }
+            
+            .admin-search {
+                flex-direction: column;
+            }
+            
+            .admin-mapel-select {
+                width: 100%;
+                min-width: unset;
+            }
+        }
     </style>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <style>body { box-sizing: border-box; }</style>
-  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
- <body>
-  <!-- iPhone BLOCK -->
-  <div id="iphoneBlock" class="iphone-block">
-   <h1>🚫 AKSES DITOLAK</h1>
-   <p>Ujian ini tidak dapat diakses melalui perangkat iOS/iPhone.</p>
-   <p style="font-size: 0.9rem; margin-top: 30px; opacity: 0.7;">Silakan gunakan perangkat Android, Windows, atau macOS.</p>
-  </div><!-- ANTI-CHEAT OVERLAY -->
-  <div id="overlay">
-   <div style="max-width: 400px; margin: auto;">
-    <h1 style="color: var(--danger); font-size: 1.8rem;">SISTEM TERKUNCI!</h1>
-    <p id="violationMessage" style="opacity: 0.8; font-size: 0.9rem;">Anda terdeteksi melakukan pelanggaran.</p>
-    <p>Hubungi pengawas untuk mendapatkan <b>KODE REGISTRASI GURU</b>.</p><input type="text" id="kodeGuruInput" placeholder="Ketik Kode Guru Di Sini" style="text-align:center; margin-bottom: 20px; background: #222; border: 1px solid #444; color: white; width: 100%;"> <button class="btn btn-primary" onclick="unlockExam()">BUKA AKSES UJIAN</button>
-   </div>
-  </div><!-- STICKY HEADER EXAM -->
-  <div id="examHeader" class="exam-header">
-   <div style="overflow: hidden; padding-right: 10px;">
-    <div id="displayNama" style="font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95rem;">
-     Nama Siswa
-    </div>
-    <div style="font-size: 0.65rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">
-     UPK MATEMATIKA PEMINATAN
-    </div>
-   </div>
-   <div class="timer-badge" id="timer">
-    90:00
-   </div>
-  </div>
-  <div class="container">
-   <!-- TAB 1: REGISTRASI -->
-   <div id="tab1" class="tab-content active">
-    <div class="card">
-     <div class="school-header">
-      <img src="https://i.imgur.com/J1mKppg.png" class="logo" alt="Logo">
-      <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1><span class="exam-badge">UPK MATEMATIKA PEMINATAN</span>
+ <body><!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+   <div class="login-card">
+    <h1>🎓 Ujian Online</h1>
+    <p>MTK Peminatan &amp; Umum</p>
+    <form id="loginForm">
+     <div class="form-group"><label for="namaInput">Nama Lengkap</label> <input type="text" id="namaInput" placeholder="Masukkan nama Anda" required>
      </div>
-     <hr style="border:0; height:1px; background:#eee; margin: 25px 0;">
-     <div class="input-vertical-group">
-      <div class="input-wrapper">
-       <label>Nama Lengkap Siswa</label> <input type="text" id="namaSiswa" placeholder="Masukkan nama sesuai absen">
-      </div>
-      <div class="input-wrapper">
-       <label>Token Ujian</label> <input type="text" id="tokenUjian" placeholder="Masukkan token dari pengawas">
-      </div>
-     </div><button class="btn btn-primary" onclick="goToTab(2)">Lanjut ke Tata Tertib</button>
-     <p style="text-align: center; font-size: 0.7rem; color: #a1a7b3; margin-top: 20px; font-weight: 600;">TAHUN PELAJARAN 2025-2026</p>
-     <p style="text-align: center; font-size: 0.7rem; color: #7a0404; margin-top: 20px; font-weight: 600;">EXAMBRO_RNJ_SECURITY_v2.0</p>
-    </div>
-   </div><!-- TAB 2: TATA TERTIB -->
-   <div id="tab2" class="tab-content">
-    <div class="card">
-     <h2 style="color: var(--danger); margin-top: 0; font-size: 1.4rem;">Peringatan Keamanan</h2>
-     <div style="background: #fff5f5; border-left: 4px solid var(--danger); padding: 15px; margin-bottom: 25px; border-radius: 8px;">
-      <ul style="margin: 0; padding-left: 18px; line-height: 1.7; color: #b91c1c; font-size: 0.9rem;">
-       <li><b>Dilarang</b> keluar dari halaman/tab ujian.</li>
-       <li><b>Dilarang</b> membuka aplikasi lain (Chrome, Sosmed, dll).</li>
-       <li><b>Dilarang</b> mengambil Screenshot atau rekaman layar.</li>
-       <li><b>Dilarang</b> Minimize atau menyembunyikan browser.</li>
-       <li><b>Dilarang</b> Copy-Paste teks soal atau jawaban.</li>
-       <li>Layar akan <b>TERKUNCI PERMANEN</b> jika melanggar ketentuan di atas.</li>
-       <li>Akun Anda akan <b>TIDAK BISA LOGIN LAGI</b> setelah terblokir.</li>
-      </ul>
-     </div><button class="btn btn-primary" onclick="mulaiUjian()">SAYA MENGERTI &amp; MULAI</button>
-    </div>
-   </div><!-- TAB 3: AREA SOAL -->
-   <div id="tab3" class="tab-content">
-    <!-- Tempat Soal Pilihan Ganda Muncul -->
-    <div id="renderPG"></div><!-- Bagian Soal Uraian (Teks Soal Saja) -->
-    <div class="card" style="background: #fff; border: 1px solid var(--border);">
-     <h3 style="color: var(--primary); margin-top:0;">Soal Uraian</h3>
-     <div id="renderUraianTeks"></div>
-    </div><!-- SATU TEMPAT UPLOAD UNTUK SEMUA -->
-    <div class="card" style="background: #f8fafc; border: 2px dashed var(--primary); padding: 25px; text-align: center;">
-     <h3 style="margin-top:0; color: var(--primary);">Upload Jawaban Uraian</h3>
-     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Foto lembar jawaban HVS Anda (untuk soal 1-5) dan unggah di sini:</p><input type="file" accept="image/*" onclick="prepareUpload()" onchange="saveFileSingle(this)" style="font-size: 1rem; width: 100%; max-width: 300px;">
-     <div id="status_upload" style="color:#10b981; font-weight:700; margin-top:10px;">
-      <!-- Status upload muncul di sini -->
-     </div>
-    </div><button class="btn btn-success" onclick="finishExam()" style="margin-top: 20px; margin-bottom: 60px;">KUMPULKAN SEMUA JAWABAN</button>
+     <div class="form-group"><label for="mapelSelect">Pilih Mapel</label> <select id="mapelSelect" required> <option value="">-- Pilih Mata Pelajaran --</option> <!-- HARI 1: Senin --> <optgroup label="📅 Senin, 20 April 2026"> <option value="BAHASA INDONESIA">09:00–10:30 | Bahasa Indonesia</option> <option value="SENI BUDAYA">10:30–12:00 | Seni Budaya</option> <option value="SEJARAH INDONESIA">12:30–14:00 | Sejarah Indonesia</option> </optgroup> <!-- HARI 2: Selasa --> <optgroup label="📅 Selasa, 21 April 2026"> <option value="MATEMATIKA UMUM">09:00–10:30 | Matematika Umum</option> <option value="FISIKA">10:30–12:00 | Fisika (IPA) / Geografi (IPS)</option> <option value="MATEMATIKA PEMINATAN">12:30–14:00 | Matematika Peminatan (IPA)</option> <option value="SEJARAH PEMINATAN">12:30–14:00 | Sejarah Peminatan (IPS)</option> </optgroup> <!-- HARI 3: Rabu --> <optgroup label="📅 Rabu, 22 April 2026"> <option value="BAHASA INGGRIS">09:00–10:30 | Bahasa Inggris</option> <option value="BIOLOGI">10:30–12:00 | Biologi (IPA) / Ekonomi (IPS)</option> <option value="PRAKARYA">12:30–14:00 | Prakarya</option> </optgroup> <!-- HARI 4: Kamis --> <optgroup label="📅 Kamis, 23 April 2026"> <option value="PKN">09:00–10:30 | PKN</option> <option value="KIMIA">10:30–12:00 | Kimia (IPA) / Sosiologi (IPS)</option> <option value="PJOK">12:30–14:00 | PJOK</option> </optgroup> </select>
+     </div><button type="submit" class="btn-login">Mulai Ujian</button>
+    </form>
    </div>
-  </div>
+  </div><!-- Exam Screen -->
+  <div id="examScreen" class="exam-screen">
+   <div class="container">
+    <div class="exam-header">
+     <div class="exam-header-top">
+      <div></div>
+      <div class="exam-center"><img src="https://i.imgur.com/J1mKppg.png" alt="Logo PKBM" class="exam-logo">
+       <div class="exam-school-name">
+        PKBM RISTEK NUSANTARA JAYA
+       </div>
+       <div class="exam-badge">
+        Ujian Pendidikan Kesetaraan (UPK)
+       </div>
+      </div>
+      <div class="exam-timer" id="examTimer">
+       60:00
+      </div>
+     </div>
+     <div class="exam-title">
+      <h2 id="examTitle">Ujian Matematika</h2>
+      <p id="examSubtitle" style="margin: 5px 0 0 0; color: #666;">Nama: <strong id="studentName"></strong></p>
+     </div>
+    </div>
+    <div class="exam-content">
+     <form id="examForm"><!-- PG Questions Container -->
+      <div id="pgContainer"></div><!-- Uraian Questions Container -->
+      <div id="uraianContainer"></div><!-- File Upload Section - Centralized -->
+      <div id="fileUploadSection" style="display:none; background:#f0f9f6; padding:20px; border-radius:10px; margin:20px 0; border:2px dashed #2d7a4a;">
+       <div style="margin-bottom:15px;">
+        <strong style="color:#0f5132; font-size:16px;">📎 Upload Jawaban Uraian</strong>
+        <p style="color:#666; margin:8px 0 0 0; font-size:14px;">Upload file jawaban uraian Anda dalam satu dokumen (PDF, DOC, JPG, PNG)</p>
+       </div>
+       <div class="file-upload" style="border:2px dashed #2d7a4a; background:white;">
+        <label for="uploadFile" style="cursor:pointer; display:block;">
+         <div style="padding:20px;">
+          <div style="font-size:24px; margin-bottom:8px;">
+           📤
+          </div>
+          <div style="color:#2d7a4a; font-weight:600;">
+           Klik untuk upload atau drag file ke sini
+          </div>
+          <div style="color:#999; font-size:12px; margin-top:5px;">
+           Maksimal 10MB
+          </div>
+         </div></label> <input type="file" id="uploadFile" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none;">
+       </div>
+       <div id="uploadedFileName" style="display:none; margin-top:10px; color:#27ae60; font-weight:600;"></div>
+      </div><button type="submit" class="btn-submit">Kirim Jawaban</button>
+     </form>
+    </div>
+   </div>
+  </div><!-- Lock Screen -->
+  <div id="lockScreen" class="lock-screen">
+   <div class="lock-content">
+    <h2>⚠️ Ujian Terkunci</h2>
+    <p>Anda terdeteksi melakukan aktivitas mencurigakan!</p>
+    <p>Hubungi pengawas ujian untuk mendapatkan kode unlock.</p>
+    <div class="unlock-code" id="unlockCodeDisplay"></div>
+    <p style="font-size: 12px; margin-top: 15px;">Kode Unlock: <strong id="unlockCodeText"></strong></p>
+   </div>
+  </div><!-- Admin Panel -->
+  <div id="adminScreen" class="admin-screen">
+   <div class="container">
+    <div class="admin-card">
+     <h2>Admin Panel - Unlock Kode</h2>
+     <ul class="admin-list" id="lockedStudentsList">
+      <li>Memuat data siswa terblokir...</li>
+     </ul>
+    </div>
+   </div>
+  </div><!-- Footer -->
+  <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #e0e0e0;">
+   <p style="margin: 0;">Exambro V.02.03.13 • RNJ IT TEAM</p>
+  </footer>
   <script>
-    const KODE_GURU = "Guru7890"; 
-    let timeLeft = 90 * 60;
-    let timerInterval;
-    let savedData = JSON.parse(localStorage.getItem("upk_session")) || {};
-    let blockedSessions = JSON.parse(localStorage.getItem("upk_blocked_sessions")) || [];
-    let violationCount = 0;
-    let lastViolationTime = 0;
-    let isExamLocked = false;
-    let audioContext;
+        // Configuration - Multi Mapel (Sesuai Jadwal Ujian)
+        const MAPEL_CONFIG = {
+            // ===== HARI 1: Senin, 20 April 2026 =====
+            'BAHASA INDONESIA': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_BAHASA_INDONESIA_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 09:00 – 10:30
+                hari: 'Senin, 20 April 2026',
+                jam_mulai: '09:00',
+                jam_akhir: '10:30'
+            },
+            'SENI BUDAYA': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_SENI_BUDAYA_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 10:30 – 12:00
+                hari: 'Senin, 20 April 2026',
+                jam_mulai: '10:30',
+                jam_akhir: '12:00'
+            },
+            'SEJARAH INDONESIA': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_SEJARAH_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 12:30 – 14:00
+                hari: 'Senin, 20 April 2026',
+                jam_mulai: '12:30',
+                jam_akhir: '14:00'
+            },
 
-    // ===== ANTI-CHEAT: AUDIO ALERT =====
-    function playViolationSound() {
-        try {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // ===== HARI 2: Selasa, 21 April 2026 =====
+            'MATEMATIKA UMUM': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_MTK_UMUM_ID/exec',
+                has_upload: true,
+                duration_minutes: 90,  // 09:00 – 10:30
+                hari: 'Selasa, 21 April 2026',
+                jam_mulai: '09:00',
+                jam_akhir: '10:30'
+            },
+            'FISIKA': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_FISIKA_ID/exec',
+                has_upload: true,
+                duration_minutes: 90,  // 10:30 – 12:00 (IPA), Geografi untuk IPS
+                hari: 'Selasa, 21 April 2026',
+                jam_mulai: '10:30',
+                jam_akhir: '12:00'
+            },
+            'GEOGRAFI': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_GEOGRAFI_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 10:30 – 12:00 (IPS)
+                hari: 'Selasa, 21 April 2026',
+                jam_mulai: '10:30',
+                jam_akhir: '12:00'
+            },
+            'MATEMATIKA PEMINATAN': {
+                apps_script_url: 'https://script.google.com/macros/s/AKfycbwJIAb3xN2cfy9bTzHSdkSUklvWpFPGwId-y5wGKXMFLZAfQmdWE1VA2IpxD6p_aVL6nw/exec',
+                has_upload: true,
+                duration_minutes: 90,  // 12:30 – 14:00
+                hari: 'Selasa, 21 April 2026',
+                jam_mulai: '12:30',
+                jam_akhir: '14:00'
+            },
+            'SEJARAH PEMINATAN': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_SEJARAH_PEMINATAN_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 12:30 – 14:00 (IPS)
+                hari: 'Selasa, 21 April 2026',
+                jam_mulai: '12:30',
+                jam_akhir: '14:00'
+            },
+
+            // ===== HARI 3: Rabu, 22 April 2026 =====
+            'BAHASA INGGRIS': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_BAHASA_INGGRIS_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 09:00 – 10:30
+                hari: 'Rabu, 22 April 2026',
+                jam_mulai: '09:00',
+                jam_akhir: '10:30'
+            },
+            'BIOLOGI': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_BIOLOGI_ID/exec',
+                has_upload: true,
+                duration_minutes: 90,  // 10:30 – 12:00 (IPA)
+                hari: 'Rabu, 22 April 2026',
+                jam_mulai: '10:30',
+                jam_akhir: '12:00'
+            },
+            'EKONOMI': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_EKONOMI_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 10:30 – 12:00 (IPS)
+                hari: 'Rabu, 22 April 2026',
+                jam_mulai: '10:30',
+                jam_akhir: '12:00'
+            },
+            'PRAKARYA': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_PRAKARYA_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 12:30 – 14:00
+                hari: 'Rabu, 22 April 2026',
+                jam_mulai: '12:30',
+                jam_akhir: '14:00'
+            },
+
+            // ===== HARI 4: Kamis, 23 April 2026 =====
+            'PKN': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_PKN_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 09:00 – 10:30
+                hari: 'Kamis, 23 April 2026',
+                jam_mulai: '09:00',
+                jam_akhir: '10:30'
+            },
+            'KIMIA': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_KIMIA_ID/exec',
+                has_upload: true,
+                duration_minutes: 90,  // 10:30 – 12:00 (IPA)
+                hari: 'Kamis, 23 April 2026',
+                jam_mulai: '10:30',
+                jam_akhir: '12:00'
+            },
+            'SOSIOLOGI': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_SOSIOLOGI_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 10:30 – 12:00 (IPS)
+                hari: 'Kamis, 23 April 2026',
+                jam_mulai: '10:30',
+                jam_akhir: '12:00'
+            },
+            'PJOK': {
+                apps_script_url: 'https://script.google.com/macros/s/YOUR_PJOK_ID/exec',
+                has_upload: false,
+                duration_minutes: 90,  // 12:30 – 14:00
+                hari: 'Kamis, 23 April 2026',
+                jam_mulai: '12:30',
+                jam_akhir: '14:00'
             }
-            const now = audioContext.currentTime;
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            
-            oscillator.start(now);
-            oscillator.stop(now + 0.1);
-            
-            // Ulang 3 kali: nit nit nit
-            for (let i = 1; i < 3; i++) {
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-                osc.frequency.value = 800;
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.3, now + 0.15 * i);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15 * i + 0.1);
-                osc.start(now + 0.15 * i);
-                osc.stop(now + 0.15 * i + 0.1);
-            }
-        } catch (e) {
-            console.log("Audio tidak tersedia");
-        }
-    }
-
-    // ===== iPhone BLOCK =====
-    function detectiPhone() {
-        const ua = navigator.userAgent;
-        const isiPhone = /iPhone|iPad|iPod/.test(ua) && !/Android/.test(ua);
-        if (isiPhone) {
-            document.getElementById('iphoneBlock').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            return true;
-        }
-        return false;
-    }
-
-    // ===== CHECK BLOCKED SESSION =====
-    function checkBlockedSession() {
-        const namaSiswa = document.getElementById('namaSiswa').value.trim();
-        const tokenUjian = document.getElementById('tokenUjian').value.trim();
-        const sessionKey = btoa(namaSiswa + "|" + tokenUjian);
-        
-        if (blockedSessions.includes(sessionKey)) {
-            // RELOAD untuk memastikan data tidak bisa dihapus manual
-            localStorage.setItem("upk_blocked_sessions", JSON.stringify(blockedSessions));
-            alert("❌ AKUN ANDA SUDAH DIBLOKIR!\n\nAnda terdeteksi melakukan pelanggaran pada ujian sebelumnya.\n\nHubungi pengawas untuk penjelasan lebih lanjut.");
-            // Cegah akses lebih lanjut
-            document.body.innerHTML = "<div style='display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;text-align:center;flex-direction:column;'><h1 style='font-size:2rem;margin:0 20px;'>AKUN DIBLOKIR PERMANEN</h1><p style='font-size:1.1rem;margin:20px;opacity:0.8;'>Hubungi pengawas untuk bantuan.</p></div>";
-            return true;
-        }
-        return false;
-    }
-
-    // ===== TRIGGER VIOLATION & LOCK =====
-    function triggerViolation(reason) {
-        const now = Date.now();
-        if (now - lastViolationTime < 500) return; // Debounce
-        
-        lastViolationTime = now;
-        violationCount++;
-        
-        playViolationSound();
-        
-        const messages = {
-            'switch': 'Pindah aplikasi/tab dideteksi.',
-            'screenshot': 'Screenshot terdeteksi.',
-            'copypaste': 'Copy-Paste terdeteksi.',
-            'minimize': 'Minimize/Fullscreen dideteksi.',
-            'keyboard': 'Keyboard mencurigakan dideteksi.',
-            'focus': 'Browser kehilangan fokus.'
         };
-        
-        document.getElementById('violationMessage').innerText = 
-            (messages[reason] || 'Pelanggaran terdeteksi.') + ` (${violationCount}x)`;
-        
-        if (violationCount >= 3) {
-            lockExamPermanent();
-        } else {
-            document.getElementById('overlay').style.display = 'block';
-        }
-    }
 
-    // ===== LOCK PERMANENT =====
-    function lockExamPermanent() {
-        isExamLocked = true;
-        
-        // Simpan blocked session
-        const namaSiswa = document.getElementById('namaSiswa').value.trim();
-        const tokenUjian = document.getElementById('tokenUjian').value.trim();
-        const sessionKey = btoa(namaSiswa + "|" + tokenUjian);
-        
-        blockedSessions.push(sessionKey);
-        localStorage.setItem("upk_blocked_sessions", JSON.stringify(blockedSessions));
-        localStorage.removeItem("upk_session");
-        
-        document.getElementById('violationMessage').innerText = 
-            "AKUN ANDA DIBLOKIR PERMANEN! Hubungi pengawas.";
-        document.getElementById('kodeGuruInput').style.display = 'none';
-        document.querySelector('button[onclick="unlockExam()"]').style.display = 'none';
-        document.getElementById('overlay').style.display = 'block';
-    }
+        const CONFIG = {
+            DRIVE_FOLDER_ID: '1Mjbj2Tvvjf3XBwnuqf3c9Psvxh1JQgA7'
+        };
 
-    // ===== UNLOCK (hanya guru dengan kode) =====
-    function unlockExam() {
-        if (isExamLocked) {
-            alert("Akun sudah DIBLOKIR PERMANEN! Hubungi kepala sekolah.");
-            return;
-        }
-        
-        if (document.getElementById('kodeGuruInput').value === KODE_GURU) {
-            violationCount = 0;
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('kodeGuruInput').value = "";
-        } else {
-            alert("Kode Guru Salah!");
-        }
-    }
+        // Global State
+        let currentScreen = 'login';
+        let studentName = '';
+        let selectedMapel = '';
+        let examTimer = null;
+        let timeRemaining = 3600; // 60 menit
+        let lockedStudents = JSON.parse(localStorage.getItem('lockedStudents') || '{}');
+        let cheatingDetected = false;
+        let uploadInProgress = false;
 
-    // ===== SETUP SECURITY BERLAPIS =====
-    function setupSecurity() {
-        // 1. DETEKSI PINDAH TAB
-        window.addEventListener('blur', () => {
-            if (!document.hidden) triggerViolation('focus');
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupCheatingDetection();
+            await loadQuestions();
+            setupEventListeners();
         });
 
-        // 2. DETEKSI VISIBILITY (MINIMIZE/SWITCH APP)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) triggerViolation('switch');
-        });
-
-        // 3. DETEKSI FULLSCREEN TOGGLE
-        document.addEventListener('fullscreenchange', () => {
-            triggerViolation('minimize');
-        });
-
-        // 4. ANTI COPYPASTE
-        document.addEventListener('copy', (e) => {
-            e.preventDefault();
-            triggerViolation('copypaste');
-        });
-
-        document.addEventListener('cut', (e) => {
-            e.preventDefault();
-            triggerViolation('copypaste');
-        });
-
-        document.addEventListener('paste', (e) => {
-            e.preventDefault();
-            triggerViolation('copypaste');
-        });
-
-        // 5. ANTI PRINT SCREEN / SCREENSHOT
-        document.addEventListener('keydown', (e) => {
-            // Print Screen
-            if (e.key === 'PrintScreen') {
-                e.preventDefault();
-                triggerViolation('screenshot');
-            }
-            // Ctrl+S (Save)
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                triggerViolation('keyboard');
-            }
-            // Ctrl+Shift+S (Screenshot)
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
-                e.preventDefault();
-                triggerViolation('screenshot');
-            }
-            // F12 (Developer Tools)
-            if (e.key === 'F12') {
-                e.preventDefault();
-                triggerViolation('keyboard');
-            }
-            // Ctrl+Shift+I (DevTools)
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'i') {
-                e.preventDefault();
-                triggerViolation('keyboard');
-            }
-            // Ctrl+Shift+J (Console)
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'j') {
-                e.preventDefault();
-                triggerViolation('keyboard');
-            }
-            // Ctrl+Shift+C (Inspector)
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'c') {
-                e.preventDefault();
-                triggerViolation('keyboard');
-            }
-            // Alt+Tab (Windows)
-            if (e.altKey && e.key === 'Tab') {
-                e.preventDefault();
-                triggerViolation('switch');
-            }
-        });
-
-        // 6. DETECT DEVTOOLS OPEN
-        let devtoolsOpen = false;
-        setInterval(() => {
-            const threshold = 160;
-            if (window.outerHeight - window.innerHeight > threshold || 
-                window.outerWidth - window.innerWidth > threshold) {
-                if (!devtoolsOpen) {
-                    devtoolsOpen = true;
-                    triggerViolation('keyboard');
+        // Setup Cheating Detection
+        function setupCheatingDetection() {
+            // Disable right-click
+            document.addEventListener('contextmenu', (e) => {
+                if (!uploadInProgress && currentScreen === 'exam') {
+                    e.preventDefault();
+                    triggerLock();
                 }
-            } else {
-                devtoolsOpen = false;
-            }
-        }, 500);
-
-        // 7. RIGHT CLICK DISABLE
-        document.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
-
-        // 8. DOUBLE CLICK DISABLE
-        document.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-        });
-
-        // 9. FULLSCREEN LOCK
-        document.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement === null) {
-                triggerViolation('minimize');
-            }
-        });
-    }
-
-    // ===== FUNGSI NAVIGASI & TOKEN =====
-    function goToTab(n) {
-        const inputNama = document.getElementById('namaSiswa').value;
-        const inputToken = document.getElementById('tokenUjian').value;
-
-        if (n === 2) {
-            if (inputNama.trim() === "") {
-                alert("Nama Lengkap harus diisi!");
-                return;
-            }
-            if (inputToken !== "RISTEK2026") {
-                alert("Token Ujian Salah! Silakan tanya pengawas.");
-                return;
-            }
-            if (checkBlockedSession()) {
-                return;
-            }
-        }
-        
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        const targetTab = document.getElementById('tab' + n);
-        if (targetTab) targetTab.classList.add('active');
-        window.scrollTo(0, 0);
-    }
-
-    function mulaiUjian() {
-        goToTab(3);
-        document.getElementById('examHeader').style.display = 'flex';
-        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
-        
-        renderSoal();
-        startTimer();
-        setupSecurity();
-    }
-
-    // ===== RENDER SOAL =====
-    function renderSoal() {
-        let pgHtml = "";
-        letsSoalPG.forEach((s, i) => {
-            let chk = savedData['pg' + i];
-            pgHtml += `<div class="soal-card"><span class="soal-text">${i + 1}. ${s[0]}</span>`;
-            s[1].forEach((opt, idx) => {
-                let isChecked = chk == idx ? 'checked' : '';
-                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" onclick="saveAns('pg${i}', ${idx})" ${isChecked}> <span>${opt}</span></label>`;
             });
-            pgHtml += `</div>`;
-        });
-        document.getElementById('renderPG').innerHTML = pgHtml;
 
-        let urHtml = "";
-        soalUraian.forEach((s, i) => {
-            urHtml += `<div style="margin-bottom:15px; padding:10px; border-bottom:1px solid #eee;">
-                <p style="font-weight:700; margin:0 0 5px 0;">Soal Uraian ${i + 1}</p>
-                <p style="margin:0; font-size:0.95rem;">${s}</p>
-            </div>`;
-        });
-        document.getElementById('renderUraianTeks').innerHTML = urHtml;
+            // Disable copy
+            document.addEventListener('copy', (e) => {
+                if (!uploadInProgress && currentScreen === 'exam') {
+                    e.preventDefault();
+                    triggerLock();
+                }
+            });
 
-        updateStatusUpload();
-        if (typeof MathJax !== 'undefined') {
-            MathJax.typeset();
-        }
-    }
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            document.addEventListener('keydown', (e) => {
+                if (!uploadInProgress && currentScreen === 'exam') {
+                    if (e.key === 'F12' || 
+                        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+                        (e.ctrlKey && e.key === 'u')) {
+                        e.preventDefault();
+                        triggerLock();
+                    }
+                }
+            });
 
-    // ===== SAVE ANSWER =====
-    function saveAns(key, val) {
-        savedData[key] = val;
-        localStorage.setItem("upk_session", JSON.stringify(savedData));
-    }
+            // Fullscreen detection
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement && currentScreen === 'exam' && !uploadInProgress) {
+                    triggerLock();
+                }
+            });
 
-    // ===== UPLOAD LOGIC =====
-    if (!savedData['filesUraian']) {
-        savedData['filesUraian'] = [];
-    }
-
-    function prepareUpload() {
-        // Izinkan file picker
-    }
-
-    function saveFileSingle(input) {
-        const file = input.files[0];
-        if (!file) return;
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert("File terlalu besar! Maksimal 5MB.");
-            input.value = "";
-            return;
+            // Tab focus detection
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && currentScreen === 'exam' && !uploadInProgress) {
+                    triggerLock();
+                }
+            });
         }
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            savedData['filesUraian'].push(e.target.result);
-            localStorage.setItem("upk_session", JSON.stringify(savedData));
-            updateStatusUpload();
-            input.value = "";
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function updateStatusUpload() {
-        const jml = savedData['filesUraian'] ? savedData['filesUraian'].length : 0;
-        const statusEl = document.getElementById('status_upload');
-        if (statusEl) {
-            if (jml > 0) {
-                statusEl.innerHTML = `<b style="color:#059669;">✅ ${jml} Foto Tersimpan</b><br>
-                <button type="button" onclick="hapusSemuaFoto()" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.8rem; text-decoration:underline; margin-top:5px;">Hapus & foto ulang</button>`;
-            } else {
-                statusEl.innerText = "Belum ada foto.";
-            }
-        }
-    }
-
-    function hapusSemuaFoto() {
-        if (confirm("Hapus semua foto?")) {
-            savedData['filesUraian'] = [];
-            localStorage.setItem("upk_session", JSON.stringify(savedData));
-            updateStatusUpload();
-        }
-    }
-
-    // ===== TIMER =====
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            let m = Math.floor(timeLeft / 60);
-            let s = timeLeft % 60;
-            let tEl = document.getElementById('timer');
-            if (tEl) tEl.innerText = `${m}:${s < 10 ? '0' + s : s}`;
+        // Trigger Lock
+        function triggerLock() {
+            if (cheatingDetected) return;
             
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                alert("Waktu Ujian Habis!");
-                finishExam();
+            cheatingDetected = true;
+            const unlockCode = generateUnlockCode();
+            
+            lockedStudents[studentName] = {
+                mapel: selectedMapel,
+                timestamp: new Date().toISOString(),
+                unlockCode: unlockCode
+            };
+            
+            localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+            
+            document.getElementById('unlockCodeText').textContent = unlockCode;
+            document.getElementById('unlockCodeDisplay').textContent = unlockCode;
+            document.getElementById('lockScreen').classList.add('active');
+        }
+
+        // Generate Unlock Code
+        function generateUnlockCode() {
+            return 'UNLOCK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Login Form
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                studentName = document.getElementById('namaInput').value.trim();
+                selectedMapel = document.getElementById('mapelSelect').value;
+                
+                if (!studentName || !selectedMapel) {
+                    alert('Silakan isi semua field!');
+                    return;
+                }
+                
+                // 🔒 CEK JAM UJIAN - VALIDASI WAKTU
+                const mapelConfig = MAPEL_CONFIG[selectedMapel];
+                const jamCheck = checkWaktuUjian(mapelConfig);
+                
+                if (!jamCheck.allowed) {
+                    // ❌ Ujian belum dibuka atau sudah ditutup
+                    alert(`⏰ ${jamCheck.message}`);
+                    return;
+                }
+                
+                // Check if already locked for a different mapel
+                if (lockedStudents[studentName]) {
+                    const lockedMapel = lockedStudents[studentName].mapel;
+                    const unlockCode = lockedStudents[studentName].unlockCode;
+                    
+                    // If trying to access different mapel, show lock
+                    if (lockedMapel !== selectedMapel) {
+                        document.getElementById('unlockCodeText').textContent = unlockCode;
+                        document.getElementById('unlockCodeDisplay').textContent = unlockCode;
+                        document.getElementById('lockScreen').classList.add('active');
+                        return;
+                    }
+                    
+                    // If same mapel, allow retry
+                    startExam();
+                    return;
+                }
+                
+                // Lock other mapel by creating lock entry
+                const otherMapel = selectedMapel === 'MATEMATIKA PEMINATAN' ? 'MATEMATIKA UMUM' : 'MATEMATIKA PEMINATAN';
+                const unlockCode = generateUnlockCode();
+                
+                lockedStudents[studentName] = {
+                    mapel: otherMapel,
+                    timestamp: new Date().toISOString(),
+                    unlockCode: unlockCode,
+                    selectedMapel: selectedMapel
+                };
+                
+                localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+                
+                startExam();
+            });
+
+            // Exam Form
+            document.getElementById('examForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await submitExam();
+            });
+
+            // File upload handlers - REMOVED (menggunakan centralized upload)
+            // Keeping event listener setup in renderQuestions untuk centralized upload
+        }
+
+        // Cek Waktu Ujian - 🔒 VALIDASI JAM UJIAN
+        function checkWaktuUjian(mapelConfig) {
+            const now = new Date();
+            const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+                               now.getMinutes().toString().padStart(2, '0');
+            
+            const jamMulai = mapelConfig.jam_mulai;
+            const jamAkhir = mapelConfig.jam_akhir;
+            
+            // Compare time strings
+            if (currentTime < jamMulai) {
+                // ❌ BELUM WAKTUNYA
+                const [hMulai, mMulai] = jamMulai.split(':');
+                const [hSekarang, mSekarang] = currentTime.split(':');
+                
+                const msekarang = parseInt(hSekarang) * 60 + parseInt(mSekarang);
+                const mmulai = parseInt(hMulai) * 60 + parseInt(mMulai);
+                const timeDiff = mmulai - msekarang;
+                
+                const jam = Math.floor(timeDiff / 60);
+                const menit = timeDiff % 60;
+                
+                let pesan = `⏰ Ujian ${mapelConfig.jam_mulai} belum dibuka.\n\n`;
+                pesan += `📅 Jadwal: ${mapelConfig.hari}\n`;
+                pesan += `🕐 Jam Ujian: ${mapelConfig.jam_mulai} - ${mapelConfig.jam_akhir}\n\n`;
+                
+                if (jam > 0) {
+                    pesan += `⏳ Tersisa: ${jam} jam ${menit} menit`;
+                } else {
+                    pesan += `⏳ Tersisa: ${menit} menit`;
+                }
+                
+                return {
+                    allowed: false,
+                    message: pesan
+                };
             }
-            timeLeft--;
-        }, 1000);
-    }
-
-    // ===== FINISH EXAM =====
-    function finishExam() {
-        const nama = document.getElementById('namaSiswa').value;
-        if (!nama) {
-            alert("Isi Nama Lengkap!");
-            return;
+            
+            if (currentTime > jamAkhir) {
+                // ❌ SUDAH LEWAT
+                return {
+                    allowed: false,
+                    message: `❌ Ujian ${mapelConfig.jam_akhir} sudah ditutup.\n\nWaktu ujian telah berakhir.`
+                };
+            }
+            
+            // ✅ BISA UJIAN
+            return { allowed: true };
         }
 
-        let kosong = [];
-        for (let i = 0; i < letsSoalPG.length; i++) {
-            if (savedData['pg' + i] === undefined) kosong.push(i + 1);
-        }
+        // Load Questions - Per Mapel dengan Soal Berbeda
+        async function loadQuestions() {
+            // ============================================
+            // SOAL PEMINATAN - 30 PG + 5 Uraian
+            // ============================================
+            const soalPeminatan_PG = [
+["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....",
+["x > 10","x < 10","x < 6","x > 4","x < 1"]],
 
-        if (kosong.length > 0) {
-            alert("Soal PG belum lengkap nomor: " + kosong.join(", "));
-            return;
-        }
+["Interval penyelesaian pertidaksamaan \\(\\left|x - 1\\right| < \\left|x + 2\\right|\\) adalah ...",
+["x < \\(\\frac{-3}{4}\\)","x < \\(\\frac{-1}{4}\\)","x > \\(\\frac{-3}{4}\\)","x < \\(\\frac{-5}{4}\\)","x > 1"]],
 
-        if (!savedData['filesUraian'] || savedData['filesUraian'].length === 0) {
-            alert("Upload foto jawaban!");
-            return;
-        }
+["Return adalah keuntungan dari suatu investasi. Sebagai contoh, jika investasi berupa tabungan di bank, return adalah bunga bank; jika investasi berupa kepemilikan saham pada suatu perusahaan, return dapat berupa kenaikan harga saham maupun hasil bagi keuntungan perusahaan. Jika return yang diperoleh diinvestasikan kembali, berlaku hubungan berikut: \\(1 + R = (1 + r)^t\\) dengan R adalah return selama jangka waktu t, dan r adalah tingkat return per-unit waktu. Ayah berinvestasi pada suatu perusahaan sebesar Rp10.000.000,00 dengan return 15% per tahun. Saat pembagian keuntungan di tiap akhir tahun, Ayah menginvestasikan kembali keuntungan tersebut. Di akhir tahun ke-t, investasi ayah di perusahaan tersebut bernilai Rp15.200.000,00 (pembulatan ke ratusan ribu terdekat). Diketahui \\(\\log 1{,}52 = 0{,}18\\) dan \\(\\log 1{,}15 = 0{,}06\\). Nilai t adalah ....",
+["2","3","4","5","6"]],
 
-        if (confirm("Kirim jawaban sekarang?")) {
-            alert("Sedang mengirim... Jangan tutup halaman ini!");
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwJIAb3xN2cfy9bTzHSdkSUklvWpFPGwId-y5wGKXMFLZAfQmdWE1VA2IpxD6p_aVL6nw/exec';
-            const payload = {
-                nama: nama,
-                mapel: "MATEMATIKA PEMINATAN",
-                jawaban: savedData,
-                fileUraian: savedData['filesUraian'].join("|SPLIT|")
+["Persamaan grafik fungsi seperti tampak pada gambar adalah .... <br><img src='https://i.imgur.com/YI2lKMX.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
+["\\( y = \\log_{3}x \\)", 
+        "\\( y = \\log_{\\frac{1}{3}}x \\)", 
+        "\\( y = \\left(-\\frac{1}{3}\\right)^x \\)", 
+        "\\( y = (1-3)^x \\)", 
+        "\\( y = 3^{-x} \\)"]],
+
+["Diketahui \\((x-1)\\) salah satu faktor dari persamaan suku banyak: \\(x^3 - 2x^2 - 5x + b = 0\\). Salah satu faktor lainnya adalah ....",
+["x - 3","x - 2","x + 1","x + 3","x + 6"]],
+
+["Alfin menabung sejumlah uang di bank, dan setelah dua tahun uangnya menjadi Rp5.292.000,00. Jika bunga majemuk 5\\% per tahun, maka jumlah awal uang yang ditabung adalah ....",
+["Rp4.400.000,00","Rp4.500.000,00","Rp4.600.000,00","Rp4.700.000,00","Rp4.800.000,00"]],
+
+["Jumlah dua bilangan positif adalah 32. Jika jumlah dari kebalikan setiap bilangan tersebut \\(\\frac{12}{15}\\), maka selisih kedua bilangan tersebut adalah ....",
+["16","12","10","8","7"]],
+
+["Nilai \\(\\displaystyle \\lim_{x \\to \\infty} \\left[\\sqrt{x(4x+5)} - \\sqrt{4x^2 - 3}\\right]\\) = ....",
+["\\(\\frac{1}{2}\\)",
+ "\\(\\frac{2}{3}\\)",
+ "\\(\\frac{2}{5}\\)",
+ "\\(\\frac{5}{3}\\)",
+ "\\(\\frac{5}{4}\\)"]],
+
+ ["Turunan pertama fungsi \\(f(x) = \\frac{\\sin x + \\cos x}{\\cos x}\\) adalah ....",
+["\\(1 - \\sec^2 x\\)",
+ "\\(\\sec^2 x\\)",
+ "\\(\\cot x + 1\\)",
+ "\\(\\cos ec^2 x\\)",
+ "\\(-\\sin x\\)"]],
+
+ ["Nilai \\(\\displaystyle \\lim_{x \\to 0} \\frac{\\sin 8x + \\sin 4x}{2x(\\cos 12x + \\cos 8x)}\\) = ....",
+["-3",
+ "-\\(\\frac{3}{10}\\)",
+ "\\(\\frac{1}{5}\\)",
+ "\\(\\frac{3}{10}\\)",
+ "3"]],
+
+ ["Luas daerah yang diarsir berikut adalah .... <br><img src='https://i.imgur.com/Y9eX02O.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
+["\\(17\\frac{1}{2}\\)",
+ "\\(15\\frac{1}{2}\\)",
+ "\\(13\\frac{1}{2}\\)",
+ "\\(10\\frac{1}{2}\\)",
+ "9"]],
+
+ ["Diketahui garis g menyinggung kurva \\(y = \\sin x + \\cos x\\) di titik yang berabsis \\(\\frac{\\pi}{3}\\). Gradien garis yang tegak lurus pada garis g adalah ....",
+["\\(1 - \\sqrt{3}\\)",
+ "\\(1 + \\sqrt{3}\\)",
+ "1",
+ "\\(\\frac{1}{2}(\\sqrt{3} - 1)\\)",
+ "\\(\\frac{1}{2}(1 - \\sqrt{3})\\)"]],
+
+ ["Suatu mesin diprogram untuk menggerakkan sebuah alat penggores sedemikian hingga alat tersebut dinyatakan dengan \\(x = 3\\cos 4t\\) dan \\(y = 2\\cos 3t\\) (posisi dalam satuan cm dan waktu t satuan detik). Kecepatan gerak alat penggores pada saat t dinyatakan dengan \\(v = \\sqrt{\\left(\\frac{dx}{dt}\\right)^2 + \\left(\\frac{dy}{dt}\\right)^2}\\) dalam satuan cm/detik. Besar kecepatan gerak alat tersebut saat \\(t = \\frac{\\pi}{2}\\) detik adalah ....",
+["2 cm/detik",
+ "\\(\\sqrt{13}\\) cm/detik",
+ "6 cm/detik",
+ "\\(6\\sqrt{5}\\) cm/detik",
+ "12 cm/detik"]],
+
+ ["Jika \\(x = 2\\sin t\\), \\(y = 4 + \\cos t\\), maka \\(\\frac{dy}{dx}\\) dalam t adalah ....",
+["\\(-\\frac{2}{3}\\sin t\\)",
+ "\\(-\\frac{2}{3}\\tan t\\)",
+ "\\(\\frac{1}{2}\\tan t\\)",
+ "\\(-\\frac{1}{2}\\tan t\\)",
+ "\\(-\\frac{1}{2}\\sin t\\)"]],
+
+ ["Luas daerah yang dibatasi oleh kurva \\(y = 6x - x^2\\) dan \\(y = x^2 - 2x\\) adalah ....",
+["\\(\\frac{20}{3}\\) satuan luas",
+ "16 satuan luas",
+ "21 satuan luas",
+ "\\(\\frac{64}{3}\\) satuan luas",
+ "32 satuan luas"]],
+
+ ["Sebuah kota selama \\(t\\) tahun perkiraan jumlah penduduknya dapat dinyatakan oleh fungsi \\(P = \\frac{12000}{(3+t)^2} + 35000\\). Perkiraan jumlah penduduknya dalam jangka waktu yang sangat lama di masa yang akan datang adalah ....",
+["12.000",
+ "20.000",
+ "35.000",
+ "40.000",
+ "45.000"]],
+
+ ["Jika \\(\\sin \\alpha = \\frac{12}{13}\\), dengan \\(\\alpha\\) lancip, maka \\(\\sin 2\\alpha + \\cos 2\\alpha\\) = ....",
+["\\(\\frac{3}{144}\\)",
+ "\\(\\frac{2}{144}\\)",
+ "-\\(\\frac{1}{144}\\)",
+ "\\(\\frac{1}{169}\\)",
+ "\\(\\frac{2}{169}\\)"]],
+
+["Persamaan lingkaran yang melalui titik potong lingkaran \\(L_1 \\equiv x^2 + y^2 + 2x + 2y - 2 = 0\\) dan \\(L_2 \\equiv x^2 + y^2 + 4x - 8y + 4 = 0\\) serta melalui titik asal adalah ....",
+["\\(3x^2 + 3y^2 + 8x - 2y = 0\\)",
+ "\\(3x^2 + 3y^2 - 8x + 4y = 0\\)",
+ "\\(3x^2 + 3y^2 + 8x - 4y = 0\\)",
+ "\\(4x^2 + 4y^2 + 8x + 4y = 0\\)",
+ "\\(4x^2 + 4y^2 + 8x - 2y = 0\\)"]],
+
+["Himpunan penyelesaian persamaan \\(\\sin(3x + 30^\\circ) = \\frac{1}{2}\\sqrt{2}\\) pada interval \\(0^\\circ \\le x \\le 180^\\circ\\) adalah ....",
+["\\(\\{5^\\circ, 35^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 125^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 65^\\circ, 95^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 125^\\circ, 155^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 95^\\circ, 155^\\circ\\}\\)"]],
+
+["Diketahui segitiga ABC siku-siku di B. Jika \\(\\sin A \\cdot \\sin C = \\frac{1}{10}\\) dan \\(\\sin(A - C) = \\frac{2}{5}x\\), maka nilai \\(x\\) adalah ....",
+["-2",
+ "-\\(\\frac{1}{2}\\)",
+ "\\(\\frac{1}{4}\\)",
+ "\\(\\frac{1}{2}\\)",
+ "2"]],
+
+ ["Diketahui vektor \\(\\begin{pmatrix} x \\\\ 2 \\\\ -1 \\end{pmatrix}\\), \\(\\mathbf{b} = \\begin{pmatrix} 4 \\\\ -3 \\\\ 6 \\end{pmatrix}\\), dan \\(\\mathbf{c} = \\begin{pmatrix} 2 \\\\ 0 \\\\ 3 \\end{pmatrix}\\). Jika \\(\\mathbf{a}\\) tegak lurus \\(\\mathbf{b}\\), hasil dari \\((3\\mathbf{a} - \\mathbf{b}) + 2\\mathbf{c}\\) adalah ....",
+["\\(\\begin{pmatrix} 9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ 9 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} -9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ 6 \\\\ 3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ -9 \\\\ 3 \\end{pmatrix}\\)"]],
+
+["Alief, Abdul, dan Azzam sedang menerbangkan layang-layang, masing-masing berdiri pada koordinat \\((-1, 4, 8)\\), \\((1, 2, 3)\\), dan \\((5, y, z)\\) yang segaris. Maka posisi berdiri Azzam pada koordinat ....",
+["(5, -7, -2)",
+ "(5, -5, -2)",
+ "(5, -2, -7)",
+ "(5, 2, 7)",
+ "(5, 7, 9)"]],
+
+["Diketahui vektor \\(\\vec{a} = -2\\mathbf{i} + 3\\mathbf{j} + \\mathbf{k}\\) dan \\(\\vec{b} = 4\\mathbf{i} + 4\\mathbf{j} + m\\mathbf{k}\\). Jika panjang proyeksi vektor \\(\\vec{a}\\) pada \\(\\vec{b}\\) adalah \\(\\frac{1}{3}\\), nilai \\(m\\) yang memenuhi adalah ....",
+["-7",
+ "-5",
+ "2",
+ "5",
+ "7"]],
+
+["Balok KLMN.OPQR mempunyai panjang rusuk KL = 16 cm, LM = 12 cm, dan MQ = 10 cm. Jarak titik P ke titik N adalah ....",
+["\\(10\\sqrt{6}\\ \\text{cm}\\)",
+ "\\(10\\sqrt{5}\\ \\text{cm}\\)",
+ "\\(10\\sqrt{3}\\ \\text{cm}\\)",
+ "\\(5\\sqrt{6}\\ \\text{cm}\\)",
+ "\\(5\\sqrt{5}\\ \\text{cm}\\)"]],
+
+["Perhatikan gambar kubus berikut:<br><img src='https://i.imgur.com/Afmchd1.png' style='max-width:100%;margin-top:10px;border-radius:10px;'><br><br>Diketahui titik P merupakan perpotongan antara diagonal BG dan CF. Cermati beberapa pernyataan berikut.<br><br>(i) Titik P terletak pada bidang ACGE<br>(ii) Titik P terletak di luar bidang BCHE<br>(iii) Titik P terletak pada bidang CDEF<br>(iv) Titik P terletak pada bidang BCGF<br>(v) Titik P terletak di luar bidang ABGH<br><br>Pernyataan yang benar adalah ....",
+["(i), (ii), dan (iii)",
+ "(i), (iii), dan (v)",
+ "(i), (iv), dan (v)",
+ "(ii), (iii), dan (iv)",
+ "(ii), (iv), dan (v)"]],
+
+["Dalam suatu ujian seorang siswa diharuskan menjawab soal multiple choice sebanyak tiga kali. Peubah acak banyaknya jawaban benar adalah ....",
+["\\(\\{0, 1\\}\\)",
+ "\\(\\{0, 1, 2\\}\\)",
+ "\\(\\{1, 2\\}\\)",
+ "\\(\\{1, 2, 3\\}\\)",
+ "\\(\\{0, 1, 2, 3\\}\\)"]],
+
+["Dua buah dadu diundi bersama-sama sebanyak tiga kali. Peluang mendapatkan dua kali mata dadu berjumlah 9 adalah ....",
+["\\(\\frac{8}{81}\\)",
+ "\\(\\frac{16}{81}\\)",
+ "\\(\\frac{16}{243}\\)",
+ "\\(\\frac{8}{243}\\)",
+ "\\(\\frac{4}{243}\\)"]],
+
+["Sepasang suami istri merencanakan untuk mempunyai 4 orang anak. Jika variabel acak \\(X\\) menyatakan banyak anak perempuan, nilai dari \\(P(X \\ge 2)\\) adalah ....",
+["\\(\\frac{4}{16}\\)",
+ "\\(\\frac{5}{16}\\)",
+ "\\(\\frac{6}{16}\\)",
+ "\\(\\frac{10}{16}\\)",
+ "\\(\\frac{11}{16}\\)"]],
+
+["Sebuah toko sepatu mencatat jumlah sepatu yang terjual setiap hari. Misalkan \\(x\\) = jumlah sepatu yang terjual dalam sehari selama bulan November 2018 sebagai berikut:<br><br><table style='border-collapse:collapse;margin:auto;'><tr><th style='border:1px solid #333;padding:6px 12px;'>X</th><th style='border:1px solid #333;padding:6px 12px;'>Jumlah hari</th></tr><tr><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>1</td><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>6</td></tr><tr><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>3</td><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>12</td></tr><tr><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>4</td><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>9</td></tr><tr><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>5</td><td style='border:1px solid #333;padding:6px 12px;text-align:center;'>3</td></tr></table><br>Distribusi peluang variabel acak \\(x\\) adalah ...",
+["<table style='border-collapse:collapse;'><tr><td style='border:1px solid #333;padding:4px;'>x</td><td style='border:1px solid #333;padding:4px;'>1</td><td style='border:1px solid #333;padding:4px;'>3</td><td style='border:1px solid #333;padding:4px;'>4</td><td style='border:1px solid #333;padding:4px;'>5</td></tr><tr><td style='border:1px solid #333;padding:4px;'>f(x)</td><td style='border:1px solid #333;padding:4px;'>0,2</td><td style='border:1px solid #333;padding:4px;'>0,4</td><td style='border:1px solid #333;padding:4px;'>0,3</td><td style='border:1px solid #333;padding:4px;'>0,1</td></tr></table>",
+
+"<table style='border-collapse:collapse;'><tr><td style='border:1px solid #333;padding:4px;'>x</td><td style='border:1px solid #333;padding:4px;'>1</td><td style='border:1px solid #333;padding:4px;'>3</td><td style='border:1px solid #333;padding:4px;'>4</td><td style='border:1px solid #333;padding:4px;'>5</td></tr><tr><td style='border:1px solid #333;padding:4px;'>f(x)</td><td style='border:1px solid #333;padding:4px;'>0,3</td><td style='border:1px solid #333;padding:4px;'>0,4</td><td style='border:1px solid #333;padding:4px;'>0,2</td><td style='border:1px solid #333;padding:4px;'>0,1</td></tr></table>",
+
+"<table style='border-collapse:collapse;'><tr><td style='border:1px solid #333;padding:4px;'>x</td><td style='border:1px solid #333;padding:4px;'>1</td><td style='border:1px solid #333;padding:4px;'>3</td><td style='border:1px solid #333;padding:4px;'>4</td><td style='border:1px solid #333;padding:4px;'>5</td></tr><tr><td style='border:1px solid #333;padding:4px;'>f(x)</td><td style='border:1px solid #333;padding:4px;'>0,2</td><td style='border:1px solid #333;padding:4px;'>0,2</td><td style='border:1px solid #333;padding:4px;'>0,3</td><td style='border:1px solid #333;padding:4px;'>0,3</td></tr></table>",
+
+"<table style='border-collapse:collapse;'><tr><td style='border:1px solid #333;padding:4px;'>x</td><td style='border:1px solid #333;padding:4px;'>1</td><td style='border:1px solid #333;padding:4px;'>3</td><td style='border:1px solid #333;padding:4px;'>4</td><td style='border:1px solid #333;padding:4px;'>5</td></tr><tr><td style='border:1px solid #333;padding:4px;'>f(x)</td><td style='border:1px solid #333;padding:4px;'>0,1</td><td style='border:1px solid #333;padding:4px;'>0,4</td><td style='border:1px solid #333;padding:4px;'>0,3</td><td style='border:1px solid #333;padding:4px;'>0,2</td></tr></table>",
+
+"<table style='border-collapse:collapse;'><tr><td style='border:1px solid #333;padding:4px;'>x</td><td style='border:1px solid #333;padding:4px;'>1</td><td style='border:1px solid #333;padding:4px;'>3</td><td style='border:1px solid #333;padding:4px;'>4</td><td style='border:1px solid #333;padding:4px;'>5</td></tr><tr><td style='border:1px solid #333;padding:4px;'>f(x)</td><td style='border:1px solid #333;padding:4px;'>0,1</td><td style='border:1px solid #333;padding:4px;'>0,3</td><td style='border:1px solid #333;padding:4px;'>0,3</td><td style='border:1px solid #333;padding:4px;'>0,2</td></tr></table>"]],
+
+["Nilai ujian MTK yang diperoleh dalam satu kelas berdistribusi normal dengan rata-rata 70 dan simpangan baku 10. Jika remedial akan diberikan kepada 20% siswa dengan nilai terendah, nilai minimum siswa yang tidak mengikuti remedial adalah ....",
+["57,5",
+ "58,5",
+ "59,2",
+ "62,5",
+ "65,0"]],
+  
+            ];
+
+            // Data soal Uraian Peminatan (5 soal)
+            const soalPeminatan_Uraian = [
+                "Tentukanlah interval penyelesaian pertidaksamaan \\(|x + 2| \\ge 2|x - 1|\\)!",
+                "Tentukan nilai dari \\(\\int (2x + 5)\\cos 2x \\, dx\\)!",
+                "Gambar di bawah adalah sebuah trapesium ABCD dengan AD = CD = BC = m cm, dan ∠DAB = ∠CBA = 2α (α adalah sudut lancip). Berapakah luas maksimum trapesium tersebut (dalam m² cm²)? Tuliskan langkah penyelesaiannya!",
+                "Tentukan batas-batas nilai a yang memenuhi agar titik P(8, -6) berada di dalam lingkaran \\(x^2 + y^2 = a^2\\)!",
+                "Suatu variabel acak x memiliki distribusi probabilitas sebagai berikut:<br><br><table style='border-collapse:collapse;margin:auto;'><tr><td style='border:1px solid #333;padding:6px;'>X = x</td><td style='border:1px solid #333;padding:6px;'>0</td><td style='border:1px solid #333;padding:6px;'>1</td><td style='border:1px solid #333;padding:6px;'>2</td><td style='border:1px solid #333;padding:6px;'>3</td></tr><tr><td style='border:1px solid #333;padding:6px;'>P(X = x)</td><td style='border:1px solid #333;padding:6px;'>k</td><td style='border:1px solid #333;padding:6px;'>k²</td><td style='border:1px solid #333;padding:6px;'>k² + k</td><td style='border:1px solid #333;padding:6px;'>3k² + 2k</td></tr></table><br>Dengan k adalah konstanta. Tentukan nilai k!"
+            ];
+
+            // ============================================
+            // SOAL UMUM - 30 PG + 5 Uraian (BERBEDA)
+            // ============================================
+            const soalUmum_PG = [
+                ["Jika \\(2^x = 8\\), maka nilai \\(x\\) adalah ....",
+                ["1","2","3","4","5"]],
+
+                ["Hasil dari \\((2x + 3)(x - 1)\\) adalah ....",
+                ["\\(2x^2 + x - 3\\)","\\(2x^2 - 2x - 3\\)","\\(2x^2 + 5x - 3\\)","\\(x^2 + x - 3\\)","\\(2x^2 - x + 3\\)"]],
+
+                ["Persamaan garis yang melalui titik (1, 2) dan (3, 6) adalah ....",
+                ["y = 2x","y = 2x + 1","y = 2x - 1","y = x + 1","y = 3x - 1"]],
+
+                ["Nilai dari \\(\\sqrt{144}\\) adalah ....",
+                ["10","11","12","13","14"]],
+
+                ["Jika \\(3x + 2 = 14\\), maka \\(x = \\) ....",
+                ["2","3","4","5","6"]],
+
+                ["Hasil dari \\(5! = \\) ....",
+                ["100","110","120","130","140"]],
+
+                ["Luas segitiga dengan alas 10 cm dan tinggi 8 cm adalah ....",
+                ["40 cm²","50 cm²","60 cm²","70 cm²","80 cm²"]],
+
+                ["Keliling lingkaran dengan jari-jari 7 cm adalah ....",
+                ["44 cm","42 cm","40 cm","38 cm","36 cm"]],
+
+                ["Jika \\(a = 2\\) dan \\(b = 3\\), maka \\(a^2 + 2ab + b^2 = \\) ....",
+                ["25","24","23","22","21"]],
+
+                ["Volume kubus dengan sisi 5 cm adalah ....",
+                ["100 cm³","125 cm³","150 cm³","175 cm³","200 cm³"]],
+
+                ["Median dari data 3, 5, 7, 9, 11 adalah ....",
+                ["5","7","9","11","13"]],
+
+                ["Jika \\(\\sin 30° = \\frac{1}{2}\\), maka \\(\\cos 30° = \\) ....",
+                ["\\(\\frac{1}{2}\\)","\\(\\frac{\\sqrt{2}}{2}\\)","\\(\\frac{\\sqrt{3}}{2}\\)","\\(\\frac{\\sqrt{4}}{2}\\)","1"]],
+
+                ["Hasil dari \\(2 + 2 \\times 2 = \\) ....",
+                ["6","8","4","2","10"]],
+
+                ["Jika \\(x + 5 = 12\\), maka \\(x = \\) ....",
+                ["5","6","7","8","9"]],
+
+                ["Hasil dari \\(\\frac{12}{3} = \\) ....",
+                ["3","4","5","6","7"]],
+
+                ["Keliling persegi panjang dengan panjang 10 cm dan lebar 6 cm adalah ....",
+                ["30 cm","32 cm","34 cm","36 cm","38 cm"]],
+
+                ["Jika \\(y = 2x + 1\\) dan \\(x = 3\\), maka \\(y = \\) ....",
+                ["5","6","7","8","9"]],
+
+                ["Modus dari data 2, 3, 3, 4, 5, 5, 5, 6 adalah ....",
+                ["2","3","4","5","6"]],
+
+                ["Hasil dari \\(10^2 - 5^2 = \\) ....",
+                ["50","75","100","125","150"]],
+
+                ["Jika perimeter segitiga sama sisi adalah 15 cm, maka panjang satu sisinya adalah ....",
+                ["3 cm","4 cm","5 cm","6 cm","7 cm"]],
+
+                ["Nilai dari \\(\\log_{10} 100 = \\) ....",
+                ["1","2","3","4","5"]],
+
+                ["Jika \\(\\frac{x}{2} = 6\\), maka \\(x = \\) ....",
+                ["10","11","12","13","14"]],
+
+                ["Hasil dari \\((-3) \\times (-4) = \\) ....",
+                ["12","-12","7","-7","10"]],
+
+                ["Jika \\(2(x - 1) = 10\\), maka \\(x = \\) ....",
+                ["4","5","6","7","8"]],
+
+                ["Luas trapesium dengan kedua alas 8 cm dan 12 cm serta tinggi 5 cm adalah ....",
+                ["40 cm²","50 cm²","60 cm²","70 cm²","80 cm²"]],
+
+                ["Jika \\(a : b = 2 : 3\\) dan \\(a = 4\\), maka \\(b = \\) ....",
+                ["6","8","9","10","12"]],
+
+                ["Hasil dari \\(\\frac{3}{4} + \\frac{1}{4} = \\) ....",
+                ["1","\\(\\frac{5}{4}\\)","\\(\\frac{3}{2}\\)","\\(\\frac{1}{2}\\)","2"]],
+
+                ["Jika \\(x^2 = 16\\), maka nilai \\(x\\) yang positif adalah ....",
+                ["2","3","4","5","6"]],
+
+                ["Rata-rata dari 5, 7, 9, 11 adalah ....",
+                ["7","8","9","10","11"]],
+            ];
+
+            // Data soal Uraian Umum (5 soal - BERBEDA dari Peminatan)
+            const soalUmum_Uraian = [
+                "Selesaikan persamaan linear: \\(3x + 5 = 14\\). Tuliskan langkah-langkah penyelesaiannya!",
+
+                "Tentukan luas persegi panjang dengan panjang 12 cm dan lebar 8 cm!",
+
+                "Jika suatu segitiga memiliki sudut-sudut \\(60°\\), \\(60°\\), dan \\(60°\\), berapakah jumlah ketiga sudut tersebut? Jelaskan tipe segitiga apa itu!",
+
+                "Hitunglah volume kubus dengan panjang sisi 6 cm!",
+
+                "Diberikan dua bilangan: 12 dan 18. Tentukanlah FPB (Faktor Persekutuan Terbesar) dan KPK (Kelipatan Persekutuan Terkecil) dari kedua bilangan tersebut!"
+            ];
+
+            // Convert ke format question objects
+            const quizPeminatan = {
+                pg: soalPeminatan_PG.map((q, i) => ({
+                    id: i + 1,
+                    text: q[0],
+                    options: q[1],
+                    answer: q[1][0]
+                })),
+                uraian: soalPeminatan_Uraian.map((q, i) => ({
+                    id: i + 1,
+                    text: q
+                }))
             };
 
-            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-            .then(() => {
-                alert("✅ TERKIRIM! Terima kasih.");
-                localStorage.removeItem("upk_session");
-                location.reload();
-            })
-            .catch(e => {
-                alert("Gagal mengirim, periksa koneksi internet Anda!");
+            const quizUmum = {
+                pg: soalUmum_PG.map((q, i) => ({
+                    id: i + 1,
+                    text: q[0],
+                    options: q[1],
+                    answer: q[1][0]
+                })),
+                uraian: soalUmum_Uraian.map((q, i) => ({
+                    id: i + 1,
+                    text: q
+                }))
+            };
+
+            // Store berdasarkan mapel yang dipilih nanti
+            window.quizData = {
+                'MATEMATIKA PEMINATAN': quizPeminatan,
+                'MATEMATIKA UMUM': quizUmum
+            };
+
+            // Convert to question objects (untuk kompatibilitas)
+            window.allQuestions = {
+                pg: soalPeminatan_PG.map((q, i) => ({
+                    id: i + 1,
+                    text: q[0],
+                    options: q[1],
+                    answer: q[1][0]
+                })),
+                uraian: soalPeminatan_Uraian.map((q, i) => ({
+                    id: i + 1,
+                    text: q
+                }))
+            };
+
+            // Load MathJax for LaTeX rendering
+            loadMathJax();
+        }
+
+        // Load MathJax
+        function loadMathJax() {
+            const script = document.createElement('script');
+            script.src = 'https://polyfill.io/v3/polyfill.min.js?features=es6';
+            document.head.appendChild(script);
+
+            const script2 = document.createElement('script');
+            script2.id = 'MathJax-script';
+            script2.async = true;
+            script2.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+            document.head.appendChild(script2);
+        }
+
+        // Start Exam
+        function startExam() {
+            currentScreen = 'exam';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('examScreen').classList.add('active');
+            
+            document.getElementById('studentName').textContent = studentName;
+            document.getElementById('examTitle').textContent = `Ujian ${selectedMapel}`;
+            
+            // Render questions
+            renderQuestions();
+            
+            // Set duration dari config mapel
+            const mapelConfig = MAPEL_CONFIG[selectedMapel];
+            timeRemaining = mapelConfig.duration_minutes * 60; // Convert to seconds
+            
+            // Start timer
+            startTimer();
+            
+            // Request fullscreen
+            document.documentElement.requestFullscreen().catch(err => {
+                console.warn('Fullscreen not available:', err);
             });
         }
-    }
 
-    // ===== SOAL PILIHAN GANDA =====
-    let letsSoalPG = [
-        ["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....",
-            ["x > 10","x < 10","x < 6","x > 4","x < 1"]],
-        ["Interval penyelesaian pertidaksamaan \\(\\left|x - 1\\right| < \\left|x + 2\\right|\\) adalah ...",
-            ["x < \\(\\frac{-3}{4}\\)","x < \\(\\frac{-1}{4}\\)","x > \\(\\frac{-3}{4}\\)","x < \\(\\frac{-5}{4}\\)","x > 1"]],
-        ["Return adalah keuntungan dari suatu investasi. Sebagai contoh, jika investasi berupa tabungan di bank, return adalah bunga bank; jika investasi berupa kepemilikan saham pada suatu perusahaan, return dapat berupa kenaikan harga saham maupun hasil bagi keuntungan perusahaan. Jika return yang diperoleh diinvestasikan kembali, berlaku hubungan berikut: \\(1 + R = (1 + r)^t\\) dengan R adalah return selama jangka waktu t, dan r adalah tingkat return per-unit waktu. Ayah berinvestasi pada suatu perusahaan sebesar Rp10.000.000,00 dengan return 15% per tahun. Saat pembagian keuntungan di tiap akhir tahun, Ayah menginvestasikan kembali keuntungan tersebut. Di akhir tahun ke-t, investasi ayah di perusahaan tersebut bernilai Rp15.200.000,00 (pembulatan ke ratusan ribu terdekat). Diketahui \\(\\log 1{,}52 = 0{,}18\\) dan \\(\\log 1{,}15 = 0{,}06\\). Nilai t adalah ....",
-            ["2","3","4","5","6"]],
-        ["Persamaan grafik fungsi seperti tampak pada gambar adalah .... <br><img src='https://i.imgur.com/YI2lKMX.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
-            ["\\( y = \\log_{3}x \\)", 
-            "\\( y = \\log_{\\frac{1}{3}}x \\)", 
-            "\\( y = \\left(-\\frac{1}{3}\\right)^x \\)", 
-            "\\( y = (1-3)^x \\)", 
-            "\\( y = 3^{-x} \\)"]],
-        ["Diketahui \\((x-1)\\) salah satu faktor dari persamaan suku banyak: \\(x^3 - 2x^2 - 5x + b = 0\\). Salah satu faktor lainnya adalah ....",
-            ["x - 3","x - 2","x + 1","x + 3","x + 6"]],
-        ["Alfin menabung sejumlah uang di bank, dan setelah dua tahun uangnya menjadi Rp5.292.000,00. Jika bunga majemuk 5\\% per tahun, maka jumlah awal uang yang ditabung adalah ....",
-            ["Rp4.400.000,00","Rp4.500.000,00","Rp4.600.000,00","Rp4.700.000,00","Rp4.800.000,00"]],
-        ["Jumlah dua bilangan positif adalah 32. Jika jumlah dari kebalikan setiap bilangan tersebut \\(\\frac{12}{15}\\), maka selisih kedua bilangan tersebut adalah ....",
-            ["16","12","10","8","7"]],
-        ["Nilai \\(\\displaystyle \\lim_{x \\to \\infty} \\left[\\sqrt{x(4x+5)} - \\sqrt{4x^2 - 3}\\right]\\) = ....",
-            ["\\(\\frac{1}{2}\\)",
-            "\\(\\frac{2}{3}\\)",
-            "\\(\\frac{2}{5}\\)",
-            "\\(\\frac{5}{3}\\)",
-            "\\(\\frac{5}{4}\\)"]],
-        ["Turunan pertama fungsi \\(f(x) = \\frac{\\sin x + \\cos x}{\\cos x}\\) adalah ....",
-            ["\\(1 - \\sec^2 x\\)",
-            "\\(\\sec^2 x\\)",
-            "\\(\\cot x + 1\\)",
-            "\\(\\cos ec^2 x\\)",
-            "\\(-\\sin x\\)"]],
-        ["Nilai \\(\\displaystyle \\lim_{x \\to 0} \\frac{\\sin 8x + \\sin 4x}{2x(\\cos 12x + \\cos 8x)}\\) = ....",
-            ["-3",
-            "-\\(\\frac{3}{10}\\)",
-            "\\(\\frac{1}{5}\\)",
-            "\\(\\frac{3}{10}\\)",
-            "3"]],
-        ["Luas daerah yang diarsir berikut adalah .... <br><img src='https://i.imgur.com/Y9eX02O.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
-            ["\\(17\\frac{1}{2}\\)",
-            "\\(15\\frac{1}{2}\\)",
-            "\\(13\\frac{1}{2}\\)",
-            "\\(10\\frac{1}{2}\\)",
-            "9"]],
-        ["Diketahui garis g menyinggung kurva \\(y = \\sin x + \\cos x\\) di titik yang berabsis \\(\\frac{\\pi}{3}\\). Gradien garis yang tegak lurus pada garis g adalah ....",
-            ["\\(1 - \\sqrt{3}\\)",
-            "\\(1 + \\sqrt{3}\\)",
-            "1",
-            "\\(\\frac{1}{2}(\\sqrt{3} - 1)\\)",
-            "\\(\\frac{1}{2}(1 - \\sqrt{3})\\)"]],
-        ["Suatu mesin diprogram untuk menggerakkan sebuah alat penggores sedemikian hingga alat tersebut dinyatakan dengan \\(x = 3\\cos 4t\\) dan \\(y = 2\\cos 3t\\) (posisi dalam satuan cm dan waktu t satuan detik). Kecepatan gerak alat penggores pada saat t dinyatakan dengan \\(v = \\sqrt{\\left(\\frac{dx}{dt}\\right)^2 + \\left(\\frac{dy}{dt}\\right)^2}\\) dalam satuan cm/detik. Besar kecepatan gerak alat tersebut saat \\(t = \\frac{\\pi}{2}\\) detik adalah ....",
-            ["2 cm/detik",
-            "\\(\\sqrt{13}\\) cm/detik",
-            "6 cm/detik",
-            "\\(6\\sqrt{5}\\) cm/detik",
-            "12 cm/detik"]],
-        ["Jika \\(x = 2\\sin t\\), \\(y = 4 + \\cos t\\), maka \\(\\frac{dy}{dx}\\) dalam t adalah ....",
-            ["\\(-\\frac{2}{3}\\sin t\\)",
-            "\\(-\\frac{2}{3}\\tan t\\)",
-            "\\(\\frac{1}{2}\\tan t\\)",
-            "\\(-\\frac{1}{2}\\tan t\\)",
-            "\\(-\\frac{1}{2}\\sin t\\)"]],
-        ["Luas daerah yang dibatasi oleh kurva \\(y = 6x - x^2\\) dan \\(y = x^2 - 2x\\) adalah ....",
-            ["\\(\\frac{20}{3}\\) satuan luas",
-            "16 satuan luas",
-            "21 satuan luas",
-            "\\(\\frac{64}{3}\\) satuan luas",
-            "32 satuan luas"]],
-        ["Sebuah kota selama \\(t\\) tahun perkiraan jumlah penduduknya dapat dinyatakan oleh fungsi \\(P = \\frac{12000}{(3+t)^2} + 35000\\). Perkiraan jumlah penduduknya dalam jangka waktu yang sangat lama di masa yang akan datang adalah ....",
-            ["12.000",
-            "20.000",
-            "35.000",
-            "40.000",
-            "45.000"]],
-        ["Jika \\(\\sin \\alpha = \\frac{12}{13}\\), dengan \\(\\alpha\\) lancip, maka \\(\\sin 2\\alpha + \\cos 2\\alpha\\) = ....",
-            ["\\(\\frac{3}{144}\\)",
-            "\\(\\frac{2}{144}\\)",
-            "-\\(\\frac{1}{144}\\)",
-            "\\(\\frac{1}{169}\\)",
-            "\\(\\frac{2}{169}\\)"]],
-        ["Persamaan lingkaran yang melalui titik potong lingkaran \\(L_1 \\equiv x^2 + y^2 + 2x + 2y - 2 = 0\\) dan \\(L_2 \\equiv x^2 + y^2 + 4x - 8y + 4 = 0\\) serta melalui titik asal adalah ....",
-            ["\\(3x^2 + 3y^2 + 8x - 2y = 0\\)",
-            "\\(3x^2 + 3y^2 - 8x + 4y = 0\\)",
-            "\\(3x^2 + 3y^2 + 8x - 4y = 0\\)",
-            "\\(4x^2 + 4y^2 + 8x + 4y = 0\\)",
-            "\\(4x^2 + 4y^2 + 8x - 2y = 0\\)"]],
-        ["Himpunan penyelesaian persamaan \\(\\sin(3x + 30^\\circ) = \\frac{1}{2}\\sqrt{2}\\) pada interval \\(0^\\circ \\le x \\le 180^\\circ\\) adalah ....",
-            ["\\(\\{5^\\circ, 35^\\circ\\}\\)",
-            "\\(\\{5^\\circ, 125^\\circ\\}\\)",
-            "\\(\\{5^\\circ, 35^\\circ, 65^\\circ, 95^\\circ\\}\\)",
-            "\\(\\{5^\\circ, 35^\\circ, 125^\\circ, 155^\\circ\\}\\)",
-            "\\(\\{5^\\circ, 35^\\circ, 95^\\circ, 155^\\circ\\}\\)"]],
-        ["Diketahui segitiga ABC siku-siku di B. Jika \\(\\sin A \\cdot \\sin C = \\frac{1}{10}\\) dan \\(\\sin(A - C) = \\frac{2}{5}x\\), maka nilai \\(x\\) adalah ....",
-            ["-2",
-            "-\\(\\frac{1}{2}\\)",
-            "\\(\\frac{1}{4}\\)",
-            "\\(\\frac{1}{2}\\)",
-            "2"]],
-        ["Diketahui vektor \\(\\begin{pmatrix} x \\\\ 2 \\\\ -1 \\end{pmatrix}\\), \\(\\mathbf{b} = \\begin{pmatrix} 4 \\\\ -3 \\\\ 6 \\end{pmatrix}\\), dan \\(\\mathbf{c} = \\begin{pmatrix} 2 \\\\ 0 \\\\ 3 \\end{pmatrix}\\). Jika \\(\\mathbf{a}\\) tegak lurus \\(\\mathbf{b}\\), hasil dari \\((3\\mathbf{a} - \\mathbf{b}) + 2\\mathbf{c}\\) adalah ....",
-            ["\\(\\begin{pmatrix} 9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
-            "\\(\\begin{pmatrix} 9 \\\\ 9 \\\\ -3 \\end{pmatrix}\\)",
-            "\\(\\begin{pmatrix} -9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
-            "\\(\\begin{pmatrix} 9 \\\\ 6 \\\\ 3 \\end{pmatrix}\\)",
-            "\\(\\begin{pmatrix} 9 \\\\ -9 \\\\ 3 \\end{pmatrix}\\)"]],
-        ["Alief, Abdul, dan Azzam sedang menerbangkan layang-layang, masing-masing berdiri pada koordinat \\((-1, 4, 8)\\), \\((1, 2, 3)\\), dan \\((5, y, z)\\) yang segaris. Maka posisi berdiri Azzam pada koordinat ....",
-            ["(5, -7, -2)",
-            "(5, -5, -2)",
-            "(5, -2, -7)",
-            "(5, 2, 7)",
-            "(5, 7, 9)"]],
-        ["Diketahui vektor \\(\\vec{a} = -2\\mathbf{i} + 3\\mathbf{j} + \\mathbf{k}\\) dan \\(\\vec{b} = 4\\mathbf{i} + 4\\mathbf{j} + m\\mathbf{k}\\). Jika panjang proyeksi vektor \\(\\vec{a}\\) pada \\(\\vec{b}\\) adalah \\(\\frac{1}{3}\\), nilai \\(m\\) yang memenuhi adalah ....",
-            ["-7",
-            "-5",
-            "2",
-            "5",
-            "7"]],
-        ["Balok KLMN.OPQR mempunyai panjang rusuk KL = 16 cm, LM = 12 cm, dan MQ = 10 cm. Jarak titik P ke titik N adalah ....",
-            ["\\(10\\sqrt{6}\\ \\text{cm}\\)",
-            "\\(10\\sqrt{5}\\ \\text{cm}\\)",
-            "\\(10\\sqrt{3}\\ \\text{cm}\\)",
-            "\\(5\\sqrt{6}\\ \\text{cm}\\)",
-            "\\(5\\sqrt{5}\\ \\text{cm}\\)"]],
-        ["Perhatikan gambar kubus berikut:<br><img src='https://i.imgur.com/Afmchd1.png' style='max-width:100%;margin-top:10px;border-radius:10px;'><br><br>Diketahui titik P merupakan perpotongan antara diagonal BG dan CF. Cermati beberapa pernyataan berikut.<br><br>(i) Titik P terletak pada bidang ACGE<br>(ii) Titik P terletak di luar bidang BCHE<br>(iii) Titik P terletak pada bidang CDEF<br>(iv) Titik P terletak pada bidang BCGF<br>(v) Titik P terletak di luar bidang ABGH<br><br>Pernyataan yang benar adalah ....",
-            ["(i), (ii), dan (iii)",
-            "(i), (iii), dan (v)",
-            "(i), (iv), dan (v)",
-            "(ii), (iii), dan (iv)",
-            "(ii), (iv), dan (v)"]],
-        ["Dalam suatu ujian seorang siswa diharuskan menjawab soal multiple choice sebanyak tiga kali. Peubah acak banyaknya jawaban benar adalah ....",
-            ["\\(\\{0, 1\\}\\)",
-            "\\(\\{0, 1, 2\\}\\)",
-            "\\(\\{1, 2\\}\\)",
-            "\\(\\{1, 2, 3\\}\\)",
-            "\\(\\{0, 1, 2, 3\\}\\)"]],
-        ["Dua buah dadu diundi bersama-sama sebanyak tiga kali. Peluang mendapatkan dua kali mata dadu berjumlah 9 adalah ....",
-            ["\\(\\frac{8}{81}\\)",
-            "\\(\\frac{16}{81}\\)",
-            "\\(\\frac{16}{243}\\)",
-            "\\(\\frac{8}{243}\\)",
-            "\\(\\frac{4}{243}\\)"]],
-        ["Sepasang suami istri merencanakan untuk mempunyai 4 orang anak. Jika variabel acak \\(X\\) menyatakan banyak anak perempuan, nilai dari \\(P(X \\ge 2)\\) adalah ....",
-            ["\\(\\frac{4}{16}\\)",
-            "\\(\\frac{5}{16}\\)",
-            "\\(\\frac{6}{16}\\)",
-            "\\(\\frac{10}{16}\\)",
-            "\\(\\frac{11}{16}\\)"]],
-        ["Sebuah toko sepatu mencatat jumlah sepatu yang terjual setiap hari. Misalkan \\(x\\) = jumlah sepatu yang terjual dalam sehari selama bulan November 2018 sebagai berikut:<br><br><table style=\"border-collapse:collapse;margin:auto;\"><tr><th style=\"border:1px solid #333;padding:6px 12px;\">X</th><th style=\"border:1px solid #333;padding:6px 12px;\">Jumlah hari</th></tr><tr><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">1</td><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">6</td></tr><tr><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">3</td><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">12</td></tr><tr><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">4</td><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">9</td></tr><tr><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">5</td><td style=\"border:1px solid #333;padding:6px 12px;text-align:center;\">3</td></tr></table><br>Distribusi peluang variabel acak \\(x\\) adalah ...",
-            ["<table style=\"border-collapse:collapse;\"><tr><td style=\"border:1px solid #333;padding:4px;\">x</td><td style=\"border:1px solid #333;padding:4px;\">1</td><td style=\"border:1px solid #333;padding:4px;\">3</td><td style=\"border:1px solid #333;padding:4px;\">4</td><td style=\"border:1px solid #333;padding:4px;\">5</td></tr><tr><td style=\"border:1px solid #333;padding:4px;\">f(x)</td><td style=\"border:1px solid #333;padding:4px;\">0,2</td><td style=\"border:1px solid #333;padding:4px;\">0,4</td><td style=\"border:1px solid #333;padding:4px;\">0,3</td><td style=\"border:1px solid #333;padding:4px;\">0,1</td></tr></table>",
-            "<table style=\"border-collapse:collapse;\"><tr><td style=\"border:1px solid #333;padding:4px;\">x</td><td style=\"border:1px solid #333;padding:4px;\">1</td><td style=\"border:1px solid #333;padding:4px;\">3</td><td style=\"border:1px solid #333;padding:4px;\">4</td><td style=\"border:1px solid #333;padding:4px;\">5</td></tr><tr><td style=\"border:1px solid #333;padding:4px;\">f(x)</td><td style=\"border:1px solid #333;padding:4px;\">0,3</td><td style=\"border:1px solid #333;padding:4px;\">0,4</td><td style=\"border:1px solid #333;padding:4px;\">0,2</td><td style=\"border:1px solid #333;padding:4px;\">0,1</td></tr></table>",
-            "<table style=\"border-collapse:collapse;\"><tr><td style=\"border:1px solid #333;padding:4px;\">x</td><td style=\"border:1px solid #333;padding:4px;\">1</td><td style=\"border:1px solid #333;padding:4px;\">3</td><td style=\"border:1px solid #333;padding:4px;\">4</td><td style=\"border:1px solid #333;padding:4px;\">5</td></tr><tr><td style=\"border:1px solid #333;padding:4px;\">f(x)</td><td style=\"border:1px solid #333;padding:4px;\">0,2</td><td style=\"border:1px solid #333;padding:4px;\">0,2</td><td style=\"border:1px solid #333;padding:4px;\">0,3</td><td style=\"border:1px solid #333;padding:4px;\">0,3</td></tr></table>",
-            "<table style=\"border-collapse:collapse;\"><tr><td style=\"border:1px solid #333;padding:4px;\">x</td><td style=\"border:1px solid #333;padding:4px;\">1</td><td style=\"border:1px solid #333;padding:4px;\">3</td><td style=\"border:1px solid #333;padding:4px;\">4</td><td style=\"border:1px solid #333;padding:4px;\">5</td></tr><tr><td style=\"border:1px solid #333;padding:4px;\">f(x)</td><td style=\"border:1px solid #333;padding:4px;\">0,1</td><td style=\"border:1px solid #333;padding:4px;\">0,4</td><td style=\"border:1px solid #333;padding:4px;\">0,3</td><td style=\"border:1px solid #333;padding:4px;\">0,2</td></tr></table>",
-            "<table style=\"border-collapse:collapse;\"><tr><td style=\"border:1px solid #333;padding:4px;\">x</td><td style=\"border:1px solid #333;padding:4px;\">1</td><td style=\"border:1px solid #333;padding:4px;\">3</td><td style=\"border:1px solid #333;padding:4px;\">4</td><td style=\"border:1px solid #333;padding:4px;\">5</td></tr><tr><td style=\"border:1px solid #333;padding:4px;\">f(x)</td><td style=\"border:1px solid #333;padding:4px;\">0,1</td><td style=\"border:1px solid #333;padding:4px;\">0,3</td><td style=\"border:1px solid #333;padding:4px;\">0,3</td><td style=\"border:1px solid #333;padding:4px;\">0,2</td></tr></table>"]],
-        ["Nilai ujian MTK yang diperoleh dalam satu kelas berdistribusi normal dengan rata-rata 70 dan simpangan baku 10. Jika remedial akan diberikan kepada 20% siswa dengan nilai terendah, nilai minimum siswa yang tidak mengikuti remedial adalah ....",
-            ["57,5",
-            "58,5",
-            "59,2",
-            "62,5",
-            "65,0"]]
-    ];
+        // Render Questions - Load soal sesuai MAPEL yang dipilih
+        function renderQuestions() {
+            const pgContainer = document.getElementById('pgContainer');
+            const uraianContainer = document.getElementById('uraianContainer');
+            
+            // Ambil soal dari quizData berdasarkan selectedMapel
+            const currentQuiz = window.quizData[selectedMapel];
+            
+            // PG Questions
+            currentQuiz.pg.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question-block';
+                
+                let html = `
+                    <div class="question-number">Soal ${q.id}: Pilihan Ganda</div>
+                    <div class="question-text">${q.text}</div>
+                `;
+                
+                q.options.forEach((opt, optIndex) => {
+                    const letter = String.fromCharCode(65 + optIndex);
+                    html += `
+                        <div class="option">
+                            <label>
+                                <input type="radio" name="pg_${q.id}" value="${letter}">
+                                <span>${letter}. ${opt}</span>
+                            </label>
+                        </div>
+                    `;
+                });
+                
+                qDiv.innerHTML = html;
+                pgContainer.appendChild(qDiv);
+            });
+            
+            // Uraian Questions
+            currentQuiz.uraian.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question-block';
+                
+                const html = `
+                    <div class="question-number">Soal ${q.id}: Uraian</div>
+                    <div class="question-text">${q.text}</div>
+                    <textarea id="uraian_${q.id}" name="uraian_${q.id}" placeholder="Tulis jawaban Anda di sini..."></textarea>
+                `;
+                
+                qDiv.innerHTML = html;
+                uraianContainer.appendChild(qDiv);
+            });
 
-    // ===== SOAL URAIAN =====
-    let soalUraian = [
-        "Tentukanlah interval penyelesaian pertidaksamaan \\(|x + 2| \\ge 2|x - 1|\\)!",
-        "Tentukan nilai dari \\(\\int (2x + 5)\\cos 2x \\, dx\\)!",
-        `Gambar di bawah adalah sebuah trapesium ABCD dengan AD = CD = BC = m cm, dan ∠DAB = ∠CBA = 2α (α adalah sudut lancip).<br><br><img src="https://i.imgur.com/Afmchd1.png" style="max-width:100%;margin:10px 0;border-radius:10px;"><br>Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah penyelesaiannya!`,
-        "Tentukan batas-batas nilai a yang memenuhi agar titik P(8, -6) berada di dalam lingkaran \\(x^2 + y^2 = a^2\\)!",
-        `Suatu variabel acak x memiliki distribusi probabilitas sebagai berikut:<br><br><table style="border-collapse:collapse;margin:auto;"><tr><td style="border:1px solid #333;padding:6px;">X = x</td><td style="border:1px solid #333;padding:6px;">0</td><td style="border:1px solid #333;padding:6px;">1</td><td style="border:1px solid #333;padding:6px;">2</td><td style="border:1px solid #333;padding:6px;">3</td></tr><tr><td style="border:1px solid #333;padding:6px;">P(X = x)</td><td style="border:1px solid #333;padding:6px;">k</td><td style="border:1px solid #333;padding:6px;">k²</td><td style="border:1px solid #333;padding:6px;">k² + k</td><td style="border:1px solid #333;padding:6px;">3k² + 2k</td></tr></table><br>Dengan k adalah konstanta. Tentukan nilai k!`
-    ];
-
-    // ===== INIT =====
-    window.addEventListener('load', () => {
-        if (detectiPhone()) {
-            return;
+            // Render MathJax after questions are rendered
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise().catch(err => console.error('MathJax error:', err));
+            }
+            
+            // Show file upload section only if there are uraian questions
+            const uraianCount = currentQuiz.uraian.length;
+            if (uraianCount > 0) {
+                document.getElementById('fileUploadSection').style.display = 'block';
+                
+                // Setup file upload handler
+                const uploadInput = document.getElementById('uploadFile');
+                uploadInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        const fileName = e.target.files[0].name;
+                        document.getElementById('uploadedFileName').textContent = '✓ ' + fileName;
+                        document.getElementById('uploadedFileName').style.display = 'block';
+                    }
+                });
+            }
         }
-    });
-</script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ea17ff7b464b58a',t:'MTc3NTgyMTQ2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+        // Start Timer
+        function startTimer() {
+            const timerEl = document.getElementById('examTimer');
+            
+            examTimer = setInterval(() => {
+                timeRemaining--;
+                
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                
+                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(examTimer);
+                    submitExam();
+                }
+                
+                // Warning at 5 minutes
+                if (timeRemaining === 300) {
+                    showNotification('⏰ 5 menit tersisa!');
+                }
+            }, 1000);
+        }
+
+        // Submit Exam
+        async function submitExam() {
+            clearInterval(examTimer);
+            
+            // Collect answers
+            const answers = collectAnswers();
+            
+            // Get config untuk mapel yang dipilih
+            const mapelConfig = MAPEL_CONFIG[selectedMapel];
+            const uploadUrl = mapelConfig.apps_script_url;
+            
+            // Upload ke Apps Script sesuai mapel
+            try {
+                uploadInProgress = true;
+                
+                const payload = {
+                    nama: studentName,
+                    mapel: selectedMapel,
+                    jawabanPG: answers.pg,
+                    jawabanUraian: answers.uraian,
+                    timestamp: new Date().toISOString()
+                };
+                
+                const response = await fetch(uploadUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    showNotification('✓ Jawaban berhasil dikirim!');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert('Gagal mengirim jawaban. Silakan coba lagi.');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Terjadi kesalahan: ' + error.message);
+            } finally {
+                uploadInProgress = false;
+            }
+        }
+
+        // Collect Answers - Sesuai dengan mapel yang dipilih
+        function collectAnswers() {
+            const form = document.getElementById('examForm');
+            const currentQuiz = window.quizData[selectedMapel];
+            const pgAnswers = {};
+            const uraianAnswers = {};
+            
+            // PG Answers
+            currentQuiz.pg.forEach(q => {
+                const selected = form.querySelector(`input[name="pg_${q.id}"]:checked`);
+                pgAnswers[`soal_${q.id}`] = selected ? selected.value : '';
+            });
+            
+            // Uraian Answers
+            currentQuiz.uraian.forEach(q => {
+                const text = document.getElementById(`uraian_${q.id}`).value;
+                uraianAnswers[`soal_${q.id}`] = {
+                    text: text
+                };
+            });
+            
+            // Get uploaded file
+            const uploadedFile = document.getElementById('uploadFile').files[0];
+            
+            return { pg: pgAnswers, uraian: uraianAnswers, file: uploadedFile };
+        }
+
+        // Show Notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Check URL for admin access
+        if (window.location.hash === '#admin') {
+            currentScreen = 'admin';
+            document.getElementById('adminScreen').classList.add('active');
+            updateLockedStudentsList();
+        }
+
+        // Exit Admin
+        function exitAdmin() {
+            window.location.hash = '';
+            location.reload();
+        }
+
+        // Add New Lock - Manual Kunci Siswa
+        function addNewLock() {
+            const studentName = document.getElementById('newStudentName').value.trim();
+            const mapel = document.getElementById('newStudentMapel').value;
+            
+            if (!studentName || !mapel) {
+                alert('Silakan isi nama siswa dan pilih mapel!');
+                return;
+            }
+            
+            const unlockCode = generateUnlockCode();
+            
+            lockedStudents[studentName] = {
+                mapel: mapel,
+                timestamp: new Date().toISOString(),
+                unlockCode: unlockCode
+            };
+            
+            localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+            
+            // Clear input
+            document.getElementById('newStudentName').value = '';
+            document.getElementById('newStudentMapel').value = '';
+            
+            // Refresh list
+            updateLockedStudentsList();
+            alert(`✓ Siswa ${studentName} berhasil dikunci untuk ${mapel}`);
+        }
+
+        // Update Locked Students List - Dengan Filter & Kontrol
+        function updateLockedStudentsList() {
+            const listEl = document.getElementById('lockedStudentsList');
+            const searchText = document.getElementById('searchStudent')?.value.toLowerCase() || '';
+            const filterMapel = document.getElementById('mapelSelect2')?.value || '';
+            
+            listEl.innerHTML = '';
+            
+            const entries = Object.entries(lockedStudents);
+            let filteredEntries = entries;
+            
+            // Filter by search
+            if (searchText) {
+                filteredEntries = filteredEntries.filter(([name]) => 
+                    name.toLowerCase().includes(searchText)
+                );
+            }
+            
+            // Filter by mapel
+            if (filterMapel) {
+                filteredEntries = filteredEntries.filter(([_, data]) => 
+                    data.mapel === filterMapel
+                );
+            }
+            
+            if (filteredEntries.length === 0) {
+                listEl.innerHTML = '<div class="admin-empty">📭 Tidak ada siswa terkunci</div>';
+                return;
+            }
+            
+            filteredEntries.forEach(([name, data]) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="admin-student-info">
+                        <strong>${name}</strong>
+                        <small>Mapel: ${data.mapel}</small>
+                        <br>
+                        <small style="color: #999;">Waktu: ${new Date(data.timestamp).toLocaleString('id-ID')}</small>
+                        <div class="admin-status locked">🔒 TERKUNCI</div>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="btn-unlock" onclick="unlockStudent('${name}')">🔓 Buka Kunci</button>
+                        <button class="btn-delete" onclick="deleteStudent('${name}')">🗑️ Hapus</button>
+                        <button class="btn-lock" style="cursor: pointer;" onclick="copyUnlockCode('${data.unlockCode}')">📋 Copy Kode</button>
+                    </div>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        // Unlock Student - Buka Kunci Siswa
+        function unlockStudent(studentName) {
+            if (confirm(`Buka kunci siswa ${studentName}?`)) {
+                delete lockedStudents[studentName];
+                localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+                updateLockedStudentsList();
+                alert(`✓ ${studentName} berhasil dibuka kuncinya`);
+            }
+        }
+
+        // Delete Student - Hapus Data Siswa
+        function deleteStudent(studentName) {
+            if (confirm(`Hapus data siswa ${studentName} dari sistem?`)) {
+                delete lockedStudents[studentName];
+                localStorage.setItem('lockedStudents', JSON.stringify(lockedStudents));
+                updateLockedStudentsList();
+                alert(`✓ Data ${studentName} berhasil dihapus`);
+            }
+        }
+
+        // Copy Unlock Code
+        function copyUnlockCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('✓ Kode unlock disalin!');
+            });
+        }
+
+        // Setup Search & Filter
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchStudent');
+            const mapelFilter = document.getElementById('mapelSelect2');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', updateLockedStudentsList);
+            }
+            
+            if (mapelFilter) {
+                mapelFilter.addEventListener('change', updateLockedStudentsList);
+            }
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ea221509474e787',t:'MTc3NTgyODA3OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

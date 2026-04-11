@@ -20,15 +20,22 @@ db.connect((err) => {
   console.log('Connected to MySQL database');
 });
 
-// ================== AUTH ==================
-// Login
+// ================== LOGIN ==================
+// Login tanpa password, auto-generate user
 app.post('/login', (req, res) => {
-  const {username, password} = req.body;
-  db.query("SELECT * FROM users WHERE username=? AND password=?", [username, password], (err, result) => {
+  const {username} = req.body;
+  db.query("SELECT * FROM users WHERE username=?", [username], (err, result) => {
     if (err) return res.status(500).json({error:err});
-    if (result.length === 0) return res.json({success:false});
-    if (result[0].blocked) return res.json({success:false, blocked:true});
-    res.json({success:true, user_id: result[0].id});
+    if (result.length === 0) {
+      // kalau nama belum ada, otomatis buat akun baru
+      db.query("INSERT INTO users (username, blocked) VALUES (?,0)", [username], (err2) => {
+        if (err2) return res.status(500).json({error:err2});
+        return res.json({success:true});
+      });
+    } else {
+      if (result[0].blocked) return res.json({success:false, blocked:true});
+      res.json({success:true, user_id: result[0].id});
+    }
   });
 });
 
@@ -68,7 +75,7 @@ app.post('/submitAnswer', (req, res) => {
 });
 
 // ================== BLOCK SYSTEM ==================
-// Blokir siswa
+// Blokir siswa (dipanggil otomatis dari frontend anti-cheat)
 app.post('/blockUser', (req, res) => {
   const {username} = req.body;
   db.query("UPDATE users SET blocked=1 WHERE username=?", [username], (err) => {

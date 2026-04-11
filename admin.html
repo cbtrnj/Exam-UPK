@@ -5,14 +5,26 @@
 </head>
 <body>
   <h2>Panel Admin</h2>
-  <p>Masukkan username siswa untuk membuka blokir:</p>
+
+  <!-- Form unblock siswa -->
+  <h3>Unblock Siswa</h3>
   <input id="username" placeholder="Username siswa">
   <button onclick="unblockUser()">Unblock</button>
 
+  <!-- Form lihat jawaban siswa -->
+  <h3>Lihat Jawaban Siswa</h3>
+  <input id="userId" placeholder="User ID siswa">
+  <button onclick="getAnswers()">Tampilkan Jawaban</button>
+
+  <div id="answers"></div>
+
   <script>
+    const backendURL = "https://exam-upk-backend.onrender.com"; // ganti sesuai URL backend kamu
+
+    // Unblock siswa
     async function unblockUser() {
       let username = document.getElementById("username").value;
-      let res = await fetch('/unblockUser', {
+      let res = await fetch(`${backendURL}/unblockUser`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({username})
@@ -22,6 +34,23 @@
         alert("Siswa berhasil di-unblock!");
       } else {
         alert("Gagal membuka blokir.");
+      }
+    }
+
+    // Lihat jawaban siswa
+    async function getAnswers() {
+      let userId = document.getElementById("userId").value;
+      let res = await fetch(`${backendURL}/getAnswers/${userId}`);
+      let data = await res.json();
+      if (data.length === 0) {
+        document.getElementById("answers").innerHTML = "<p>Tidak ada jawaban ditemukan.</p>";
+      } else {
+        document.getElementById("answers").innerHTML = data.map(ans => `
+          <div>
+            <p><b>Mapel:</b> ${ans.subject}</p>
+            <p><b>Jawaban:</b> ${ans.answer_link}</p>
+          </div>
+        `).join('');
       }
     }
   </script>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ujian Matematika</title>
+</head>
+<body>
+  <h2>Ujian Matematika</h2>
+  <p>Silakan upload jawaban Anda ke Google Drive, lalu masukkan link di bawah ini:</p>
+
+  <input id="answerLink" placeholder="Paste link Google Drive di sini">
+  <button onclick="submitMath()">Kirim Jawaban</button>
+
+  <script>
+    const backendURL = "https://exam-upk-backend.onrender.com"; // ganti sesuai URL backend kamu
+    const username = localStorage.getItem("user");
+
+    // Kirim jawaban Matematika ke backend
+    async function submitMath() {
+      let answerLink = document.getElementById("answerLink").value;
+      let res = await fetch(`${backendURL}/submitMath`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({user_id: 1, subject: "matematika", answer_link: answerLink})
+      });
+      let data = await res.json();
+      if (data.success) alert("Jawaban berhasil dikirim!");
+    }
+
+    // ================== ANTI-CHEAT ==================
+    async function blockUser() {
+      await fetch(`${backendURL}/blockUser`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({username})
+      });
+      document.body.innerHTML = "<h1 style='color:red'>ANDA TERBLOKIR!</h1>";
+      let audio = new Audio("nit-nit.mp3");
+      audio.play();
+    }
+
+    // Deteksi copas/tab switch
+    document.addEventListener("copy", blockUser);
+    document.addEventListener("paste", blockUser);
+    document.addEventListener("cut", blockUser);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) blockUser();
+    });
+    window.addEventListener("blur", blockUser);
+  </script>
+</body>
+</html>

@@ -5,10 +5,24 @@
 </head>
 <body>
   <h2>Dashboard Ujian</h2>
-  <p>Pilih mata pelajaran:</p>
+  <p>Selamat datang di portal ujian. Silakan pilih mata pelajaran:</p>
+
+  <!-- Tombol navigasi ke setiap mapel -->
   <button onclick="location.href='math.html'">Matematika</button>
   <button onclick="location.href='general.html?subject=bahasa'">Bahasa Indonesia</button>
   <button onclick="location.href='general.html?subject=ipa'">IPA</button>
   <button onclick="location.href='general.html?subject=ips'">IPS</button>
+
+  <!-- Tombol logout -->
+  <br><br>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    // Logout: hapus data user dari localStorage lalu kembali ke login
+    function logout() {
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>

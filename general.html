@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ujian Mapel Umum</title>
+</head>
+<body>
+  <h2>Ujian Mapel</h2>
+  <div id="questions"></div>
+  <button onclick="submitAnswers()">Kirim Jawaban</button>
+
+  <script>
+    // Ambil subject dari URL (contoh: general.html?subject=bahasa)
+    const urlParams = new URLSearchParams(window.location.search);
+    const subject = urlParams.get('subject');
+
+    // Ambil soal dari backend
+    async function loadQuestions() {
+      let res = await fetch(`https://exam-upk-backend.onrender.com/questions/${subject}`);
+      let data = await res.json();
+      document.getElementById("questions").innerHTML = data.map(q => `
+        <div>
+          <p>${q.question}</p>
+          <label><input type="radio" name="q${q.id}" value="A"> ${q.option_a}</label><br>
+          <label><input type="radio" name="q${q.id}" value="B"> ${q.option_b}</label><br>
+          <label><input type="radio" name="q${q.id}" value="C"> ${q.option_c}</label><br>
+          <label><input type="radio" name="q${q.id}" value="D"> ${q.option_d}</label><br>
+        </div>
+      `).join('');
+    }
+
+    // Kirim jawaban ke backend
+    async function submitAnswers() {
+      let answers = [];
+      document.querySelectorAll("input[type=radio]:checked").forEach(el => {
+        answers.push({question_id: el.name.replace("q",""), answer: el.value});
+      });
+
+      let res = await fetch('https://exam-upk-backend.onrender.com/submitAnswer', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({subject, answers})
+      });
+      let data = await res.json();
+      if (data.success) alert("Jawaban berhasil dikirim!");
+    }
+
+    loadQuestions();
+  </script>
+</body>
+</html>

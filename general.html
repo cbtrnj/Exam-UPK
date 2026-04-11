@@ -9,13 +9,16 @@
   <button onclick="submitAnswers()">Kirim Jawaban</button>
 
   <script>
+    const backendURL = "https://exam-upk-backend.onrender.com"; // ganti sesuai URL backend kamu
+    const username = localStorage.getItem("user");
+
     // Ambil subject dari URL (contoh: general.html?subject=bahasa)
     const urlParams = new URLSearchParams(window.location.search);
     const subject = urlParams.get('subject');
 
     // Ambil soal dari backend
     async function loadQuestions() {
-      let res = await fetch(`https://exam-upk-backend.onrender.com/questions/${subject}`);
+      let res = await fetch(`${backendURL}/questions/${subject}`);
       let data = await res.json();
       document.getElementById("questions").innerHTML = data.map(q => `
         <div>
@@ -35,16 +38,37 @@
         answers.push({question_id: el.name.replace("q",""), answer: el.value});
       });
 
-      let res = await fetch('https://exam-upk-backend.onrender.com/submitAnswer', {
+      let res = await fetch(`${backendURL}/submitAnswer`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({subject, answers})
+        body: JSON.stringify({user_id: 1, subject, answers}) // user_id bisa diambil dari login response
       });
       let data = await res.json();
       if (data.success) alert("Jawaban berhasil dikirim!");
     }
 
     loadQuestions();
+
+    // ================== ANTI-CHEAT ==================
+    async function blockUser() {
+      await fetch(`${backendURL}/blockUser`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({username})
+      });
+      document.body.innerHTML = "<h1 style='color:red'>ANDA TERBLOKIR!</h1>";
+      let audio = new Audio("nit-nit.mp3");
+      audio.play();
+    }
+
+    // Deteksi copas/tab switch
+    document.addEventListener("copy", blockUser);
+    document.addEventListener("paste", blockUser);
+    document.addEventListener("cut", blockUser);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) blockUser();
+    });
+    window.addEventListener("blur", blockUser);
   </script>
 </body>
 </html>

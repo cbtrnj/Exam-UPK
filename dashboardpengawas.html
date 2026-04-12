@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard Pengawas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+
+<h1 class="text-xl font-bold mb-4">Dashboard Pengawas</h1>
+
+<table class="w-full border">
+<thead>
+<tr class="bg-gray-200">
+<th>Nama</th>
+<th>Status</th>
+<th>Pelanggaran</th>
+<th>Kirim</th>
+</tr>
+</thead>
+<tbody id="data"></tbody>
+</table>
+
+<script>
+
+const URL="PASTE_URL_GAS_KAMU";
+
+async function load(){
+let res=await fetch(URL);
+let d=await res.json();
+
+let html="";
+d.forEach(x=>{
+html+=`<tr class="border">
+<td>${x.nama}</td>
+<td>${x.status}</td>
+<td>${x.pelanggaran}</td>
+<td>${x.kirim}</td>
+</tr>`;
+});
+
+data.innerHTML=html;
+}
+
+setInterval(load,3000);
+load();
+
+</script>
+
+</body>
+</html>

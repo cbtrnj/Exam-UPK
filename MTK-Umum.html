@@ -408,9 +408,21 @@ const soalUraian = [
 
     // --- 3. LOGIKA SISTEM ---
     let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
-    // Inisialisasi savedData agar bisa menampung PG, Foto (files), maupun Text (uraian)
+    
+    // Inisialisasi memori HP (Gudang Jawaban)
     let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [], uraian: {} };
     let audioCtx, oscillator;
+
+    // FUNGSI PENYIMPANAN (Agar nomor 1-45 tetap nempel saat refresh)
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
 
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     
@@ -426,7 +438,15 @@ const soalUraian = [
         oscillator.stopTimeInterval = interval;
     }
 
-    function stopAlarm() { if (oscillator) { try { oscillator.stop(); clearInterval(oscillator.stopTimeInterval); } catch(e){} } }
+    function stopAlarm() { 
+        if (oscillator) { 
+            try { 
+                oscillator.stop(); 
+                oscillator.disconnect();
+                clearInterval(oscillator.stopTimeInterval); 
+            } catch(e){} 
+        } 
+    }
 
     function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 30000); }
 
@@ -444,18 +464,12 @@ const soalUraian = [
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             document.getElementById('videoPreview').srcObject = stream;
-        } catch (e) { console.warn("Kamera formalitas tidak aktif."); }
+        } catch (e) { console.warn("Kamera tidak aktif."); }
         
         goToTab(3);
-        
-        // Update Header
         document.getElementById('examHeader').style.display = 'flex';
         document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
-        
-        // Memasukkan Nama Mapel ke Header (Pastikan ID displayMapelHeader ada di HTML)
-        if(document.getElementById('displayMapelHeader')){
-            document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
-        }
+        if(document.getElementById('displayMapelHeader')) document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
         
         renderSoal(); 
         startTimer();
@@ -489,38 +503,35 @@ const soalUraian = [
         } else { alert("Kode Salah!"); }
     }
 
+    // FUNGSI RENDER (Disesuaikan untuk Matematika Peminatan)
     function renderSoal() {
-    // 1. Render Pilihan Ganda
-    let pgHtml = "";
-    SoalPG.forEach((s, i) => {
-        let savedIdx = savedData.pg['q'+i];
-        pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
-        s[1].forEach((opt, idx) => {
-            let isChecked = savedIdx == idx ? 'checked' : '';
-            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s.q || s[0]}<br><br>`;
+            let opsi = s.o || s[1];
+            opsi.forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
         });
-        pgHtml += `</div>`;
-    });
-    document.getElementById('renderPG').innerHTML = pgHtml;
+        document.getElementById('renderPG').innerHTML = pgHtml;
 
-    // 2. Render Uraian (NOMOR OTOMATIS + TEKS SOAL SAJA)
-    let uHtml = "";
-    soalUraian.forEach((soal, i) => {
-        // i+1 membuat nomor 1, 2, 3 secara otomatis
-        uHtml += `<div style="margin-bottom:20px; padding:15px; border-left:4px solid var(--primary); background:#f8fafc;">
-                    <b>${i + 1}.</b> ${soal}
-                  </div>`;
-    });
-    
-    // Pastikan masuk ke ID renderUraianTeks
-    if(document.getElementById('renderUraianTeks')){
-        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;">
+                        <b>${i + 1}.</b> ${soal}<br>
+                        <textarea class="form-control mt-2" rows="3" oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        if(document.getElementById('renderUraianTeks')) document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        // Memicu ulang MathJax jika ada rumus
+        if(window.MathJax) MathJax.typeset();
     }
-    
-    if(window.MathJax) MathJax.typeset();
-}
 
-    // Fungsi simpan foto (untuk Matematika)
     function saveFileSingle(input) {
         const file = input.files[0]; if(!file) return;
         const reader = new FileReader();
@@ -544,24 +555,33 @@ const soalUraian = [
 
     function finishExam() {
         bypassSecurity();
-        
-        // Cek Pilihan Ganda
         let pgBelum = SoalPG.some((_, i) => savedData.pg['q'+i] === undefined);
+        if (pgBelum) { alert("Pilihan Ganda belum lengkap!"); return; }
         
-        // Cek Jawaban (bisa foto atau teks uraian)
-        let uraianKosong = (savedData.files.length === 0 && Object.keys(savedData.uraian).length === 0);
-
-        if (pgBelum || uraianKosong) {
-            alert("Harap lengkapi semua jawaban!"); 
-            return;
-        }
-        
-        if(confirm("Yakin ingin mengirimkan semua jawaban?")) { 
-            alert("Jawaban Berhasil Dikirim!"); 
-            localStorage.removeItem(SESSION_KEY); 
-            location.reload(); 
+        if(confirm("Yakin ingin mengirim semua jawaban?")) { 
+            const btn = document.getElementById('btnKirim');
+            btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = {
+                nama: document.getElementById('namaSiswa').value,
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg,
+                uraian: savedData.uraian,
+                files: savedData.files
+            };
+            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => {
+                alert("Jawaban Berhasil Terkirim!"); 
+                localStorage.removeItem(SESSION_KEY); 
+                location.reload(); 
+            }).catch(() => {
+                alert("Gagal Kirim! Cek Koneksi."); btn.disabled = false;
+            });
         }
     }
+
+    // PENYELAMAT DATA: Langsung render saat halaman dibuka jika ada data lama
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+
 </script>
 </body>
 </html>

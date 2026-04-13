@@ -406,24 +406,26 @@ const soalUraian = [
 ];
 
 
-    // --- 3. LOGIKA SISTEM (VERSI MATEMATIKA) ---
+    // --- 3. LOGIKA SISTEM (VERSI MATEMATIKA - UPLOAD KERTAS JAWABAN) ---
     let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
     let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [], uraian: {} };
     let audioCtx, oscillator;
 
-    // FUNGSI SIMPAN INSTAN (Supaya tidak hilang saat refresh)
+    // FUNGSI SIMPAN PG
     function saveAns(q, a) { 
         savedData.pg['q'+q] = a; 
         localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
     }
 
+    // FUNGSI UPLOAD FOTO (BISA BANYAK LEMBAR)
     function saveFileSingle(input) {
         const file = input.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            savedData.files.push(e.target.result);
+            savedData.files.push(e.target.result); // Menambah foto ke dalam daftar
             localStorage.setItem(SESSION_KEY, JSON.stringify(savedData));
-            document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
+            // Update status jumlah lembar yang sudah difoto
+            document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Lembar Foto)`;
         };
         reader.readAsDataURL(file);
     }
@@ -443,28 +445,31 @@ const soalUraian = [
         });
         document.getElementById('renderPG').innerHTML = pgHtml;
 
-        // 2. Render Judul Soal Uraian + Tombol Kamera (Tanpa Textarea)
-        let uHtml = "";
+        // 2. Render Soal Uraian (Hanya Teks Soal)
+        let uHtml = "<div class='alert alert-info'>Silakan kerjakan soal uraian di bawah ini pada kertas jawaban Anda.</div>";
         soalUraian.forEach((soal, i) => {
-            uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;">
-                        <b>${i + 1}.</b> ${soal}<br>
-                        <div class="mt-3">
-                            <label class="btn btn-primary btn-sm">📸 Foto Jawaban Nomor ${i+1}
-                                <input type="file" hidden accept="image/*" capture="camera" onchange="saveFileSingle(this)">
-                            </label>
-                        </div>
-                      </div>`;
+            uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;"><b>${i + 1}.</b> ${soal}</div>`;
         });
+
+        // 3. Tambahkan Satu Area Upload di Paling Bawah
+        uHtml += `
+            <div class="soal-card" style="background: #fffbe6; border: 2px dashed #f59e0b; text-align: center;">
+                <p><b>UPLOAD SEMUA LEMBAR JAWABAN (FOTO)</b></p>
+                <label class="btn btn-warning">
+                    📸 Ambil Foto Kertas Jawaban
+                    <input type="file" hidden accept="image/*" capture="camera" onchange="saveFileSingle(this)">
+                </label>
+                <p id="status_upload" class="small mt-2 text-success">
+                    ${savedData.files.length > 0 ? '✅ '+savedData.files.length+' Lembar Tersimpan' : 'Belum ada foto yang diunggah'}
+                </p>
+                <button class="btn btn-danger btn-sm" onclick="if(confirm('Hapus semua foto?')){savedData.files=[]; renderSoal();}">Muat Ulang Foto</button>
+            </div>`;
+
         document.getElementById('renderUraianTeks').innerHTML = uHtml;
-        
-        // Tampilkan status foto jika ada data lama
-        if(savedData.files.length > 0) {
-            document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
-        }
         if(window.MathJax) MathJax.typeset();
     }
 
-    // --- FUNGSI PENDUKUNG ---
+    // --- FUNGSI KEAMANAN & PENGIRIMAN ---
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     function playAlarm() {
         if (!audioCtx) initAudio();
@@ -511,13 +516,15 @@ const soalUraian = [
 
     function finishExam() {
         bypassSecurity();
-        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
-        if(confirm("Yakin ingin mengirim?")) { 
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Lengkapi Pilihan Ganda!"); return; }
+        if (savedData.files.length === 0) { alert("Anda belum mengunggah foto jawaban uraian!"); return; }
+        
+        if(confirm("Yakin ingin mengirim semua jawaban?")) { 
             const btn = document.getElementById('btnKirim');
             btn.disabled = true; btn.innerText = "MENGIRIM...";
             const payload = { nama: document.getElementById('namaSiswa').value, mapel: NAMA_MAPEL, pg: savedData.pg, files: savedData.files };
             fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
-            .then(() => { alert("Berhasil!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .then(() => { alert("Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
             .catch(() => { alert("Gagal!"); btn.disabled = false; });
         }
     }

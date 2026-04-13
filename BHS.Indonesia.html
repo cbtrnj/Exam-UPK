@@ -176,8 +176,21 @@
 
     // --- 3. LOGIKA SISTEM ---
     let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
-    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    
+    // Inisialisasi memori HP (Gudang Jawaban)
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [], uraian: {} };
     let audioCtx, oscillator;
+
+    // FUNGSI PENYIMPANAN (Agar nomor 1-45 tetap nempel saat refresh)
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
 
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     
@@ -193,13 +206,21 @@
         oscillator.stopTimeInterval = interval;
     }
 
-    function stopAlarm() { if (oscillator) { try { oscillator.stop(); clearInterval(oscillator.stopTimeInterval); } catch(e){} } }
+    function stopAlarm() { 
+        if (oscillator) { 
+            try { 
+                oscillator.stop(); 
+                oscillator.disconnect();
+                clearInterval(oscillator.stopTimeInterval); 
+            } catch(e){} 
+        } 
+    }
+
     function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 30000); }
 
     function goToTab(n) {
-        if(n === 2) {
-            if(document.getElementById('namaSiswa').value === "") { alert("Isi Nama!"); return; }
-            if(document.getElementById('tokenUjian').value !== TOKEN_VALID) { alert("Token Salah!"); return; }
+        if(n === 2 && document.getElementById('tokenUjian').value !== TOKEN_VALID) {
+            alert("Token Salah!"); return;
         }
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById('tab' + n).classList.add('active');
@@ -211,13 +232,12 @@
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             document.getElementById('videoPreview').srcObject = stream;
-        } catch (e) { console.warn("Kamera off"); }
+        } catch (e) { console.warn("Kamera tidak aktif."); }
         
         goToTab(3);
         document.getElementById('examHeader').style.display = 'flex';
         document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
-        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
-        document.getElementById('mapelTitle').innerText = NAMA_MAPEL;
+        if(document.getElementById('displayMapelHeader')) document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
         
         renderSoal(); 
         startTimer();
@@ -244,83 +264,92 @@
 
     function unlockExam() {
         if(document.getElementById('kodeGuruInput').value === KODE_GURU) {
-            violationCount = 0; document.getElementById('lifeCounter').innerText = `Pelanggaran: 0/3`;
-            document.getElementById('kodeGuruInput').value = "";
-            document.getElementById('inputGuruArea').style.display = 'none';
-            document.getElementById('btnTutupMandiri').style.display = 'block';
+            violationCount = 0; 
+            document.getElementById('lifeCounter').innerText = `Pelanggaran: 0/3`;
             tutupOverlay();
-        } else { alert("Kode Guru Salah!"); }
+            document.getElementById('kodeGuruInput').value = "";
+        } else { alert("Kode Salah!"); }
     }
 
+    // FUNGSI RENDER (Disesuaikan untuk Matematika Peminatan)
     function renderSoal() {
         let pgHtml = "";
         SoalPG.forEach((s, i) => {
             let savedIdx = savedData.pg['q'+i];
-            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
-            s[1].forEach((opt, idx) => {
-                let isChecked = savedIdx == idx ? 'checked' : '';
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s.q || s[0]}<br><br>`;
+            let opsi = s.o || s[1];
+            opsi.forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
                 pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
             });
             pgHtml += `</div>`;
         });
         document.getElementById('renderPG').innerHTML = pgHtml;
 
-        let uHtml = `<div class="card"><h3 style="color:var(--primary);">SOAL URAIAN</h3>`;
+        let uHtml = "";
         soalUraian.forEach((soal, i) => {
             let savedText = savedData.uraian['u'+i] || "";
-            uHtml += `
-                <div style="margin-bottom:25px; padding:15px; border-left:4px solid var(--primary); background:#f8fafc;">
-                    <p><b>${i + 1}. ${soal}</b></p>
-                    <textarea class="jawaban-uraian" placeholder="Ketik jawaban Anda di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
-                </div>`;
+            uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;">
+                        <b>${i + 1}.</b> ${soal}<br>
+                        <textarea class="form-control mt-2" rows="3" oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
         });
-        uHtml += `</div>`;
-        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        if(document.getElementById('renderUraianTeks')) document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        // Memicu ulang MathJax jika ada rumus
+        if(window.MathJax) MathJax.typeset();
     }
 
-    function saveAns(q, a) { savedData.pg['q'+q] = a; localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); }
-    function saveUraian(q, text) { savedData.uraian['u'+q] = text; localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); }
-    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`; } }, 1000); }
+    function saveFileSingle(input) {
+        const file = input.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            savedData.files.push(e.target.result);
+            localStorage.setItem(SESSION_KEY, JSON.stringify(savedData));
+            document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function startTimer() { 
+        setInterval(() => { 
+            if(timeLeft > 0) { 
+                timeLeft--; 
+                let m = Math.floor(timeLeft/60), s = timeLeft%60; 
+                document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`; 
+            } 
+        }, 1000); 
+    }
 
     function finishExam() {
         bypassSecurity();
         let pgBelum = SoalPG.some((_, i) => savedData.pg['q'+i] === undefined);
-        let uraianBelum = soalUraian.some((_, i) => !savedData.uraian['u'+i] || savedData.uraian['u'+i].trim() === "");
+        if (pgBelum) { alert("Pilihan Ganda belum lengkap!"); return; }
         
-        if (pgBelum || uraianBelum) { alert("Harap lengkapi semua jawaban!"); return; }
-        
-        if(confirm("Yakin ingin mengumpulkan jawaban?")) {
+        if(confirm("Yakin ingin mengirim semua jawaban?")) { 
             const btn = document.getElementById('btnKirim');
-            btn.disabled = true; 
-            btn.innerText = "MENGIRIM...";
-
+            btn.disabled = true; btn.innerText = "MENGIRIM...";
             const payload = {
                 nama: document.getElementById('namaSiswa').value,
                 mapel: NAMA_MAPEL, 
-                totalSoalPG: SoalPG.length,
                 pg: savedData.pg,
-                uraian: savedData.uraian
+                uraian: savedData.uraian,
+                files: savedData.files
             };
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors", 
-                cache: "no-cache",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            })
+            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
             .then(() => {
-                alert("Jawaban Berhasil Terkirim!");
-                localStorage.removeItem(SESSION_KEY);
-                location.reload();
-            })
-            .catch(err => { 
-                alert("Terjadi Kesalahan Jaringan!"); 
-                btn.disabled = false; 
-                btn.innerText = "KUMPULKAN SEMUA JAWABAN"; 
+                alert("Jawaban Berhasil Terkirim!"); 
+                localStorage.removeItem(SESSION_KEY); 
+                location.reload(); 
+            }).catch(() => {
+                alert("Gagal Kirim! Cek Koneksi."); btn.disabled = false;
             });
         }
     }
+
+    // PENYELAMAT DATA: Langsung render saat halaman dibuka jika ada data lama
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+
 </script>
 </body>
 </html>

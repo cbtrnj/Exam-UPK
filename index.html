@@ -1,103 +1,128 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="id" class="h-full">
 <head>
-  <title>Login Ujian UPK</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal CBT UPK</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    * { box-sizing: border-box; }
     body {
-      text-align: center;
-      font-family: Arial, sans-serif;
-      margin-top: 30px;
-      background: linear-gradient(135deg, #4facfe, #00f2fe); /* gradasi biru */
-      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 50%, #003d82 100%);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
     }
-    header {
-      background-color: #222;
-      color: #fff;
-      padding: 15px;
-      font-size: 22px;
-      font-weight: bold;
-      border-bottom: 3px solid #4facfe;
+    .container {
+      width: 100%;
+      max-width: 600px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
     }
-    img {
-      width: 120px;
-      margin: 20px 0;
+    .card {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      border-radius: 12px;
+      padding: 32px 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.15);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .logo-section { text-align: center; margin-bottom: 20px; }
+    .logo-img {
+      width: 80px; height: 80px; margin: 0 auto 12px;
+      background: rgba(255,255,255,0.1);
       border-radius: 10px;
-      box-shadow: 0 0 10px #000;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(255,255,255,0.1);
     }
-    h2, h3 {
-      margin: 5px 0;
-      text-shadow: 1px 1px 2px #000;
+    .logo-img img { width: 75%; height: 75%; object-fit: contain; }
+    .logo-img i { width: 40px; height: 40px; color: #60a5fa; }
+    .text-section { text-align: center; }
+    .text-section h1 { font-size: 26px; font-weight: 800; color: #fff; margin: 0 0 6px; }
+    .text-section p { font-size: 13px; color: #dbeafe; margin: 3px 0; }
+    .desc { font-size: 12px; color: #bfdbfe; margin-top: 6px; }
+    .year-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #fff; padding: 4px 12px; border-radius: 14px;
+      font-size: 11px; font-weight: 700; margin-top: 8px;
     }
-    input {
-      padding: 10px;
-      margin: 10px;
-      width: 240px;
-      border-radius: 5px;
-      border: none;
-      outline: none;
+    .features {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin: 24px 0;
     }
-    button {
-      padding: 10px 20px;
-      cursor: pointer;
-      background-color: #ff9800;
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      font-weight: bold;
-      transition: 0.3s;
+    .feature {
+      background: rgba(255,255,255,0.08);
+      padding: 12px; border-radius: 8px; text-align: center;
+      border: 1px solid rgba(255,255,255,0.12);
     }
-    button:hover {
-      background-color: #e68900;
+    .feature i { width: 22px; height: 22px; color: #60a5fa; margin-bottom: 6px; }
+    .feature-text { font-size: 11px; font-weight: 600; color: #fff; }
+    .btn-start {
+      width: 100%; padding: 14px 24px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 15px rgba(59,130,246,0.4);
     }
-    footer {
-      margin-top: 40px;
-      font-size: 14px;
-      color: #eee;
+    .btn-start:active { opacity: 0.95; }
+    .footer-text {
+      text-align: center; margin-top: 16px;
+      font-size: 11px; color: #bfdbfe;
     }
   </style>
 </head>
 <body>
-  <!-- Header Exambro -->
-  <header>Exambro V2</header>
-
-  <!-- Logo sekolah -->
-  <img src="https://i.imgur.com/J1mKppg.png" alt="Logo Sekolah">
-
-  <!-- Nama sekolah dan judul ujian -->
-  <h2>PKBM Ristek Nusantara Jaya</h2>
-  <h3>Ujian Pendidikan Kesetaraan (UPK)</h3>
-
-  <!-- Form login -->
-  <input id="username" placeholder="Masukkan Nama">
-  <button onclick="login()">Login</button>
-
-  <audio id="blockSound" src="nit-nit.mp3" preload="auto"></audio>
-
-  <!-- Footer kredit -->
-  <footer>RNJ-Team.IT</footer>
+  <div class="container">
+    <div class="card">
+      <div class="logo-section">
+        <div class="logo-img">
+          <img id="logo-img" src="https://i.imgur.com/J1mKppg.png" alt="Logo" loading="lazy"
+               onerror="this.style.display='none'; document.getElementById('logo-icon').style.display='flex';">
+          <i id="logo-icon" data-lucide="graduation-cap" style="display:none;"></i>
+        </div>
+      </div>
+      <div class="text-section">
+        <h1 id="portal-title">APLIKASI RUANG UJIAN RNJ</h1>
+        <p id="lembaga-name">PKBM Ristek Nusantara Jaya</p>
+        <p id="deskripsi" class="desc">Ujian Pendidikan Kesetaraan</p>
+        <div class="year-badge" id="tahun-ujian">Tahun 2026</div>
+      </div>
+      <div class="features">
+        <div class="feature"><i data-lucide="zap"></i><div class="feature-text">Cepat & Lancar</div></div>
+        <div class="feature"><i data-lucide="shield"></i><div class="feature-text">Aman Terpercaya</div></div>
+        <div class="feature"><i data-lucide="clock"></i><div class="feature-text">Mengurangi Limbah Kertas</div></div>
+        <div class="feature"><i data-lucide="check-circle"></i><div class="feature-text">Instan Tanpa Ribet</div></div>
+      </div>
+      <button class="btn-start" onclick="startExam()">
+        <i data-lucide="play"></i> <span>Mulai Ujian</span>
+      </button>
+      <div class="footer-text">
+        Siap untuk ujianmu? Pastikan koneksi internet stabil sebelum memulai
+      </div>
+    </div>
+  </div>
 
   <script>
-    const backendURL = "https://Exam-UPK-backend.onrender.com";// ganti sesuai URL backend
-
-    async function login() {
-      let username = document.getElementById("username").value;
-      let res = await fetch(`${backendURL}/login`, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({username})
-      });
-      let data = await res.json();
-      if (data.blocked) {
-        alert("Anda terblokir! Hubungi pengawas.");
-        document.getElementById("blockSound").play();
-        document.body.style.backgroundColor = "red";
-      } else if (data.success) {
-        localStorage.setItem("user", username);
-        window.location.href = "dashboard.html";
-      } else {
-        alert("Login gagal!");
-      }
+    function startExam() {
+      // arahkan ke file GitHub/ruang ujian berikutnya
+      window.location.href ="https://cbtrnj.github.io/Exam-UPK/pilih-hari"; 
     }
+    lucide.createIcons();
   </script>
 </body>
 </html>

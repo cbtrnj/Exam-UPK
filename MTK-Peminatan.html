@@ -5,212 +5,127 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UPK - PKBM Ristek Nusantara Jaya</title>
     
-    <!-- Fonts & MathJax -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
         :root {
-            --bg-overall: #F1F4F9;
-            --bg-card: #FFFFFF;
-            --primary: #0A66C2;
-            --danger: #ef4444;
-            --text-dark: #1F2937;
-            --text-muted: #6B7280;
-            --border: #E5E7EB;
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
         }
-
         * { box-sizing: border-box; }
-
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-overall);
-            margin: 0; padding: 0; color: var(--text-dark);
-            -webkit-user-select: none; user-select: none;
-            overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
         }
-
-        /* Layout Utama */
-        .container { 
-            max-width: 850px; 
-            margin: 20px auto; 
-            padding: 0 10px; 
-        }
-
-        /* Header Ujian Sticky */
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
         .exam-header {
-            display: none; background: white; padding: 12px 15px;
-            position: sticky; top: 0; z-index: 1000;
-            justify-content: space-between; align-items: center;
-            border-bottom: 3px solid var(--primary);
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-
-        /* Card Modern */
-        .card {
-            background: var(--bg-card); padding: 40px;
-            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
-        }
-
-        /* Tab Management */
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
         .tab-content { display: none; }
         .active { display: block; }
-
-        /* School Branding */
-        .school-header { text-align: center; margin-bottom: 10px; }
-        .logo { width: 90px; height: auto; margin-bottom: 10px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
-        .school-name { font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--text-dark); }
-        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 8px; text-transform: uppercase; }
-
-        /* Form Inputs (Token di bawah Nama) */
-        .input-vertical-group { display: flex; flex-direction: column; gap: 15px; margin: 30px 0; }
-        .input-wrapper label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; padding-left: 4px; }
-        input[type="text"] { 
-            width: 100%; padding: 16px; border: 2px solid var(--border); 
-            border-radius: 12px; font-size: 16px !important; background: #F9FAFB;
-            transition: 0.2s;
-        }
-        input[type="text"]:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(10,102,194,0.1); }
-
-        /* Buttons */
-        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: #10b981; color: white; }
-        .btn:active { transform: scale(0.98); }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* Kamera Kecil Tetap di Header */
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Soal Styles */
-        .soal-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 15px; }
-        .soal-text { font-size: 1.05rem; line-height: 1.6; margin-bottom: 15px; display: block; font-weight: 600; }
-        .opsi-item { display: flex; align-items: center; padding: 14px; border: 1px solid #f3f4f6; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
-        .opsi-item:hover { background: #f0f7ff; border-color: var(--primary); }
-        .opsi-item input { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; }
-
-        /* Overlay Lock */
-        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index:10000; padding: 20vh 20px 0 20px; }
-        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; font-family: monospace; }
-
-        /* Mobile Optimization */
-        @media (max-width: 600px) {
-            .container { padding: 0 8px; margin: 10px auto; }
-            .card { padding: 25px 18px; border-radius: 15px; }
-            .school-name { font-size: 1.2rem; }
-            .soal-text { font-size: 1rem; }
-            .opsi-item { padding: 12px; font-size: 0.95rem; }
-            .exam-header { padding: 10px; }
-        }
-
-        @media (max-width: 350px) {
-            .school-name { font-size: 1rem; }
-            .logo { width: 70px; }
-            .timer-badge { font-size: 0.9rem; }
-        }
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
     </style>
 </head>
-<body>
+<body onclick="initAudio()">
 
-<!-- ANTI-CHEAT OVERLAY -->
 <div id="overlay">
-    <div style="max-width: 400px; margin: auto;">
-        <h1 style="color: var(--danger); font-size: 1.8rem;">SISTEM TERKUNCI!</h1>
-        <p style="opacity: 0.8; font-size: 0.9rem;">Anda terdeteksi melakukan pelanggaran (Pindah aplikasi/Screenshot).</p>
-        <p>Hubungi pengawas untuk mendapatkan <b>KODE REGISTRASI GURU</b>.</p>
-        <input type="text" id="kodeGuruInput" placeholder="Ketik Kode Guru Di Sini" style="text-align:center; margin-bottom: 20px; background: #222; border: 1px solid #444; color: white; width: 100%;">
-        <button class="btn btn-primary" onclick="unlockExam()">BUKA AKSES UJIAN</button>
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;">
+        <p>Sistem Terkunci. Masukkan <b>KODE GURU</b>:</p>
+        <input type="text" id="kodeGuruInput" placeholder="Kode" style="text-align:center; width:200px;">
+        <button class="btn btn-primary" onclick="unlockExam()">BUKA</button>
     </div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
 </div>
 
-<!-- STICKY HEADER EXAM -->
 <div id="examHeader" class="exam-header">
-    <div style="overflow: hidden; padding-right: 10px;">
-        <div id="displayNama" style="font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95rem;">Nama Siswa</div>
-        <div style="font-size: 0.65rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">UPK MATEMATIKA PEMINATAN</div>
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">Nama Siswa</div>
+        
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 3px; text-transform: uppercase;"></div>
+        
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
     </div>
-    <div class="timer-badge" id="timer">90:00</div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
 </div>
 
 <div class="container">
-    
-    <!-- TAB 1: REGISTRASI (Token di bawah Nama) -->
     <div id="tab1" class="tab-content active">
         <div class="card">
             <div class="school-header">
-                <img src="https://i.imgur.com/J1mKppg.png" class="logo" alt="Logo">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
                 <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
-                <span class="exam-badge">UPK MATEMATIKA PEMINATAN</span>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge">MATEMATIKA PEMINATAN</span>
             </div>
-            
-            <hr style="border:0; height:1px; background:#eee; margin: 25px 0;">
-            
-            <div class="input-vertical-group">
-                <div class="input-wrapper">
-                    <label>Nama Lengkap Siswa</label>
-                    <input type="text" id="namaSiswa" placeholder="Masukkan nama sesuai absen">
-                </div>
-                <div class="input-wrapper">
-                    <label>Token Ujian</label>
-                    <input type="text" id="tokenUjian" placeholder="Masukkan token dari pengawas">
-                </div>
-            </div>
-            
-            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut ke Tata Tertib</button>
-            <p style="text-align: center; font-size: 0.7rem; color: #a1a7b3; margin-top: 20px; font-weight: 600;">TAHUN PELAJARAN 2025-2026</p>
-        <p style="text-align: center; font-size: 0.7rem; color: #7a0404; margin-top: 20px; font-weight: 600;">EXAMBRO_RNJ_SIBERSCURITY</p>
+            <input type="text" id="namaSiswa" placeholder="Nama Lengkap">
+            <input type="text" id="tokenUjian" placeholder="Token Ujian">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b style="color: rgb(19, 3, 67);">Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
         </div>
     </div>
 
-    <!-- TAB 2: TATA TERTIB -->
     <div id="tab2" class="tab-content">
         <div class="card">
-            <h2 style="color: var(--danger); margin-top: 0; font-size: 1.4rem;">Peringatan Keamanan</h2>
-            <div style="background: #fff5f5; border-left: 4px solid var(--danger); padding: 15px; margin-bottom: 25px; border-radius: 8px;">
-                <ul style="margin: 0; padding-left: 18px; line-height: 1.7; color: #b91c1c; font-size: 0.9rem;">
-                    <li><b>Dilarang</b> keluar dari halaman/tab ujian.</li>
-                    <li><b>Dilarang</b> membuka aplikasi lain (Chrome, Sosmed, dll).</li>
-                    <li><b>Dilarang</b> mengambil Screenshot atau rekaman layar.</li>
-                    <li>Layar akan <b>TERKUNCI</b> jika melanggar ketentuan di atas.</li>
-                </ul>
-            </div>
-            <button class="btn btn-primary" onclick="mulaiUjian()">SAYA MENGERTI & MULAI</button>
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halama Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
         </div>
     </div>
 
-    <!-- TAB 3: AREA SOAL -->
-<div id="tab3" class="tab-content">
-    <!-- Tempat Soal Pilihan Ganda Muncul -->
-    <div id="renderPG"></div>
-    
-    <!-- Bagian Soal Uraian (Teks Soal Saja) -->
-    <div class="card" style="background: #fff; border: 1px solid var(--border);">
-        <h3 style="color: var(--primary); margin-top:0;">Soal Uraian</h3>
-        <div id="renderUraianTeks"></div> <!-- Hanya teks soal -->
-    </div>
-
-    <!-- SATU TEMPAT UPLOAD UNTUK SEMUA -->
-    <div class="card" style="background: #f8fafc; border: 2px dashed var(--primary); padding: 25px; text-align: center;">
-        <h3 style="margin-top:0; color: var(--primary);">Upload Jawaban Uraian</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-            Foto lembar jawaban HVS Anda (untuk soal 1-5) dan unggah di sini:
-        </p>
-        <input type="file" accept="image/*" onclick="prepareUpload()" onchange="saveFileSingle(this)" style="font-size: 1rem; width: 100%; max-width: 300px;">
-        <div id="status_upload" style="color:#10b981; font-weight:700; margin-top:10px;">
-            <!-- Status upload muncul di sini -->
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div class="card">
+            <h3>Soal Uraian</h3>
+            <div id="renderUraianTeks"></div>
         </div>
+        <div class="card" style="text-align: center; border: 2px dashed var(--primary);">
+            <h3>Upload Jawaban Uraian</h3>
+            <input type="file" accept="image/*" onmousedown="bypassSecurity()" onchange="saveFileSingle(this)">
+            <div id="status_upload" style="margin-top:10px; font-weight:bold; color:#10b981;"></div>
+        </div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px;">KUMPULKAN SEMUA JAWABAN</button>
     </div>
-    
-    <button class="btn btn-success" onclick="finishExam()" style="margin-top: 20px; margin-bottom: 60px;">KUMPULKAN SEMUA JAWABAN</button>
-</div>
-
 </div>
 
 <script>
-    const KODE_GURU = "Guru7890"; 
-    let timeLeft = 90 * 60;
-    let timerInterval;
-    let savedData = JSON.parse(localStorage.getItem("upk_session")) || {};
-
-    let letsSoalPG = [
+    const NAMA_MAPEL = "MATEMATIKA PEMINATAN";
+    const SCRIPT_URL = "URL_SCRIPT_ANDA";
+    const KODE_GURU = "Guru7890", TOKEN_VALID = "RISTEK2026", SESSION_KEY = "UPK_RISTEK_2026";
+    
+    // VARIABEL SESUAI PERMINTAAN
+     const SoalPG = [
 ["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....",
 ["x > 10","x < 10","x < 6","x > 4","x < 1"]],
 
@@ -445,7 +360,7 @@
   
 ];
 
-let soalUraian= [
+const soalUraian= [
 "Tentukanlah interval penyelesaian pertidaksamaan \\(|x + 2| \\ge 2|x - 1|\\)!",
 
 "Tentukan nilai dari \\(\\int (2x + 5)\\cos 2x \\, dx\\)!",
@@ -481,242 +396,162 @@ Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah peny
 
 ];
 
-// FUNGSI UNTUK MENYIMPAN JAWABAN SAAT DIKLIK
-function saveAns(key, val) {
-    savedData[key] = val; // Simpan ke variabel memory
-    localStorage.setItem("upk_session", JSON.stringify(savedData)); // Simpan ke memori HP agar tidak hilang saat refresh
-    console.log("Tersimpan:", key, "=", val); // Untuk cek di console
-}
+    // --- 3. LOGIKA SISTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    // Inisialisasi savedData agar bisa menampung PG, Foto (files), maupun Text (uraian)
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [], uraian: {} };
+    let audioCtx, oscillator;
 
-   // --- 1. FUNGSI NAVIGASI & TOKEN ---
-function goToTab(n) {
-    // Ambil input dari tab login
-    const inputNama = document.getElementById('namaSiswa').value;
-    const inputToken = document.getElementById('tokenUjian').value;
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        let interval = setInterval(() => { gainNode.gain.setValueAtTime(gainNode.gain.value === 0 ? 0.5 : 0, audioCtx.currentTime); }, 150);
+        oscillator.stopTimeInterval = interval;
+    }
 
-    // Validasi saat ingin pindah dari Tab Login (n=1) ke Tab Instruksi (n=2)
-    if(n === 2) {
-        if(inputNama.trim() === "") {
-            alert("Nama Lengkap harus diisi!");
-            return;
+    function stopAlarm() { if (oscillator) { try { oscillator.stop(); clearInterval(oscillator.stopTimeInterval); } catch(e){} } }
+
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 30000); }
+
+    function goToTab(n) {
+        if(n === 2 && document.getElementById('tokenUjian').value !== TOKEN_VALID) {
+            alert("Token Salah!"); return;
         }
-        // Token Ujian
-        if(inputToken !== "RISTEK2026") {
-            alert("Token Ujian Salah! Silakan tanya pengawas.");
-            return; 
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab' + n).classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById('videoPreview').srcObject = stream;
+        } catch (e) { console.warn("Kamera formalitas tidak aktif."); }
+        
+        goToTab(3);
+        
+        // Update Header
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        
+        // Memasukkan Nama Mapel ke Header (Pastikan ID displayMapelHeader ada di HTML)
+        if(document.getElementById('displayMapelHeader')){
+            document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        }
+        
+        renderSoal(); 
+        startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        if(isBypass) return;
+        violationCount++; playAlarm();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
         }
     }
-    
-    // Jalankan perpindahan tab
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    const targetTab = document.getElementById('tab' + n);
-    if(targetTab) targetTab.classList.add('active');
-    window.scrollTo(0,0);
-}
 
-function mulaiUjian() {
-    goToTab(3); // Pindah ke halaman soal
-    document.getElementById('examHeader').style.display = 'flex';
-    document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
-    
-    renderSoal();
-    startTimer();
-    setupSecurity(); // Aktifkan sistem anti-contek
-}
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
 
-// --- 2. SISTEM KEAMANAN (ANTI-CONTEK) ---
-let isCameraActive = false;
-
-function setupSecurity() {
-    // Deteksi pindah tab atau keluar browser
-    window.onblur = function() {
-        if (!isCameraActive) {
-            document.getElementById('overlay').style.display = 'block';
-        }
-    };
-
-    // Deteksi layar HP dimatikan atau switch aplikasi
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden && !isCameraActive) {
-            document.getElementById('overlay').style.display = 'block';
-        }
-    });
-}
-
-function unlockExam() {
-    if(document.getElementById('kodeGuruInput').value === KODE_GURU) {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('kodeGuruInput').value = "";
-    } else {
-        alert("Kode Guru Salah!");
+    function unlockExam() {
+        if(document.getElementById('kodeGuruInput').value === KODE_GURU) {
+            violationCount = 0; 
+            document.getElementById('lifeCounter').innerText = `Pelanggaran: 0/3`;
+            tutupOverlay();
+            document.getElementById('kodeGuruInput').value = "";
+        } else { alert("Kode Salah!"); }
     }
-}
 
-// --- 3. RENDER SOAL ---
-function renderSoal() {
-    // Render Pilihan Ganda
+    function renderSoal() {
+    // 1. Render Pilihan Ganda
     let pgHtml = "";
-    letsSoalPG.forEach((s, i) => {
-        let chk = savedData['pg' + i];
-        pgHtml += `<div class="soal-card"><span class="soal-text">${i + 1}. ${s[0]}</span>`;
+    SoalPG.forEach((s, i) => {
+        let savedIdx = savedData.pg['q'+i];
+        pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
         s[1].forEach((opt, idx) => {
-            let isChecked = chk == idx ? 'checked' : '';
-            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" onclick="saveAns('pg${i}', ${idx})" ${isChecked}> <span>${opt}</span></label>`;
+            let isChecked = savedIdx == idx ? 'checked' : '';
+            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
         });
         pgHtml += `</div>`;
     });
     document.getElementById('renderPG').innerHTML = pgHtml;
 
-    // Render Uraian
-    let urHtml = "";
-    soalUraian.forEach((s, i) => {
-        urHtml += `<div style="margin-bottom:15px; padding:10px; border-bottom:1px solid #eee;">
-            <p style="font-weight:700; margin:0 0 5px 0;">Soal Uraian ${i + 1}</p>
-            <p style="margin:0; font-size:0.95rem;">${s}</p>
-        </div>`;
+    // 2. Render Uraian (NOMOR OTOMATIS + TEKS SOAL SAJA)
+    let uHtml = "";
+    soalUraian.forEach((soal, i) => {
+        // i+1 membuat nomor 1, 2, 3 secara otomatis
+        uHtml += `<div style="margin-bottom:20px; padding:15px; border-left:4px solid var(--primary); background:#f8fafc;">
+                    <b>${i + 1}.</b> ${soal}
+                  </div>`;
     });
-    document.getElementById('renderUraianTeks').innerHTML = urHtml;
-
-    updateStatusUpload();
-    if (typeof MathJax !== 'undefined') {
-        MathJax.typeset();
+    
+    // Pastikan masuk ke ID renderUraianTeks
+    if(document.getElementById('renderUraianTeks')){
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
     }
+    
+    if(window.MathJax) MathJax.typeset();
 }
 
-// --- 4. LOGIKA UPLOAD ---
-if (!savedData['filesUraian']) {
-    savedData['filesUraian'] = [];
-}
-
-function prepareUpload() {
-    isCameraActive = true; // Matikan sementara proteksi agar bisa buka galeri/kamera
-}
-
-function saveFileSingle(input) {
-    const file = input.files[0];
-    if (!file) { 
-        resetSecurity();
-        return; 
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-        alert("File terlalu besar! Maksimal 5MB.");
-        input.value = "";
-        resetSecurity();
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        savedData['filesUraian'].push(e.target.result);
-        localStorage.setItem("upk_session", JSON.stringify(savedData));
-        updateStatusUpload();
-        input.value = ""; 
-        resetSecurity();
-    };
-    reader.readAsDataURL(file);
-}
-
-function resetSecurity() {
-    // Beri toleransi waktu 3 detik untuk kembali ke browser sebelum proteksi aktif lagi
-    setTimeout(() => {
-        isCameraActive = false;
-    }, 3000);
-}
-
-function updateStatusUpload() {
-    const jml = savedData['filesUraian'] ? savedData['filesUraian'].length : 0;
-    const statusE1 = document.getElementById('status_upload');
-    if (statusE1) {
-        if (jml > 0) {
-            statusE1.innerHTML = `<b style="color:#059669;">✅ ${jml} Foto Tersimpan</b><br>
-            <button type="button" onclick="prepareUpload(); hapusSemuaFoto()" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.8rem; text-decoration:underline; margin-top:5px;">Hapus & foto ulang</button>`;
-        } else {
-            statusE1.innerText = "Belum ada foto.";
-        }
-    }
-}
-
-function hapusSemuaFoto() {
-    if(confirm("Hapus semua foto?")) {
-        savedData['filesUraian'] = [];
-        localStorage.setItem("upk_session", JSON.stringify(savedData));
-        updateStatusUpload();
-    }
-    resetSecurity();
-}
-
-// --- 5. TIMER & FINISH ---
-function startTimer() {
-    timerInterval = setInterval(() => {
-        let m = Math.floor(timeLeft / 60);
-        let s = timeLeft % 60;
-        let tEl = document.getElementById('timer');
-        if(tEl) tEl.innerText = `${m}:${s < 10 ? '0' + s : s}`;
-        
-        if (timeLeft <= 0) { 
-            clearInterval(timerInterval); 
-            alert("Waktu Ujian Habis!"); 
-            finishExam(); 
-        }
-        timeLeft--;
-    }, 1000);
-}
-
-function finishExam() {
-    // VAKSIN: Matikan proteksi sesaat agar alert tidak memicu lock
-    prepareUpload(); 
-
-    const nama = document.getElementById('namaSiswa').value;
-    if (!nama) { 
-        alert("Isi Nama Lengkap!"); 
-        resetSecurity(); // Aktifkan lagi dengan jeda 3 detik
-        return; 
-    }
-
-    let kosong = [];
-    for (let i = 0; i < letsSoalPG.length; i++) {
-        if (savedData['pg' + i] === undefined) kosong.push(i + 1);
-    }
-
-    if (kosong.length > 0) { 
-        alert("Soal PG belum lengkap nomor: " + kosong.join(", ")); 
-        resetSecurity(); // PENTING: Supaya tidak lock setelah klik OK
-        return; 
-    }
-
-    if (!savedData['filesUraian'] || savedData['filesUraian'].length === 0) { 
-        alert("Upload foto jawaban!"); 
-        resetSecurity(); 
-        return; 
-    }
-
-    // Konfirmasi Kirim
-    if (confirm("Kirim jawaban sekarang?")) {
-        alert("Sedang mengirim... Jangan tutup halaman ini!");
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwJIAb3xN2cfy9bTzHSdkSUklvWpFPGwId-y5wGKXMFLZAfQmdWE1VA2IpxD6p_aVL6nw/exec';
-        const payload = {
-            nama: nama,
-            mapel: "MATEMATIKA PEMINATAN", 
-            jawaban: savedData,
-            fileUraian: savedData['filesUraian'].join("|SPLIT|") 
+    // Fungsi simpan foto (untuk Matematika)
+    function saveFileSingle(input) {
+        const file = input.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            savedData.files.push(e.target.result);
+            localStorage.setItem(SESSION_KEY, JSON.stringify(savedData));
+            document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
         };
-
-        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-        .then(() => {
-            alert("✅ TERKIRIM! Terima kasih.");
-            localStorage.removeItem("upk_session");
-            location.reload();
-        })
-        .catch(e => {
-            alert("Gagal mengirim, periksa koneksi internet Anda!");
-            resetSecurity();
-        });
-    } else {
-        // Jika user klik 'Cancel' pada konfirmasi kirim
-        resetSecurity();
+        reader.readAsDataURL(file);
     }
-}
+
+    function startTimer() { 
+        setInterval(() => { 
+            if(timeLeft > 0) { 
+                timeLeft--; 
+                let m = Math.floor(timeLeft/60), s = timeLeft%60; 
+                document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`; 
+            } 
+        }, 1000); 
+    }
+
+    function finishExam() {
+        bypassSecurity();
+        
+        // Cek Pilihan Ganda
+        let pgBelum = SoalPG.some((_, i) => savedData.pg['q'+i] === undefined);
+        
+        // Cek Jawaban (bisa foto atau teks uraian)
+        let uraianKosong = (savedData.files.length === 0 && Object.keys(savedData.uraian).length === 0);
+
+        if (pgBelum || uraianKosong) {
+            alert("Harap lengkapi semua jawaban!"); 
+            return;
+        }
+        
+        if(confirm("Yakin ingin mengirimkan semua jawaban?")) { 
+            alert("Jawaban Berhasil Dikirim!"); 
+            localStorage.removeItem(SESSION_KEY); 
+            location.reload(); 
+        }
+    }
 </script>
 </body>
 </html>

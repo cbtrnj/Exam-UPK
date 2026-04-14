@@ -4,30 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UPK - PKBM Ristek Nusantara Jaya</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
     <style>
-        :root {
-            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
-            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
-        }
+        :root { --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2; --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB; }
         * { box-sizing: border-box; }
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
-            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall); margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none; }
         .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
-        .exam-header {
-            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
-            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
+        .exam-header { display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
-        .tab-content { display: none; }
-        .active { display: block; }
+        .tab-content { display: none; } .active { display: block; }
         .school-header { text-align: center; margin-bottom: 20px; }
         .logo { width: 80px; height: auto; margin-bottom: 10px; }
         .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
@@ -37,16 +23,13 @@
         .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: #10b981; color: white; }
-        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
-        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
         .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
-        
-        /* Kamera Kecil Tetap di Header */
         #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
         #camContainer video { width: 100%; height: 100%; object-fit: cover; }
-
         #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
         .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
     </style>
 </head>
 <body onclick="initAudio()">
@@ -65,11 +48,9 @@
 
 <div id="examHeader" class="exam-header">
     <div style="flex:1">
-        <div id="displayNama" style="font-weight: 800;">Nama Siswa</div>
-        
-        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 3px; text-transform: uppercase;"></div>
-        
-        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+        <div id="displayNama" style="font-weight: 800;">Siswa</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div id="lifeCounter" style="color:red; font-size:0.75rem; font-weight:bold;">Pelanggaran: 0/3</div>
     </div>
     <div style="display: flex; align-items: center;">
         <div class="timer-badge" id="timer">90:00</div>
@@ -84,7 +65,7 @@
                 <img src="https://i.imgur.com/J1mKppg.png" class="logo">
                 <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
                 <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
-                <span class="exam-badge">MATEMATIKA PEMINATAN</span>
+                <span id="labelMapel" class="exam-badge">MATEMATIKA PEMINATAN</span>
             </div>
             <input type="text" id="namaSiswa" placeholder="Nama Lengkap">
             <input type="text" id="tokenUjian" placeholder="Token Ujian">
@@ -97,8 +78,7 @@
         <div class="card">
             <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
             <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
-            <p>Jangan Meninggalkan Halama Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
-            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
             <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
             <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
         </div>
@@ -112,21 +92,25 @@
         </div>
         <div class="card" style="text-align: center; border: 2px dashed var(--primary);">
             <h3>Upload Jawaban Uraian</h3>
-            <input type="file" accept="image/*" onmousedown="bypassSecurity()" onchange="saveFileSingle(this)">
-            <div id="status_upload" style="margin-top:10px; font-weight:bold; color:#10b981;"></div>
+            <p class="small">Wajib upload minimal 1 foto (lembar jawaban)</p>
+            <label class="btn btn-primary" style="background:#f59e0b; display:inline-block; width:auto; padding:10px 20px;" onclick="bypassSecurity()">
+                📸 Ambil Foto Jawaban
+                <input type="file" id="inputFile" accept="image/*" capture="camera" hidden onchange="saveFileSingle(this)">
+            </label>
+            <div id="status_upload" style="margin-top:10px; font-weight:bold; color:#10b981;">Belum ada foto yang diunggah</div>
         </div>
-        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px;">KUMPULKAN SEMUA JAWABAN</button>
+        <button id="btnKirim" class="btn btn-success" onclick="finishExam()" style="margin-bottom: 80px;">KUMPULKAN SEMUA JAWABAN</button>
     </div>
 </div>
 
 <script>
-    const NAMA_MAPEL = "MATEMATIKA PEMINATAN";
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-WIaAxNxXf0iXUmaMPP0V1CREbQepBRK8GZOsTNx8cFro1BvRtjHMO921W13HmFBW/exec";
-    const KODE_GURU = "Guru7890", TOKEN_VALID = "RISTEK2026", SESSION_KEY = "UPK_RISTEK_2026";
-    
-    // VARIABEL SESUAI PERMINTAAN
-     const SoalPG = [
-["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....",
+   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec";
+const NAMA_MAPEL = "MATEMATIKA PEMINATAN", KODE_GURU = "Guru7890", TOKEN_VALID = "RISTEK2026";
+
+const SESSION_KEY = "UPK_RISTEK_" + NAMA_MAPEL.replace(/\s+/g, '_');
+
+const SoalPG = [
+    ["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....",
 ["x > 10","x < 10","x < 6","x > 4","x < 1"]],
 
 ["Interval penyelesaian pertidaksamaan \\(\\left|x - 1\\right| < \\left|x + 2\\right|\\) adalah ...",
@@ -396,130 +380,245 @@ Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah peny
 
 ];
 
-    // --- 3. LOGIKA SISTEM (VERSI MATEMATIKA - UPLOAD KERTAS JAWABAN) ---
-    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
-    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [], uraian: {} };
-    let audioCtx, oscillator;
+let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60;
+let isBypass = false;
 
-    // FUNGSI SIMPAN PG
-    function saveAns(q, a) { 
-        savedData.pg['q'+q] = a; 
-        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+// 🔥 TAMBAHAN PENTING
+let isUploading = false;
+let isDialogOpen = false;
+
+let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [] };
+let audioCtx, oscillator;
+
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+function bypassSecurity() {
+    isBypass = true;
+    setTimeout(() => { isBypass = false; }, 15000);
+}
+
+function saveAns(q, a) { 
+    savedData.pg['q'+q] = a; 
+    localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+}
+
+function saveFileSingle(input) {
+    isUploading = true;
+    bypassSecurity();
+
+    const file = input.files[0];
+    if (!file) {
+        isUploading = false;
+        return;
     }
 
-    // FUNGSI UPLOAD FOTO (BISA BANYAK LEMBAR)
-    function saveFileSingle(input) {
-        const file = input.files[0]; if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            savedData.files.push(e.target.result); // Menambah foto ke dalam daftar
-            localStorage.setItem(SESSION_KEY, JSON.stringify(savedData));
-            // Update status jumlah lembar yang sudah difoto
-            document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Lembar Foto)`;
-        };
-        reader.readAsDataURL(file);
-    }
+    const status = document.getElementById('status_upload');
+    status.innerText = "⏳ Memproses...";
 
-    function renderSoal() {
-        // 1. Render Pilihan Ganda
-        let pgHtml = "";
-        SoalPG.forEach((s, i) => {
-            let savedIdx = savedData.pg['q'+i];
-            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s.q || s[0]}<br><br>`;
-            let opsi = s.o || s[1];
-            opsi.forEach((opt, idx) => {
-                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
-                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
-            });
-            pgHtml += `</div>`;
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        savedData.files.push(e.target.result);
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData));
+        status.innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
+
+        setTimeout(() => {
+            isUploading = false;
+        }, 2000);
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function renderSoal() {
+    let pgHtml = "";
+    SoalPG.forEach((s, i) => {
+        let saved = savedData.pg['q'+i];
+        pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+        s[1].forEach((opt, idx) => {
+            let chk = (saved !== undefined && saved == idx) ? 'checked' : '';
+            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${chk} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
         });
-        document.getElementById('renderPG').innerHTML = pgHtml;
+        pgHtml += `</div>`;
+    });
+    document.getElementById('renderPG').innerHTML = pgHtml;
 
-        // 2. Render Soal Uraian (Hanya Teks Soal)
-        let uHtml = "<div class='alert alert-info'>Silakan kerjakan soal uraian di bawah ini pada kertas jawaban Anda.</div>";
-        soalUraian.forEach((soal, i) => {
-            uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;"><b>${i + 1}.</b> ${soal}</div>`;
-        });
+    let uHtml = "";
+    soalUraian.forEach((soal, i) => { 
+        uHtml += `<div style="margin-bottom:15px;"><b>${i + 1}.</b> ${soal}</div>`; 
+    });
+    document.getElementById('renderUraianTeks').innerHTML = uHtml;
 
-        // 3. Tambahkan Satu Area Upload di Paling Bawah
-        uHtml += `
-            <div class="soal-card" style="background: #fffbe6; border: 2px dashed #f59e0b; text-align: center;">
-                <p><b>UPLOAD SEMUA LEMBAR JAWABAN (FOTO)</b></p>
-                <label class="btn btn-warning">
-                    📸 Ambil Foto Kertas Jawaban
-                    <input type="file" hidden accept="image/*" capture="camera" onchange="saveFileSingle(this)">
-                </label>
-                <p id="status_upload" class="small mt-2 text-success">
-                    ${savedData.files.length > 0 ? '✅ '+savedData.files.length+' Lembar Tersimpan' : 'Belum ada foto yang diunggah'}
-                </p>
-                <button class="btn btn-danger btn-sm" onclick="if(confirm('Hapus semua foto?')){savedData.files=[]; renderSoal();}">Muat Ulang Foto</button>
-            </div>`;
+    if(savedData.files.length > 0)
+        document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
 
-        document.getElementById('renderUraianTeks').innerHTML = uHtml;
-        if(window.MathJax) MathJax.typeset();
-    }
+    if(window.MathJax) MathJax.typeset();
+}
 
-    // --- FUNGSI KEAMANAN & PENGIRIMAN ---
-    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    function playAlarm() {
-        if (!audioCtx) initAudio();
-        oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
-        oscillator.start();
-        oscillator.stopTimeInterval = setInterval(() => { gainNode.gain.setValueAtTime(gainNode.gain.value === 0 ? 0.5 : 0, audioCtx.currentTime); }, 150);
+function goToTab(n) {
+    if(n === 2 && document.getElementById('tokenUjian').value !== TOKEN_VALID) { 
+        alert("Token Salah!"); 
+        return; 
     }
-    function stopAlarm() { if (oscillator) { try { oscillator.stop(); clearInterval(oscillator.stopTimeInterval); } catch(e){} } }
-    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 30000); }
-    function goToTab(n) {
-        if(n === 2 && document.getElementById('tokenUjian').value !== TOKEN_VALID) { alert("Token Salah!"); return; }
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab' + n).classList.add('active');
-        window.scrollTo(0,0);
-    }
-    async function mulaiUjian() {
-        isBypass = true;
-        try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); document.getElementById('videoPreview').srcObject = stream; } catch (e) {}
-        goToTab(3);
-        document.getElementById('examHeader').style.display = 'flex';
-        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
-        if(document.getElementById('displayMapelHeader')) document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
-        renderSoal(); startTimer();
-        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
-    }
-    function setupSecurity() {
-        window.onblur = () => { if(!isBypass) handleViolation(); };
-        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
-    }
-    function handleViolation() {
-        if(isBypass) return;
-        violationCount++; playAlarm();
-        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
-        document.getElementById('overlay').style.display = 'block';
-        if(violationCount >= MAX_VIOLATIONS) { document.getElementById('btnTutupMandiri').style.display = 'none'; document.getElementById('inputGuruArea').style.display = 'block'; }
-    }
-    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
-    function unlockExam() { if(document.getElementById('kodeGuruInput').value === KODE_GURU) { violationCount = 0; document.getElementById('lifeCounter').innerText = `Pelanggaran: 0/3`; tutupOverlay(); document.getElementById('kodeGuruInput').value = ""; } else { alert("Kode Salah!"); } }
-    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`; } }, 1000); }
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab'+n).classList.add('active');
+}
 
-    function finishExam() {
-        bypassSecurity();
-        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Lengkapi Pilihan Ganda!"); return; }
-        if (savedData.files.length === 0) { alert("Anda belum mengunggah foto jawaban uraian!"); return; }
-        
-        if(confirm("Yakin ingin mengirim semua jawaban?")) { 
-            const btn = document.getElementById('btnKirim');
-            btn.disabled = true; btn.innerText = "MENGIRIM...";
-            const payload = { nama: document.getElementById('namaSiswa').value, mapel: NAMA_MAPEL, pg: savedData.pg, files: savedData.files };
-            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
-            .then(() => { alert("Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
-            .catch(() => { alert("Gagal!"); btn.disabled = false; });
+async function mulaiUjian() {
+    isBypass = true;
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('videoPreview').srcObject = stream;
+    } catch (e) {}
+
+    goToTab(3);
+    document.getElementById('examHeader').style.display = 'flex';
+    document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+    document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+
+    renderSoal();
+    startTimer();
+
+    setTimeout(() => {
+        isBypass = false;
+        setupSecurity();
+    }, 3000);
+}
+
+// 🔥 FIX UTAMA ADA DI SINI
+function setupSecurity() {
+    window.onblur = () => {
+        if (!isBypass && !isUploading && !isDialogOpen) {
+            handleViolation();
         }
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && !isBypass && !isUploading && !isDialogOpen) {
+            handleViolation();
+        }
+    });
+}
+
+function handleViolation() {
+    violationCount++;
+    playAlarm();
+
+    document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+    document.getElementById('overlay').style.display = 'block';
+
+    if(violationCount >= MAX_VIOLATIONS) {
+        document.getElementById('btnTutupMandiri').style.display = 'none';
+        document.getElementById('inputGuruArea').style.display = 'block';
+    }
+}
+
+function playAlarm() {
+    if (!audioCtx) initAudio();
+
+    oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    oscillator.start();
+
+    oscillator.stopInt = setInterval(() => {
+        gain.gain.value = (gain.gain.value === 0 ? 0.3 : 0);
+    }, 200);
+}
+
+function tutupOverlay() {
+    document.getElementById('overlay').style.display = 'none';
+    if(oscillator) {
+        oscillator.stop();
+        clearInterval(oscillator.stopInt);
+    }
+}
+
+function unlockExam() {
+    if(document.getElementById('kodeGuruInput').value === KODE_GURU) {
+        violationCount = 0;
+        document.getElementById('lifeCounter').innerText = "Pelanggaran: 0/3";
+        tutupOverlay();
+        document.getElementById('inputGuruArea').style.display = 'none';
+        document.getElementById('btnTutupMandiri').style.display = 'block';
+    } else {
+        alert("Kode Salah!");
+    }
+}
+
+function startTimer() {
+    setInterval(() => {
+        if(timeLeft > 0) {
+            timeLeft--;
+            let m = Math.floor(timeLeft/60),
+                s = timeLeft%60;
+            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+        }
+    }, 1000);
+}
+
+function finishExam() {
+    isDialogOpen = true;
+
+    if(Object.keys(savedData.pg).length < SoalPG.length) {
+        alert("HARAP ISI SEMUA PG!");
+        isDialogOpen = false;
+        return;
     }
 
-    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+    if(savedData.files.length === 0) {
+        alert("UPLOAD FOTO WAJIB!");
+        isDialogOpen = false;
+        return;
+    }
+
+    if(!confirm("Kumpulkan jawaban?")) {
+        isDialogOpen = false;
+        return;
+    }
+
+    isBypass = true;
+
+    const btn = document.getElementById('btnKirim');
+    btn.disabled = true;
+    btn.innerText = "MENGIRIM...";
+
+    const payload = { 
+        nama: document.getElementById('namaSiswa').value, 
+        mapel: NAMA_MAPEL, 
+        pg: savedData.pg, 
+        files: savedData.files 
+    };
+
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        alert("SUKSES!");
+        localStorage.removeItem(SESSION_KEY);
+        location.reload();
+    })
+    .catch(() => {
+        alert("GAGAL!");
+        btn.disabled = false;
+        btn.innerText = "KUMPULKAN SEMUA JAWABAN";
+        isBypass = false;
+    })
+    .finally(() => {
+        isDialogOpen = false;
+    });
+}
 </script>
 </body>
 </html>

@@ -113,7 +113,7 @@
 <script>
     // --- 1. SETTING UTAMA ---
     const NAMA_MAPEL = "BAHASA INDONESIA"; 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-WIaAxNxXf0iXUmaMPP0V1CREbQepBRK8GZOsTNx8cFro1BvRtjHMO921W13HmFBW/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
     const KODE_GURU = "Guru7890", TOKEN_VALID = "RISTEK2026";
     const SESSION_KEY = "RNJ02." + NAMA_MAPEL.replace(/\s+/g, '_'); 
 
@@ -214,7 +214,7 @@
             uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;">
                         <b>${i + 1}.</b> ${soal}<br>
                         <textarea class="form-control mt-2" rows="6" 
-                            style="min-height:150px; font-size:16px; border: 1px solid #cbd5e1;" 
+    style="width:100%; min-height:180px; font-size:16px; border: 1px solid #cbd5e1; border-radius:10px; padding:12px;" 
                             placeholder="Ketik jawaban Anda di sini..." 
                             oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
                       </div>`;

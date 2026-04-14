@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK - PKBM Ristek Nusantara Jaya</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        .jawaban-uraian { width: 100%; height: 150px; padding: 15px; border: 1px solid var(--border); border-radius: 10px; margin-top: 10px; font-family: inherit; resize: none; background: #fff; font-size: 1rem; }
+        
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.7rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka tab lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;">
+        <p>Sistem Terkunci. Silakan hubungi pengawas dan masukkan <b>KODE GURU</b>:</p>
+        <input type="text" id="kodeGuruInput" placeholder="Kode" style="text-align:center; width:200px; color: black;">
+        <button class="btn btn-primary" onclick="unlockExam()">BUKA SISTEM</button>
+    </div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">Nama Siswa</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 3px; text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">BAHASA INGGRIS</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="Masukkan Nama Lengkap Anda">
+            <input type="text" id="tokenUjian" placeholder="Masukkan Token Ujian">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b style="color: rgb(19, 3, 67);">Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. SETTING UTAMA ---
+    const NAMA_MAPEL = "BAHASA INGGRIS"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const KODE_GURU = "Guru7890", TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "RNJ05." + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+    const SoalPG = [
+["What is the main idea of the following paragraph? \"Global warming leads to rising sea levels, unpredictable weather patterns, and loss of biodiversity.\"", 
+["The importance of biodiversity","The effects of global warming","The causes of unpredictable weather","The rise of sea levels"]],
+
+["Which sentence uses correct subject-verb agreement?", 
+["She go to school every day.","They goes to school every day.","She goes to school every day.","They going to school every day."]],
+
+["Choose the correct indirect speech for: \"I am reading a novel,\" said Siti.", 
+["Siti said she is reading a novel.","Siti said she was reading a novel.","Siti says she was reading a novel.","Siti said she will read a novel."]],
+
+["Identify the purpose of the following text: \"This device can help you save water by monitoring your usage and alerting you when you use too much.\"", 
+["To entertain","To inform","To persuade","To describe"]],
+
+["Which phrasal verb means \"to cancel\"?", 
+["Look after","Call off","Turn up","Bring out"]],
+
+["Which of the following is a cause-effect sentence?", 
+["She likes chocolate.","He fell because the floor was wet.","The dress is beautiful.","They are playing football."]],
+
+["What is the opposite meaning of \"scarce\"?", 
+["Abundant","Rare","Expensive","Abnormal"]],
+
+["Which sentence is correct to request permission?", 
+["Can I borrow your book?","I can borrow your book.","I borrow your book?","Will I borrow your book?"]],
+
+["The function of a recount text is to...", 
+["Explain how to do something","Tell past experiences","Persuade readers","Describe something"]],
+
+["Which connector is used to show contrast?", 
+["Because","So","However","Then"]],
+
+["Which statement is NOT true about renewable energy?", 
+["It comes from sources that are naturally replenished","Solar energy is a type of renewable energy","Renewable energy will eventually run out","Wind power is renewable"]],
+
+["Which of the following is the best summary of a text about the benefits of exercise?", 
+["Exercise takes time","Exercise can improve health and mood","Many people dislike exercise","Exercise is difficult"]],
+
+["Choose the correct order for a formal letter closing:", 
+["Yours sincerely, name","Name, yours sincerely","Yours sincerely","Sincerely yours, name"]],
+
+["In a debate, what is the main aim of the rebuttal?", 
+["To introduce the topic","To present supporting arguments","To counter the opponent's points","To close the debate"]],
+
+["Select the correct passive voice: \"People speak English in many countries.\"", 
+["English is spoken in many countries.","English spoken in many countries.","English was spoken in many countries.","English is speak in many countries."]],
+
+["Which sentence gives advice?", 
+["You should study harder.","You must study harder.","You can study harder.","You are studying harder."]],
+
+["Which one is a complex sentence?", 
+["She studies every night.","She studies every night because she wants to pass.","She wants to pass.","She studies."]],
+
+["What does \"break the ice\" mean?", 
+["Start a conversation in a social setting","Destroy something","Make ice cubes","Go outside"]],
+
+["Which is a fact?", 
+["I think dogs are better than cats.","The earth orbits the sun.","She looks happy.","It’s probably going to rain."]],
+
+["Which is the correct reported question for: \"Where do you live?\"", 
+["He asked me where I live.","He asked me where do I live.","He asked me where I lived.","He asked me where did I live."]],
+
+["The main function of an argumentative essay is to...", 
+["Narrate a story","Persuade the reader","Describe a process","Summarize data"]],
+
+["A text about \"how to make origami\" belongs to...", 
+["Descriptive text","Procedure text","Report text","Narrative text"]],
+
+["Which of the following can be considered plagiarism?", 
+["Paraphrasing without citation","Quoting with citation","Writing original ideas","Summarizing in your own words"]],
+
+["What is the conclusion of a text?", 
+["The opening sentence","The summary of main points","The supporting details","The background information"]],
+
+["The idiom \"once in a blue moon\" means...", 
+["Very often","Rarely","Always","Sometimes"]],
+
+["Which is the correct conditional sentence type 2?", 
+["If I will have money, I will buy a car.","If I had money, I would buy a car.","If I have money, I buy a car.","If I had money, I will buy a car."]],
+
+["The word \"innovative\" is closest in meaning to...", 
+["Traditional","Unusual","Creative","Old"]],
+
+["Which of the following is a purpose of a job interview?", 
+["To criticize the company","To obtain a job","To travel","To advertise products"]],
+
+["The main idea of a paragraph is usually found in the...", 
+["First sentence","Last sentence","Supporting details","Topic sentence"]],
+
+["The antonym of \"generous\" is...", 
+["Kind","Mean","Helpful","Polite"]],
+
+["The best way to avoid misunderstanding in communication is to...", 
+["Use ambiguous words","Speak unclearly","Clarify your message","Ignore feedback"]],
+
+["Which sentence is in the correct future tense?", 
+["I will go to the market tomorrow.","I goes to the market tomorrow.","I gone to the market tomorrow.","I going to the market tomorrow."]],
+
+["The word \"sustainable\" in the context of environment means...", 
+["Can be continued without damaging the environment","Expensive","Difficult to find","Easy to use"]],
+
+["What is paraphrasing?", 
+["Copying word for word","Writing using your own words","Deleting information","Summarizing only"]],
+
+["Which is the best thesis statement for an essay about the importance of reading?", 
+["Reading is fun.","Reading plays an essential role in personal and academic growth.","Many people read books.","I like reading."]],
+
+["Which of the following is NOT a component of a news report?", 
+["Headline","Byline","Plot twist","Lead"]],
+
+["Which modal verb expresses obligation?", 
+["Can","Must","Might","May"]],
+
+["Which is the correct use of \"despite\"?", 
+["Despite of the rain, we went out.","Despite the rain, we went out.","Despite the raining, we went out.","Despite to rain, we went out."]],
+
+["The suffix \"-less\" in \"hopeless\" means...", 
+["Having","Without","Full of","Likely"]],
+
+["The communicative purpose of a descriptive text is to...", 
+["Tell a sequence of events","Describe a particular person, place, or thing","Explain how something is done","Argue about an issue"]],
+
+["Which one is a formal expression of giving suggestion?", 
+["You should try this","Why don’t you try this?","I would recommend that you try this","Try this!"]],
+
+["Which of these is an example of a real-world application of English?", 
+["Reading a novel only","Writing a diary for yourself","Communicating with international colleagues","Watching cartoons"]],
+
+["Which of the following is the correct synonym for \"enhance\"?", 
+["Decrease","Improve","Ignore","Hide"]],
+
+["If someone says, “I can’t make it to the meeting,” what does it mean?", 
+["They will be late","They cannot attend","They are the organizer","They are on the way"]],
+
+["Which of the following strategies best helps comprehension of a difficult text?", 
+["Skipping unknown words","Guessing all meanings","Annotating and summarizing","Ignoring context clues"]]
+];
+
+const soalUraian = [
+"Explain how English language skills can help you in the global workplace!",
+"Read the following text, then analyze the moral message that can be taken: During a job interview, Rina was honest about her lack of experience but emphasized her willingness to learn. She was given a chance and proved herself as a valuable employee.",
+"Make a short job application letter in English for the position you desire.",
+"Provide an example of a real-life situation where you used English to solve an everyday problem. Explain the process and the outcome.",
+"Read the following text, then make a summary in English (maximum 3 sentences): Climate change affects various aspects of human life, including health, food security, and natural disasters. People must work together to reduce emissions and adapt to new challenges."
+];
+
+    // --- 3. LOGIKA SISTEM (VERSI BAHASA / UMUM - TEXTAREA) ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    
+    // Inisialisasi memori HP (Hanya PG dan Uraian Teks)
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    // FUNGSI SIMPAN (Langsung masuk memori agar ANTI-REFRESH)
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        // 1. Render Pilihan Ganda
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s.q || s[0]}<br><br>`;
+            let opsi = s.o || s[1];
+            opsi.forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        // 2. Render Uraian (TEXTAREA PROPORSIONAL)
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;">
+                        <b>${i + 1}.</b> ${soal}<br>
+                        <textarea class="form-control mt-2" rows="6" 
+    style="width:100%; min-height:180px; font-size:16px; border: 1px solid #cbd5e1; border-radius:10px; padding:12px;" 
+                            placeholder="Ketik jawaban Anda di sini..." 
+                            oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+    }
+
+    // --- FUNGSI KEAMANAN & TIMER ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopTimeInterval = setInterval(() => { gainNode.gain.setValueAtTime(gainNode.gain.value === 0 ? 0.5 : 0, audioCtx.currentTime); }, 150);
+    }
+    function stopAlarm() { if (oscillator) { try { oscillator.stop(); clearInterval(oscillator.stopTimeInterval); } catch(e){} } }
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 30000); }
+    function goToTab(n) {
+        if(n === 2 && document.getElementById('tokenUjian').value !== TOKEN_VALID) { alert("Token Salah!"); return; }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab' + n).classList.add('active');
+        window.scrollTo(0,0);
+    }
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); document.getElementById('videoPreview').srcObject = stream; } catch (e) {}
+        goToTab(3);
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        if(document.getElementById('displayMapelHeader')) document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+    function handleViolation() {
+        if(isBypass) return;
+        violationCount++; playAlarm();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) { document.getElementById('btnTutupMandiri').style.display = 'none'; document.getElementById('inputGuruArea').style.display = 'block'; }
+    }
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+    function unlockExam() { if(document.getElementById('kodeGuruInput').value === KODE_GURU) { violationCount = 0; document.getElementById('lifeCounter').innerText = `Pelanggaran: 0/3`; tutupOverlay(); document.getElementById('kodeGuruInput').value = ""; } else { alert("Kode Salah!"); } }
+    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        bypassSecurity();
+        // Cek PG Lengkap
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        
+        if(confirm("Yakin ingin mengirim semua jawaban?")) { 
+            const btn = document.getElementById('btnKirim');
+            btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value, 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; });
+        }
+    }
+
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

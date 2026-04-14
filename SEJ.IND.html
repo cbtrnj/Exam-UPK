@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK - PKBM Ristek Nusantara Jaya</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        .jawaban-uraian { width: 100%; height: 150px; padding: 15px; border: 1px solid var(--border); border-radius: 10px; margin-top: 10px; font-family: inherit; resize: none; background: #fff; font-size: 1rem; }
+        
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.7rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka tab lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;">
+        <p>Sistem Terkunci. Silakan hubungi pengawas dan masukkan <b>KODE GURU</b>:</p>
+        <input type="text" id="kodeGuruInput" placeholder="Kode" style="text-align:center; width:200px; color: black;">
+        <button class="btn btn-primary" onclick="unlockExam()">BUKA SISTEM</button>
+    </div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">Nama Siswa</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-bottom: 3px; text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">SEJARAH INDONESIA</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="Masukkan Nama Lengkap Anda">
+            <input type="text" id="tokenUjian" placeholder="Masukkan Token Ujian">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b style="color: rgb(19, 3, 67);">Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. SETTING UTAMA ---
+    const NAMA_MAPEL = "SEJARAH INDONESIA"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const KODE_GURU = "Guru7890", TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "RNJ03." + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+    const SoalPG = [
+["Adapun Sejarawan yang mengatakan bahwa sejarah tidak berkembang lurus ke arah depan, tetapi bergerak seperti garis yang melingkar adalah....",
+["Sartono Kartodirjo","Aristoteles","Herodotus","Muhammad Yamin","Ibnu Khaldun"]],
+
+["Unsur-unsur penting di dalam peristiwa sejarah terdiri dari manusia, ruang, dan waktu dalam ini sejarah menempatkan manusia sebagai....",
+["Penemu sejarah","Penggerak sejarah","Perusak sejarah","Pelaku sejarah","Penggagas sejarah"]],
+
+["Untuk mengungkap kehidupan manusia masa lampau, sejarah telah memformulasikan dalam lima pertanyaan salah satunya adalah when, yakni menunjuk pada....",
+["Peristiwa yang terjadi pada masa lampau","Tempat peristiwa terjadi","Proses terjadinya peristiwa sejarah","Waktu terjadinya peristiwa sejarah","Adanya hubungan sebab akibat dalam peristiwa sejarah"]],
+
+["Pertempuran Ambarawa yang terjadi pada tanggal 20 Oktober – 15 Desember 1945 diawali dengan kedatangan tentara sekutu yang diboncengi NICA dan mendarat di Semarang. Pertempuran tersebut dimulai pada tanggal 23 November 1945. Pertempuran berakhir pada tanggal 15 Desember 1945 dan Indonesia berhasil merebut Ambarawa. Urutan peristiwa sejarah tersebut menunjukkan konsep berpikir diakronik karena ....",
+["peristiwa Ambarawa diuraikan memanjang dalam waktu tetapi terbatas dalam ruang","peristiwa Ambarawa diuraikan dari aspek sosial dan politik masyarakat Indonesia","terjadi perubahahan yang dapat mendorong pasukan Indonesia memenangkan pertempuran tersebut","keberlanjutan dimana peristiwa tersebut memberikan semangat nasionalisme kepada para prajurit Indonesia","peristiwa tersebut menunjukkan adanya fakta sejarah yang dapat dijadikan bahan historiografi"]],
+
+["Ilmu sejarah merupakan suatu ilmu yang memiliki hubungan erat dengan kehidupan manusia. Setiap kehidupan manusia terdapat berbagai peristiwa. Oleh karena itu jika seorang sejarawan akan menulis kembali peristiwa tersebut terdapat beberpa konsep berfikir yang harus diterapkan. Salah satu konsep berfikir yang digunakan seorang sejarawan sinkronik, yaitu ....",
+["mengutamakan urutan terjadi peristiwa-peristiwa sejarah","mengkaji peristiwa sejarah yang terjadi pada masa tertentu","mempelajari peristiwa berdasar pembakan suatu masa","penulisan sejarah berdasrkan realitas suatu peristiwa","penulisan sejarah berdasrkan catatan-catan suatu perjalanan"]],
+
+["Masyarakat prasejarah sudah mengenal berbagai upacara. Salah satunya adalah upacara penguburan yang dibuktikan dengan adanya peninggalan berupa....",
+["Punden berundak","Medalion","Menhir","Dolmen","Sarkofagus"]],
+
+[`Perhatikan peninggalan prasejarah berikut!<br><img src="https://i.imgur.com/y7lmtsf.png" style='max-width:100%;margin:10px 0;border-radius:10px;'></br>
+Gambar tersebut menunjukkan corak kehidupan masyarakat praakasara yaitu masa ....`,
+[
+"mengumpulkan makanan yang berfungi untuk alas gerabah",
+"perundagian yang berfungsi sebagai senjata rakyat",
+"meramu dan berburu yang berfungsi untuk menusuk binatang",
+"bercocok tanam yang berfungsi untuk mencangkul tanah",
+"beternak yang berfungsi untuk memotong binatang"
+]],
+
+["Wujud pengaruh agama dan kebudayaan Hindu-Budha bagi masyarakat Indonesia antara lain berkembangnya teknologi pembuatan candi, dikenalnya sistem kasta pada masyarakat Hindu, mulai dikenalnya konsep raja dan kerajaan, mulai dikenalnya aksara dan kesusastraan, dan mulai dikenalnya kepercayaan atau agama Hindu-Budha. Maka terjadilah perubahan Zaman menjadi, menjadi Zaman…",
+["Sejarah","Prasejarah","Nirleka","Hindu-Budha","Islam"]],
+
+["Proses masuk dan berkembangnya agama Islam di Indonesia telah membawa perubahan besar di dalam struktur sosial masyarakat Indonesia yang sebelumnya berkarakteristik Hindu-Buddha. Kehadiran agama Islam dapat diterima baik oleh sebagian besar masyarakat Indonesia. Faktor penyebab Islam berkembang pesat di Indonesia adalah ....",
+["Hindu terdapat perbedaan status seseorang dalam masyarakat","pengaruh Hindu-Buddha hanya terdapat di kalangan istana","penyebaran agama Islam di masyarakt dilakukan secara damai","ajaran agama Islam mudah dipelajari oleh bangsa Indonesia","keimanan masyarakat Indonesia telah terbentuk sebelumnya"]],
+
+["Salah satu contoh tradisi hindu yang masih bertahan dalam kehidupan masyarakat bali di tengah masyarakat indonesia heterogen saat ini ...",
+["upacara pembakaran mayat","pembangunan kuil pemujaan","tradisi penyerahan sesajen ke pura","upacara membawa sesajen ke sawah","upacara penyembahan Dewa Brahma"]],
+["Majapahit merupakan kerajaan Nasional kedua, kerajaan ini bercorak agraris dan perdagangan. Kerajaan Majapahit tumbuh menjadi negara besar yang menguasai perdagangan dan pelayaran serta mencapai puncak kejayaan pada masa pemerintahan Hayam Wuruk (1350-1389 M). Faktor Majapahit menjadi kerajaan besar agraris dan perdagangan adalah ....",
+["tanahnya subur banyak menghasilkan bahan-bahan ekspor, seperti beras dan kacang-kacangan","pusat kerajaan di tepi sungai besar sehingga hubungan dengan dunia luar sangat mudah","Majapahit terletak di daerah pedalaman dengan hasil perekonomian berupa hasil pertanian","masyarakat Majapahit pada umumnya bermatapencaharian sebagai petani sehingga hasil pertanian melimpah","masyarakat Majapahit memiliki kepandaian mengolah lahan pertanian sehingga banyak negara luar belajar bertani"]],
+
+["Sikap kita terhadap peninggalan sejarah yang bercorak Islam ialah ikut serta melestarikannya. Salah satu bentuk peninggalan sejarah yaitu berupa masjid, makam, kaligrafi, dan karya sastra. Makam Fatimah binti Maimun ditemukan di daerah....",
+["Gresik","Klaten","Sulawesi selatan","Cirebon","Sumatera"]],
+
+["Berdasarkan tulisan-tilisan yang terdapat pada prasasti diketahui bahwa raja yang pernah memerintah   di Tarumanegara adalah Raja Purnawarwan. Raja Purnawan merupakan raja besar yang telah berhasil meningkatkan kehidupan rakyatnya. Disebutkan bahwa kehidupan ekonomi kerajaan Tarumanegara telah teratur. Bukti dari penjelasanya tersebut adalah ...",
+["kehidupan masyarakatnya mengalami perubahan kearah sejahtera  sehingga terwujudnya kemakmuran","banyak ditemukan peninggalan yang berupa candi-candi dan berbagai barang purbakala","wilayah kekuasaan kerajaan Tarumanegara meliputi seluruh Jawa bagian barat dan pantai utara Jawa","Raja Purnawarwan telah menggalang kerjasama dengan kerajaan-kerajaan lain di luar Nusantara","dibangunnya terusan sepanjang 6122 tombak sebagai sarana mencegah banjir dan pelayaran"]],
+
+["Bersamaan dengan masuk dan berkembangnya Islam di Indonesia maka terjadilah akulturasi kebudayaan antara budaya lokal dengan kebudayaan Islam. Hal ini menambah keanekaragaman budaya kita sehingga kita bangga dengan budaya bangsa. Salah satu contohnya adalah bangunan masjid Agung Demak sangat menonjol pada bagian....",
+["Pilar-pilarnya","Ukiran pada mimbarnya","Ukiran pada pintu-pintu masjid","Atap tumpang pada masjid","Adanya bedug masjid"]],
+
+["Bangsa Barat yang pertama kali berlabuh di Nusantara dan kemudian melakukan kegiatan monopoli perdagangan rempah-rempah di Maluku adalah….",
+["Belanda","Spanyol","Inggris","Portugis","Perancis"]],
+
+["Pada masa pendudukan Jepang di Indonesia, mereka melakukan berbagai tindakan yang mampu memberikan dampak bagi bangsa Indonesia. Di bidang ekonomi Jepang mengeksploitasi SDA/ SDM untuk kepentingan perang dan menerapkan sistem ekonomi perang dan sistem autarki (memenuhi kebutuhan daerah sendiri dan menunjang kegiatan perang). Kebijakan Jepang saat menduduki Indonesia tidak sepenuhnya merugikan, ada beberapa kebijakan yang memberi kesan positif bagi perkembangan bangsa Indonesia. Dampak positif pendudukan Jepang di bidang ekonomi bagi bangsa Indonesia saat ini adalah ....",
+["sumber daya alam Indonesia diekploitasi secara besar-besaran","Indonesia menjadi negara pengolah sumber bahan baku industry","sumber daya alam Indonesia dikelola oleh perusahaan asing","diperkenalkan line system untuk peningkatan produksi pangan","masuknya  investor asing ke Indonesia untuk memperbaiki ekonomi"]],
+
+["Kebijakan Belanda yang melahirkan golongan cerdik pandai yang menjadi penggerak nasionalisme di Indonesia adalah….",
+["Irigasi","Transmigrasi","Kuli Ordinantie","Industrilisasi","Edukasi"]],
+
+["Penjajahan bangsa Barat di Indonesia pada abad ke-19 telah memeras, menyiksa dan merebut hak-hak rakyat Nusantara. Perjuangan bangsa Indonesia terhadap penjajah hampir dilakukan diseluruh wilayah, terutama di daerah yang menjadi pusat kekuasaan penjajah. Ciri perlawanan bangsa Indonesia pada abad ke-19 adalah ....",
+["bersifat lokal/kedaerahan dilakukan secara sporadic","perjuangan menggunakan strategi perang gerilya","cara perjuangan menggunakan strategi diplomasi","melakukan kerjasama dengan penjajah Barat","menggunakan cara memecah belah kekuatan Barat"]],
+
+["Thomas S. Rafles merupakan orang Inggris pertama yang dihadirkan oleh pemerintah Inggris untuk memerintah di Indonesia.Dalam perjalanan pemerintahan yang dipimpinnya, banyak reformasi di bidang pertanahan, salah satunya tentang sistem sewa tanah. Pemerintah Inggris dikenal dengan kebijakan sewa tanah ketika berkuasa di Indonesia. Kebijakan tersebut dinamakan....",
+["Contingenten","Landrent","Mendrenk","Octroii","Cultuur Stelsel"]],
+
+["Pada saat Soekarno ditangkap dan dipenjarakan di Sukamiskin (Bandung) sebagai akibat gerakan organisasi PNI yang radikal dan non-kooperatif dengan pemerintah kolonial, di depan pengadilan ia melakukan pidato pembelaan dirinya yang berjudul …",
+["Enough is Enough","Kami bukan bangsa inlander","Indonesia menggugat","Menuju Indonesia merdeka","Saatnya Indonesia berbicara"]],
+
+["Perang yang menguras keuangan yang sangat besar dan juga perang terbesar bagi Belanda, dikenal dengan perang Jawa terjadi pada tahun 1825 – 1830. Perang ini dipimpin oleh….",
+["Pangeran Diponegoro","Pattimura","Tuanku Imam Bonjol","Pangeran Antasari","Sultan Trenggono"]],
+
+["Karena Belanda merasa kesulitan menundukkan Aceh dengan kekuatan senjata, sehingga menempuh cara lain, yaitu berupaya mengetahui rahasia kehidupan sosial budaya, dengan mengirim salah seorang ahli tentang Islam di Aceh yang bernama....",
+["Douwes Dekker","Van Houvel","Snouck Hurgronje","JHR. Kohler","Van den Bosch"]],
+
+["Proklamasi kemerdekaan memberikan dorongan semangat perjuangan bagi rakyat Indonesia. Pernyataan yang memberi tahu kepada bangsa Indonesia sendiri dan kepada dunia luar bahwa saat ini bangsa Indonesia telah lepas dari penguasaan negara lain. Makna proklamasi bagi kehidupan sosial bangsa Indonesia adalah ....",
+["memberikan rasa bebas dan merdeka dari belenggu penjajahan dan propaganda bangsa lain","adanya kebebasan dalam melakukan perdagangan yang sebelumnya mengalami monopoli","kemerdekaan yang diperoleh bangsa Indonesia merupakan berkat rahmat Tuhan Yang Maha Esa","adanya peradaban baru dengan kebiasaan baru yang terbangun menjadi tradisi baru masyarakat","adanya pengakuan kedaulatan dari negara lain di dunia sebagai negara merdeka yang terlepas dari penjajahan"]],
+
+["Dinamika politik dan pemerintahan Indonesia pada awal kemerdekaan pada masaDemokrasi liberal, para elite politik dan pemimpin bangsa masih mencoba menemukan konsep pemerintahan yang sesuai dengan kondisi bangsa. Kehidupan politik pada masa demokrasi liberal yaitu ....",
+["partai politik berkembang secara kuantitas dan terciptanya kolaborasi antarpartai","kegiatan pemerintahan dijalankan oleh presiden dan mempertanggung jawabkannya kepada parlemen","sering terjadi pergantian kabinet akibat adanya mosi tidak percaya parlemen terhadap kabinet yang berkuasa tersebut","perdana menteri bertanggung jawab kepada presiden dan memberikan kepercayaan kepada parlemen","presiden bertugas sebagai kepala pemerintahan dan kepala"]],
+
+["Tujuan Pemerintah pendudukan Jepang membentuk organisasi untuk orang Indonesia dengan nama Gerakan Tiga A adalah….",
+["Mempermudah terjalinnya hubungan komunikasi antara Pemerintah Kolonial Belanda dengan Pemerintah pendudukan Jepang","Untuk mengganti organisasi-organisasi yang dibubarkan oleh Pemerintah pendudukan Jepang","Menarik simpatik rakyat Indonesia untuk membantu Jepang dalam menghadapi sekutu","Sebagai realisasi dari janji-janji Pemerintah pendudukan Jepang kepada rakyat Indonesia","Untuk menindas keseluruh gerakan yang dilakukan oleh bangsa Indonesia"]],
+
+["Sultan Hamengkubwono IX (12 April 1912-2 Oktober 1988) adalah Sultan Yogyakarta ke-9 dan Gubernur pertama Daerah Istimewa Yogyakarta serta pernah menjabat wakil presiden Republik Indonesia yang kedua. Beliau memiliki peran yang sangat besar dalam mempertahankan kemerdekaan Indonesia. Peran beliau dalam mempertahankan kemerdekaan Indonesia adalah  ....",
+["menyediakan Keraton Yogyakarta sebagai markas pejuang dan TNI ketika Serangan Umum 1 Maret 1949","menjadi tokoh utama memimpin perang dalam Serangan Umum 1 Maret 1949 melawan tentara Sekutu","menjadikan keraton Yogyakarta sebagai pusat pemerintahan Sementara Republik Indonesia","menjadi tokoh utama sebagai penggerak Serangan Umum 1 Maret 1949 melawan tentara Sekutu ","sebagai pemimpin negara menggantikan Soekarno dalam Serangan Umum 1 Maret 1949"]],
+
+["Pada bulan April 1943 dikeluarkannya pengumuman oleh Pemerintah Jepang yang memberikan kesempatan kepada para pemuda untuk menjadi Heiho. Heiho adalah….",
+["Prajurit Belanda yang tunduk terhadap kekuasaan Jepang","Barisan pemuda yang di didik dengan latihan Semi Militer","Prajurit cadangan yang dibentuk oleh Jepang","Tentara Indonesia yang di persiapakan untuk membantuJepang","Barisan Pemuda yang diberikan senjata perang"]],
+
+["Perkembangan ekonomi pada masa Demokrasi Terpimpin, Presiden Soekarno menerapkan sistem ekonomi terpimpin. Dalam hal ini presiden langsung terjun dan mengatur perekonomian. Dalam rangka meningkatkan aktivitas perekonomian Presiden Soekarno menempuh beberpa langkah. Salah satu langkah tersebut adalah melaksanakan pembangunan nasional. Dalam pelaksaanaan pembangunan nasioanl diperlukan modal dan tenaga ahli. Untuk menyelesaikan msalah tersebut Presiden menyampaikan Deklarasi ekonomi  (Dekon).Tujuan dari Dekon adalah menciptakan ekonomi yang bersifat demokrasi bebas dari imperialisme. Pada pelaksanaannya Dekon tidak mengatasi kemrosotan ekonomi bahkan malah memberatkan rakyat. Program ini dianggap gagal, karena ....",
+["kehidupan masyarakat pada umumnya masih di bawah taraf hidup ","pendapatan perkapita masyarakat masih belum sesuai standar","semua program pemerintah pada saat itu untuk kepentingan politik","masih ada campr tangan pihak asing yang ingin mengusai perekonomian","tidak ada ukuran yang obyektif untuk menilai suatu usaha dan hasil usaha"]],
+
+["Indonesia terdiri dari beberapa agama dan kepercayaan, tetapi persatuan dan kesatuan bangsa harus tetap dijaga disetujuinya penghilangan kalimat “dengan menjalankan syariat bagi pemeluknya” dalam piagam Jakarta menunjukan ….",
+["Mayoritas penduduk Indonesia memeluk agama Islam","Syariat Islam menjadi penghalang persatuan bangsa Indonesia","Kurang dihayatinya makna syariat Islam oleh para anggota PPKI","Kegagalan tokoh muslium di PPKI dalam mempertahankan kalimat tersebut","Adanya sikap mementingkan kepentingan bangsa dan Negara dari tokoh umat Islam yang ada dalam     PPKI"]],
+
+["Proklamasi kemerdekaan Indonesia merupakan peristiwa sejarah yang sangat penting bagi bangsa Indonesia. Secara kronologis (berurut) peristiwa-peristiwa penting sekitar proklamasi kemerdekaan Indonesia adalah….",
+["Terbentuknya BPUPKI Pembentukan PPKI perunusan teks proklamasi peristiwa Rengas Dengklok","Kekelahan Jepang kemenangan sekutu lahirnya gerakan pemuda revolusioner","Peristiwa Rengas Dengklok pengangkatan ketua PPKI pembentukan KNIP","Pembentukan BPUPKI pembentuken PPKI Pembentukan PETA","Pergantian BPUPKI menjadi PPKI pemanggilan Ir. Soekarno - Hatta ke Saigon peristiwa Rengas Dengklok perumusan teks proklamasi"]],
+
+["Peristiwa Andi Aziz berawal dari tuntutan Kapten Andi Aziz dan pasukannya yang berasal dari KNIL (pasukan Belanda di Indonesia) terhadap pemerintah Indonesia agar hanya mereka yang dijadikan pasukan APRIS di Negara Indonesia Timur (NIT). Ketika akhirnya tentara Indonesia benar-benar didatangkan ke Sulawesi Selatan dengan tujuan memelihara keamanan, hal ini menyulut ketidakpuasan di kalangan pasukan Andi Aziz. Upaya pemerintah dalam menghadapi pemberontakan Andi Aziz yaitu ....",
+["PM. Hatta memerintahkan menangkap Kapten Westerling dan Sultan Hamid II namun Westerling berhasil lari",
+"mengirim pasukan untuk melakukan operasi militer di Sulawesi Selatan yang dipimpin oleh Kolonel Kawilarang",
+"Leimena mengajak Andi Aziz dan pasukannya untuk mengajak perundingan untuk sebuah kesepakatan",
+"melakukan operasi 17 Agustus untuk mengamankan sumber-sumber minyak yang ada di sektor Sulawesi",
+"mengirim pasukan dalam operasi Merdeka untuk melakukan perundingan antara Andi Aziz dan pemerintah"]
+],
+
+["Pada masa pemerintahan RIS muncul pembrontakan yang mengguncang stabilitas politik dalam negeri antara lain pembrontakan APRA di Jawa Barat tahun 1950. Tujuan APRA adalah mempertahankan bentuk negara federal Pasundan di Indonesia dan mempertahankan adanya tentara sendiri pada setiap negara bagian RIS. Usaha yang dilakukan pemerintah untuk menyelesaikan pembrontakan APRA tahun 1950 adalah ....",
+["menangkap semua tentara Belanda yang terlibat dan diasingkan ke luar",
+"melakukan tekanan terhadap pimpinan tentara Belanda dan operasi militer",
+"melucuti senjata tentara Belanda yang dipakai pembrontak dan dimusnahkan",
+"menarik semua tentara yang bertugas di setiap negara bagian RIS ke pusat",
+"memusnahkan tempat-tempat persembunyian yang digunakan pembrontak"]
+],
+
+["Kemerdekaan yang dicapai bangsa Indonesia adalah hasil perjuangan gigih bangsa Indonesia sendiri dan bukan pemberian Jepang. Pernyataan di bawah ini yang menunjukan bangsa Indonesia merdeka dengan usaha sendiri adalah….",
+["Indonesia memproklamasikan kemerdekaan nya pada saat Jepang telah menyerah kepada sekutu dan terjadi kekosongan kekuasaan",
+"Pemerintah Jepang membentuk BPUPKI yang beranggotakan orang-orang Indonesia",
+"Setelah BPUPKI dibubarkan, pemerintah Jepang membentuk PPKI",
+"Adanya penambahan anggota PPKI oleh bangsa Indonesia",
+"Teks proklamasi yang menyatakan bahwa bangsa Indonesia telah merdeka dengan usaha sendir"]
+],
+
+["Para tokoh bangsa berjuang tanpa pamrih dalam mewujudkan kemerdekaan Indonesia. Berikut adalah tiga orang tokoh yang merumuskan teks/naskah Proklamasi Kemerdekaan Indonesia ....",
+["Drs. Moh. Hatta, Mr. Ahmad Soebardjo, dan Ir. Soekarno",
+"Otto Iskandardinata, Latief Herdaningrat, dan Sukarni",
+"Ir. Soekarno, Sayuti Malik, dan Laksamana Maeda",
+"Laksamana Maeda, Ir. Soekarno, dan Sukarni",
+"Sayuti Malik, Soekarno, B.M. Diah"]
+],
+
+["Dalam Demokrasi Liberal, negara menghormati dan melindungi hak-hak warganya. Pada masa Demokrasi Liberal (1950-1959) terjadi tujuh kali pergantian kabinet dalam waktu yang singkat. Hal ini disebabkan ....",
+["kelompok oposisi lebih sering berusaha menjatuhkan kabinet yang sedang berkuasa",
+"anggota kabinet tidak memiliki keahlian",
+"partai-partai politik saling berebut kekuasaan",
+"kabinet kurang mendapatkan dukungan dari presiden",
+"tidak adanya kerja sama harmonis antara"]
+],
+
+["Kebijakan memotong uang dengan memberlakukan setengahnya untuk mata uang yang bernilai Rp. 2,50 ke atas dikenal dengan istilah…",
+["Gunting Syafrudin",
+"Gunting Ali-Baba",
+"Gunting Natsir",
+"Pancakarya",
+"Trilogi ekonomi"]
+],
+
+["Setelah B.J. Habibie dilantik menjadi Presiden RI dan sesuai dengan janji yang diucapkannya, maka pada tanggal 22 Mei 1998 Presiden III ini membentuk kabinet baru yang diberi nama ...",
+["Kabinet Reformasi Pembangunan",
+"Kabinet Reformasi Gotong Royong",
+"Kabinet Reformasi Persatuan",
+"Kabinet Reformasi Bersatu",
+"Kabinet Reformasi Pembaharuan"]
+],
+
+["Menyelesaikan konflik-konflik di berbagai belahan dunia. Pasukan Garuda merupakan bagian dari Tentara Nasional Indonesia (TNI) yang tergabung dalam bendera PBB yang bertugas sebagai “Peace Keeping Force”. Berdasarkan ilustrasi tersebut peran yang telah dilakukan Indonesia dalam mewujudkan perdamaian dunia yaitu ....",
+["Presiden Soekarno mengirimkan kontingen Garuda III untuk membantu PBB dalam menyelesaikan konflik di Mesir",
+"Brigjen TNI S. Sumantri memimpin kontingen Garuda XI untuk menyelesaikan konflik di Vietnam",
+"Brigjen TNI Harsoyo memimpin kontingen Garuda VIII untuk menyelesaikan konflik di kawasan Teluk",
+"Wiyogo Atmodarminto memimpin kontingen Garuda IV untuk menyelesaikan konflik di Kongo",
+"mengirimkan kontingen Garuda II yang dipimpin oleh Letkol Inf. Solichin untuk menyelesaikan konflik di Kongo"]
+],
+
+["Demontrasi pada tahun 1997 – 1998 dipicu oleh anggapan bahwa pemerintah gagal menciptakan pemerintahan yang bersih dan berwibawa. Hal tersebut dilihat dari…",
+["Krisis moneter yang tidak segera terselesaikan",
+"Indonesia terjerat hutang yang banyak",
+"Banyak perusahaan asing yang memonopoli harga",
+"Praktik KKN yang banyak dilakukan pejabat negara",
+"Norma masyarakat semakin rendah"]
+],
+
+["ASEAN adalah organisasi regional bangsa-bangsa Asia Tenggara yang bergerak di bidang ekonomi, geopolitik dan budaya. Dalam kegiatan ASEAN tersebut Indonesia mampu memainkan peran sebagai pemimpin Asia Tenggara, terutama pada masa pemerintahan Presiden Soeharto. Indonesia memiliki peranan yang cukup penting di dalam perkembangan ASEAN, di mana Indonesia merupakan salah satu penentu arah perkembangan organisasi tersebut. Contoh peran Indonesia dalam ASEAN menjadi penengah saat terjadinya konflik antara Kamboja dan Vietnam tahun 1987. Konflik ini dapat diselesaikan melalui Konferensi Paris tahun 1991 di mana kedua negara menyepakati adanya perjanjian damai. Dari deskripsi tersebut dapat disimpulkan bahwa Indonesia ....",
+["dapat menyelesaikan konflik yang terjadi di berbagai dunia",
+"mampu menciptakan perdamaian di kawasan Asia Tenggara",
+"dapat menyelesaikan permasalahan ASEAN tanpa bantuan",
+"bekerjasama dengan negara lain dalam mewujudkan kesejahteran",
+"mampu mewujudkan suatu stabilatas nasional  melalui keadilan"]
+]
+];
+
+const soalUraian = [
+"Catatan kejadian-kejadian secara singkat dari waktu ke waktu secara berurutan di sebut kronik. Periodisasi merupakan pembabakan waktu dalam sejarah berdasarkan dimensi ruang, waktu dan tema tertentu. Sedangkan urutan peristiwa yang di mulai dari peristiwa yang paling awal terjadi sampai yang terakhir terjadidi sebut Kronologi. Tuliskan contok kronologi dari Pristiwa Proklamasi!",
+"Manusia purba hidup secara berpindah-pindah dari satu tempat ke tempat yang lain, peralatan yang dihasilkan masih sangat sederhana. Bila bahan makanan di suatu daerah mulai habis, mereka akan berpindah ke tempat yang baru yang masih banyak memiliki kandungan bahan makan. Apakah penyebab Manusia purba tersebut berpindah-pindah?",
+"Cara penyebaran Agama dan kebudyaan Islam di Indonesia berlangsung melalui berbagai saluran, sebutkan saluran-saluran penyiaran agama Islam di Indonesia",
+"Dalam upaya mempertahankan kemerdekaan Indonesia melalui jalan diplomasi diadakan Perjanjian Linggarjati yang berlangsung pada tanggal 15 November 1946 di Linggarjati, Cirebon. Dalam perundingan tersebut, Indonesia diwakili oleh Sutan Syahrir, sedangkan Belanda diwakili oleh Prof. Schermerhom, hadir pula Lord Killearn sebagai penengah dari Inggris. Jelaskan mengapa Perjanjian Linggajati Indonesia mengalami kerugian dan berikan contoh kerugiannya",
+"Pada tanggal 25 Oktober 1999 Presiden Abdurrahman wahid & Wapres Megawati Soekarno Putri setelah berhasil terpilih sebagai orang nomer 1 di Indonesia selanjutnya berhasil membentuk kabinet. Sebutkan kabinet yang dibentuk oleh Abdurrahman wahid & Wapres Megawati Soekarno Putri!"
+];
+
+    // --- 3. LOGIKA SISTEM (VERSI BAHASA / UMUM - TEXTAREA) ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    
+    // Inisialisasi memori HP (Hanya PG dan Uraian Teks)
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    // FUNGSI SIMPAN (Langsung masuk memori agar ANTI-REFRESH)
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        // 1. Render Pilihan Ganda
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s.q || s[0]}<br><br>`;
+            let opsi = s.o || s[1];
+            opsi.forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        // 2. Render Uraian (TEXTAREA PROPORSIONAL)
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid #2563eb;">
+                        <b>${i + 1}.</b> ${soal}<br>
+                        <textarea class="form-control mt-2" rows="6" 
+    style="width:100%; min-height:180px; font-size:16px; border: 1px solid #cbd5e1; border-radius:10px; padding:12px;" 
+                            placeholder="Ketik jawaban Anda di sini..." 
+                            oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+    }
+
+    // --- FUNGSI KEAMANAN & TIMER ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopTimeInterval = setInterval(() => { gainNode.gain.setValueAtTime(gainNode.gain.value === 0 ? 0.5 : 0, audioCtx.currentTime); }, 150);
+    }
+    function stopAlarm() { if (oscillator) { try { oscillator.stop(); clearInterval(oscillator.stopTimeInterval); } catch(e){} } }
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 30000); }
+    function goToTab(n) {
+        if(n === 2 && document.getElementById('tokenUjian').value !== TOKEN_VALID) { alert("Token Salah!"); return; }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab' + n).classList.add('active');
+        window.scrollTo(0,0);
+    }
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); document.getElementById('videoPreview').srcObject = stream; } catch (e) {}
+        goToTab(3);
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        if(document.getElementById('displayMapelHeader')) document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+    function handleViolation() {
+        if(isBypass) return;
+        violationCount++; playAlarm();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) { document.getElementById('btnTutupMandiri').style.display = 'none'; document.getElementById('inputGuruArea').style.display = 'block'; }
+    }
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+    function unlockExam() { if(document.getElementById('kodeGuruInput').value === KODE_GURU) { violationCount = 0; document.getElementById('lifeCounter').innerText = `Pelanggaran: 0/3`; tutupOverlay(); document.getElementById('kodeGuruInput').value = ""; } else { alert("Kode Salah!"); } }
+    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        bypassSecurity();
+        // Cek PG Lengkap
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        
+        if(confirm("Yakin ingin mengirim semua jawaban?")) { 
+            const btn = document.getElementById('btnKirim');
+            btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value, 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; });
+        }
+    }
+
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

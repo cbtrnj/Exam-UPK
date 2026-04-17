@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Hari Ujian</title>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .container {
+      background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 50%, #faf8ff 100%);
+      border-radius: 25px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 40px rgba(126, 34, 206, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      padding: 40px 30px;
+      text-align: center;
+      border: 2px solid rgba(126, 34, 206, 0.2);
+      max-height: 95vh;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 3px solid rgba(126, 34, 206, 0.2);
+    }
+
+    .header-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 40px rgba(126, 34, 206, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.1);
+      animation: pulse-icon 2s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-icon::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      animation: shine 3s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+      0%, 100% {
+        transform: translate(0, 0);
+      }
+      50% {
+        transform: translate(20px, 20px);
+      }
+    }
+
+    .header-icon svg {
+      width: 60px;
+      height: 60px;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 25px rgba(126, 34, 206, 0.3);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 12px 35px rgba(126, 34, 206, 0.5);
+      }
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 1.05rem;
+      color: #6b7280;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #ede9fe 0%, #faf5ff 100%);
+      border-left: 5px solid #7e22ce;
+      border-radius: 15px;
+      padding: 20px 24px;
+      margin-bottom: 40px;
+      text-align: left;
+      font-size: 0.98rem;
+      color: #5b4f7c;
+      box-shadow: 0 4px 20px rgba(126, 34, 206, 0.12);
+      font-weight: 500;
+      line-height: 1.6;
+      backdrop-filter: blur(10px);
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    /* ========== HARI AKTIF ========== */
+    .day-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 15px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 8px 25px rgba(30, 60, 114, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .day-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .day-btn:hover::before {
+      left: 100%;
+    }
+
+    .day-btn:hover {
+      background: linear-gradient(135deg, #2a5298 0%, #3d6db9 100%);
+      box-shadow: 0 12px 35px rgba(30, 60, 114, 0.4);
+      transform: translateY(-4px);
+    }
+
+    .day-btn:active {
+      transform: scale(0.98);
+    }
+
+    .day-btn i {
+      width: 26px;
+      height: 26px;
+      transition: transform 0.3s ease;
+    }
+
+    .day-btn:hover i {
+      transform: scale(1.1) rotate(10deg);
+    }
+
+    /* ========== HARI TERKUNCI ========== */
+    .day-btn.locked {
+      background: linear-gradient(135deg, #d4d4d8 0%, #c4c4ca 100%);
+      color: #888;
+      cursor: not-allowed;
+      opacity: 0.6;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .day-btn.locked:hover {
+      background: linear-gradient(135deg, #d4d4d8 0%, #c4c4ca 100%);
+      transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .day-btn.locked::before {
+      display: none;
+    }
+
+    .day-name {
+      text-align: left;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .day-status {
+      font-size: 0.88rem;
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      color: #1e3c72;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 2px solid #d1d5db;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .back-btn:hover {
+      background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+      transform: translateX(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      border-color: #1e3c72;
+    }
+
+    .back-btn:active {
+      transform: scale(0.96);
+    }
+
+    .back-btn i {
+      width: 22px;
+      height: 22px;
+      transition: transform 0.3s ease;
+    }
+
+    .back-btn:hover i {
+      transform: translateX(-3px);
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      .header h1 {
+        font-size: 1.7rem;
+      }
+
+      .day-btn {
+        padding: 18px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        padding: 50px 35px;
+      }
+
+      .header h1 {
+        font-size: 2.3rem;
+      }
+
+      .days-grid {
+        gap: 18px;
+        margin-bottom: 35px;
+      }
+
+      .day-btn {
+        padding: 22px;
+        font-size: 1.15rem;
+      }
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="wrapper">
+   <div class="container">
+    <!-- Header -->
+    <div class="header">
+     <div class="header-icon">
+      <svg viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+       <!-- Karakter wajah siswa yang fokus & siap ujian --> <!-- Kepala bulat --> <circle cx="50" cy="40" r="28" fill="#FFF8DC" stroke="white" stroke-width="2" /> <!-- Rambut --> <path d="M 22 40 Q 22 12 50 12 Q 78 12 78 40" fill="#3D3D3D" /> <!-- Mata kanan (fokus) --> <circle cx="42" cy="36" r="3.5" fill="#1e3c72" /> <circle cx="42" cy="35" r="1.5" fill="white" /> <!-- Mata kiri (fokus) --> <circle cx="58" cy="36" r="3.5" fill="#1e3c72" /> <circle cx="58" cy="35" r="1.5" fill="white" /> <!-- Hidung --> <line x1="50" y1="40" x2="50" y2="48" stroke="#3D3D3D" stroke-width="1.5" stroke-linecap="round" /> <!-- Mulut (senyum percaya diri) --> <path d="M 44 52 Q 50 55 56 52" stroke="#1e3c72" stroke-width="2" fill="none" stroke-linecap="round" /> <!-- Badan/Jas --> <rect x="28" y="70" width="44" height="20" rx="4" fill="#7e22ce" stroke="white" stroke-width="1.5" /> <!-- Dasi --> <polygon points="50,70 48,66 52,66" fill="#FF6B6B" /> <path d="M 50 66 L 50 72" stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" /> <!-- Tangan kanan (pegang pensil) --> <g>
+        <line x1="72" y1="75" x2="85" y2="60" stroke="#FFF8DC" stroke-width="5" stroke-linecap="round" /> <!-- Pensil -->
+        <rect x="84" y="48" width="4" height="18" fill="#FFD700" transform="rotate(45 86 57)" />
+        <polygon points="86,46 88,48 84,48" fill="#FF6347" />
+       </g> <!-- Tangan kiri --> <line x1="28" y1="75" x2="15" y2="75" stroke="#FFF8DC" stroke-width="5" stroke-linecap="round" /> <!-- Badge "UJIAN" di atas --> <circle cx="50" cy="8" r="7" fill="#FF6B6B" /> <text x="50" y="11" text-anchor="middle" font-size="8" font-weight="bold" fill="white">
+        ✓
+       </text>
+      </svg>
+     </div>
+     <h1>📅 Pilih Hari Ujian</h1>
+     <p>Silahkan pilih hari ujian Anda untuk melanjutkan</p>
+    </div><!-- Info Box -->
+    <div class="info-box">
+     <strong>ℹ️ Informasi:</strong><br>
+   Silahkan klik hari sesuai jadwal ujian. Hari lain akan dibuka sesuai jadwal ujian.
+    </div><!-- Days Grid -->
+    <div class="days-grid">
+     <!-- Senin (Aktif) --> <a href="senin.html" class="day-btn active"> <span class="day-name">📍 Senin</span> <span class="day-status"> <i data-lucide="check-circle"></i> Aktif </span> </a> 
+     <!-- Selasa (Terkunci) --> <a href="hari-selasa.html" class="day-btn locked"> <span class="day-name">📍 Selasa</span> <span class="day-status"> <i data-lucide="check-circle"></i> Terkunci </span> </a> 
+     <!-- Rabu (Terkunci) --> <a href="hari-rabu.html" class="day-btn locked"> <span class="day-name">📍 Rabu</span> <span class="day-status"> <i data-lucide="check-circle"></i> Terkunci </span> </a> 
+     <!-- Kamis (Terkunci) --> <a href="hari-kamis.html" class="day-btn locked"> <span class="day-name">📍 Kamis</span> <span class="day-status"> <i data-lucide="check-circle"></i> Terkunci </span> </a> 
+   <!-- Kamis (Terkunci) --> <a href="hari-jum'at.html" class="day-btn locked"> <span class="day-name">📍 Jum'at</span> <span class="day-status"> <i data-lucide="lock"></i> Terkunci </span> </a> 
+  
+    </div>
+  </div>
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e64d5611704145b',t:'MTc3NTE4NTMzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

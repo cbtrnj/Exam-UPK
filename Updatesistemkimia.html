@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK - PKBM Ristek Nusantara Jaya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root { --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2; --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall); margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none; }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header { display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; } .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;">
+        <p>Sistem Terkunci. Masukkan <b>KODE GURU</b>:</p>
+        <input type="text" id="kodeGuruInput" placeholder="Kode" style="text-align:center; width:200px;">
+        <button class="btn btn-primary" onclick="unlockExam()">BUKA</button>
+    </div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">Siswa</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div id="lifeCounter" style="color:red; font-size:0.75rem; font-weight:bold;">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span id="labelMapel" class="exam-badge">KIMIA</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b style="color: rgb(19, 3, 67);">Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div class="card">
+            <h3>Soal Uraian</h3>
+            <div id="renderUraianTeks"></div>
+        </div>
+        <div class="card" style="text-align: center; border: 2px dashed var(--primary);">
+            <h3>Upload Jawaban Uraian</h3>
+            <p class="small">Wajib upload minimal 1 foto (lembar jawaban)</p>
+            <label class="btn btn-primary" style="background:#f59e0b; display:inline-block; width:auto; padding:10px 20px;" onclick="bypassSecurity()">
+                📸 Ambil Foto Jawaban
+                <input type="file" id="inputFile" accept="image/*" capture="camera" hidden onchange="saveFileSingle(this)">
+            </label>
+            <div id="status_upload" style="margin-top:10px; font-weight:bold; color:#10b981;">Belum ada foto yang diunggah</div>
+        </div>
+        <button id="btnKirim" class="btn btn-success" onclick="finishExam()" style="margin-bottom: 80px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+   // Link pengumpulan jawaban (yang sudah berjalan lama)
+const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+
+// Link server keamanan baru (yang Anda kirim barusan)
+const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+
+const WA_ADMIN = "6285888157682"; // GANTI dengan nomor WhatsApp Admin RNJ (Gunakan 62)
+const TOKEN_VALID = "RISTEK2026"; 
+const NAMA_MAPEL = "KIMIA";
+
+const SESSION_KEY = "UPK_RISTEK_" + NAMA_MAPEL.replace(/\s+/g, '_');
+
+const SoalPG = [
+[
+"Ion X²⁺ memiliki konfigurasi elektron 1s² 2s² 2p⁶ 3s² 3p⁶\n Nilai keempat bilangan kuantum elektron terakhir dari atom X adalah ... .",
+[
+"A. n = 3, l = 1, m = -1, s = -1/2",
+"B. n = 3, l = 1, m = 0, s = -1/2",
+"C. n = 4, l = 0, m = 0, s = -1/2",
+"D. n = 4, l = 0, m = 0, s = +1/2",
+"E. n = 3, l = 2, m = -1, s = -1/2"
+]
+],
+[
+"Jika Diketahui Unsur X²⁺ dengan konfigurasi [Ne] 3s² 3p⁶ unsur tersebut terletak pada... .",
+[
+"A. Golongan VIII A Periode 3",
+"B. Golongan VIII A Periode 4",
+"C. Golongan VI A Periode 3",
+"D. Golongan II A Periode 3",
+"E. Golongan II A Periode 4"
+]
+],
+[
+"Gas asetilen merupakan bahan baku penting dalam industri, yang dibuat dari batubara, air dan kapur, dengan reaksi sebagai berikut:\n1. CaCO₃ → CaO + CO₂\n2. CaO + 3C → CaC₂ + CO\n3. CaC₂ + 3H₂O → C₂H₂ + Ca(OH)₂\nNama senyawa yang bereaksi dengan air pada persamaan reaksi pembentukan gas asetilen adalah....",
+[
+"A. Kalsium karbonat",
+"B. Kalsium oksida",
+"C. Kalsium karbida",
+"D. Kalsium hidroksida",
+"E. Karbon monoksida"
+]
+],
+[
+"Berikut ini sistematika dalam penulisan laporan ilmiah...\n1. Teori 3. Kesimpulan 5. Daftar Pustaka\n2. Pembahasan 4. Pendahuluan 6. Percobaan\nUrutan sistematika penelitian laporan ilmiah adalah...",
+[
+"A. 1, 2, 3, 4, 5, 6",
+"B. 1, 4, 2, 3, 6, 5",
+"C. 4, 6, 1, 2, 5, 3",
+"D. 4, 1, 6, 2, 3, 5",
+"E. 4, 1, 6, 2, 5, 3"
+]
+],
+[
+"Berapa gram FeS₂ (Mr = 120) yang kemurniannya 90% harus dibakar untuk memperoleh 2,24 liter SO₂ (0°C, 1 atm) berdasarkan \nreaksi FeS₂ (s) + 11 O₂(g) → 2Fe₂O₃ + 8SO₂(g) ?",
+[
+"A. 5,4 gram",
+"B. 6,0 gram",
+"C. 6,7 gram",
+"D. 12,0 gram",
+"E. 12,6 gram"
+]
+],
+[
+"Berdasarkan percobaan hamburan sinar alfa yang dilakukan oleh Rutherford didapatkan fakta bahwa sebagian besar sinar alfa \nditeruskan, Hal ini menunjukkan...",
+[
+"A. Atom terdiri dari inti dan elektron",
+"B. Massa atom terpusat pada inti",
+"C. Elektron bergerak mengelilingi inti",
+"D. Bagian terbesar dari atom adalah ruang hampa",
+"E. Pada inti atom terdapat proton dan elektron"
+]
+],
+[
+"Perhatikan beberapa larutan berikut!\n(1) HCl 0,5 M (3) NaCl 0,5 M\n(2) C₂H₅OH 0,5 M (4) CO(NH₂)₂ 0,5 M\nPasangan larutan yang memiliki daya hantar sama besar adalah …. ",
+[
+"A. (1) dan (2)",
+"B. (1) dan (3)",
+"C. (2) dan (3)",
+"D. (2) dan (4)",
+"E. (3) dan (4)"
+]
+],
+[
+"Perhatikan data uji pH terhadap dua tabung air limbah berikut :\n<img src='https://i.imgur.com/6J3GxLe.png'><br>\nDari hasil pengujian maka pH dari air limbah 1 dan air limbah 2 berturut- turut adalah ...",
+[
+"A. 4,2 ≤ pH ≤ 8,3 dan pH ≥ 10,0",
+"B. pH ≤ 4,2 dan pH ≥ 10,0",
+"C. 4,2 ≤ pH dan 6,3 ≤ pH ≤ 10,0",
+"D. pH ≤ 8,3 dan pH ≥ 10,0",
+"E. 4,2 ≤ pH ≤ 8,3 dan 6,3 ≤ pH ≤ 10,0"
+]
+],
+[
+"Berikut ini data hasil titrasi larutan HCl dengan larutan Ca(OH)₂ 0,3 M sebagai berikut :\n<img src='https://i.imgur.com/gyHt4Jp.png'><br>\nBerdasarkan data tersebut, konsentrasi larutan HCl tersebut adalah ... .",
+[
+"A. 4,5 × 10⁻² M",
+"B. 2,0 × 10⁻² M",
+"C. 9,0 × 10⁻¹ M",
+"D. 5,0 × 10⁻¹ M",
+"E. 2,0 × 10⁻¹ M"
+]
+],
+[
+"Volume larutan HCl 1 M yang harus direaksikan dengan 100 mL larutan NH₃ 1 M (Kᵦ = 10⁻⁵) untuk mendapatkan larutan buffer dengan pH = 9 adalah ... .",
+[
+"A. 125 mL",
+"B. 100 mL",
+"C. 75 mL",
+"D. 50 mL",
+"E. 25 mL"
+]
+],
+[
+"Dalam larutan terdapat natrium asetat 0,1 mol/L yang mengalami hidrolisis sesuai dengan persamaan : CH₃COO⁻ + H₂O ⇌ CH₃COOH + OH⁻ jika tetapan hidrolisis (Kₕ) adalah sebesar 10⁻⁹, pH larutan tersebut adalah....",
+[
+"A. 9",
+"B. 7",
+"C. 6",
+"D. 5",
+"E. 1"
+]
+],
+[
+"Diketahui tabel data larutan asam dan basa sebagai berikut:\n<img src='https://i.imgur.com/6J3GxLe.png'><br>\nJika larutan asam dan basa tersebut dicampurkan, campuran yang termasuk larutan penyangga adalah nomor....",
+[
+"A. 1",
+"B. 2",
+"C. 3",
+"D. 4",
+"E. 5"
+]
+],
+[
+"Perhatikan beberapa pernyataan berikut !\n1. Memiliki perbedaan titik didih antar komponennya.\n2. Tahan terhadap panas\n3. Komponennya tidak mudah menguap\n4. Berbentuk gas\nSyarat sampel yang dapat dipisahkan dengan teknik destilasi sederhana ditunjukan oleh angka ...",
+[
+"A. 1 dan 2",
+"B. 1 dan 3",
+"C. 2 dan 3",
+"D. 2 dan 4",
+"E. 4 dan 5"
+]
+],
+[
+"Diketahui Ksp Ag₂CrO₄ = 2,4 × 10⁻¹², jika 100 mL larutan AgNO₃ 10⁻³ M dicampur dengan 100 mL larutan Na₂CrO₄ 10⁻³ M. Pernyataan yang tepat adalah...",
+[
+"A. Terbentuk endapan Ag₂CrO₄ karena Qc < Ksp",
+"B. Terjadi larutan Ag₂CrO₄ karena Qc < Ksp",
+"C. Terjadi larutan tepat jenuh Ag₂CrO₄ karena Qc = Ksp",
+"D. Terjadi larutan Ag₂CrO₄ karena Qc > Ksp",
+"E. Terbentuk endapan Ag₂CrO₄ karena Qc > Ksp"
+]
+],
+[
+"Perhatikan tabel jenis jenis koloid berikut !</br>\n<img src='https://i.imgur.com/Fle5Ubn.png'><br>\nPasangan yang tepat untuk jenis koloid, fase terdispersi, medium pendispersi dan contoh koloid ditunjukan oleh nomor ...",
+[
+"A. 1 dan 2",
+"B. 1 dan 3",
+"C. 2 dan 3",
+"D. 2 dan 4",
+"E. 3 dan 4"
+]
+],
+
+[
+"Perhatikan persamaan reaksi kesetimbangan berikut !\nFe³⁺(aq) + SCN⁻(aq) ⇌ FeSCN²⁺(aq)\n(kuning coklat) (tidak berwarna) (merah darah)\nApabila pada suhu tetap, ke dalam sistem kesetimbangan tersebut ditambahkan ion SCN⁻, kesetimbangan akan bergeser ke arah ....",
+[
+"A. kanan, warna bertambah merah",
+"B. kiri, warna memudar",
+"C. kanan, warna memudar",
+"D. kiri, warna bertambah merah",
+"E. kiri, campuran menjadi tidak berwarna"
+]
+],
+[
+"Pada reaksi kesetimbangan berikut : N₂O₄ (g) ⇌ 2 NO₂ (g). Jika N₂O₄ dibiarkan mencapai kesetimbangan pada suhu tertentu, dan ternyata bahwa dalam keadaan ini jumlah N₂O₄ sama dengan jumlah NO₂, maka derajat disosiasi N₂O₄ adalah... .",
+[
+"A. 1/4",
+"B. 1/3",
+"C. 1/2",
+"D. 2/3",
+"E. 3/4"
+]
+],
+[
+"Diperoleh data laju reaksi dari pembentukan gas oksigen menurut reaksi : 2SO₃(g) → 2SO₂(g) + O₂(g)\n<img src='https://i.imgur.com/KmZautm.png'><br>\nBerdasarkan data tersebut laju pembentukan gas oksigen adalah ... .",
+[
+"A. +5 × 10⁻⁵ M det⁻¹",
+"B. -5 × 10⁻⁵ M det⁻¹",
+"C. -2,5 × 10⁻⁵ M det⁻¹",
+"D. +2,0 × 10⁻⁵ M det⁻¹",
+"E. +5 × 10⁻⁴ M det⁻¹"
+]
+],
+[
+"Berikut adalah tiga senyawa yang mengandung unsur oksigen yaitu nitrogen monoksida, karbon dioksida, dan diklorooksida. Bilangan oksidasi unsur nitrogen, karbon, dan klorin pada senyawa tersebut berturut-turut adalah ....",
+[
+"A. +1; +2; +3",
+"B. +1; +3; +2",
+"C. +2; +4; +1",
+"D. +2; +3; +1",
+"E. +3; +4; +3"
+]
+],
+[
+"Pengaruh dari berbagai faktor terhadap laju reaksi dapat dijelaskan dengan teori tumbukan. Menurut teori ini suatu reaksi berlangsung sebagai hasil tumbukan antar partikel pereaksi. Akan tetapi tidak setiap tumbukan menghasilkan reaksi. Melainkan hanya tumbukan antar partikel yang memiliki energi cukup serta arah tumbukan yang tepat. Berikut ini tindakan yang akan memperbesar laju reaksi, kecuali ....",
+[
+"A. Pada suhu tetap ditambah suatu katalis",
+"B. Suhu dinaikkan",
+"C. Pada suhu tetap tekanan diperbesar",
+"D. Pada suhu tetap volume diperbesar",
+"E. Pada volume tetap ditambah zat pereaksi lebih banyak"
+]
+],
+[
+"Data Tᶠ beberapa larutan elektrolit dan non elektrolit</br>\n<img src='https://i.imgur.com/DbujlqA.png'><br>\nBerdasarkan data tersebut dapat disimpulkan bahwa..",
+[
+"A. Semakin besar konsentrasi zat semakin tinggi pula titik beku larutan.",
+"B. Titik beku larutan elektrolit lebih tinggi daripada larutan non elektrolit",
+"C. Larutan elektrolit yang berkonsentrasi sama memiliki titik beku yang sama.",
+"D. Pada konsentrasi yang sama, titik beku larutan elektrolit lebih rendah daripada larutan non elektrolit",
+"E. Titik beku larutan dipengaruhi oleh jenis zat terlarut dan jenis pelarut."
+]
+],
+[
+"Perhatikan gambar rangkaian sel Volta berikut\n<img src='https://i.imgur.com/U64lHDH.png'><br>\nNomor gambar, notasi sel, harga E° sel yang tepat adalah ....",
+[
+"A. (1) Zn|Zn²⁺||Ni²⁺|Ni positif",
+"B. (2) Cu|Cu²⁺||Ni²⁺|Ni positif",
+"C. (3) Zn|Zn²⁺||Cu|Cu²⁺ positif",
+"D. (4) Pb|Pb²⁺||Cu|Cu²⁺ positif",
+"E. (5) Fe²⁺|Fe||Cu|Cu²⁺ positif"
+]
+],
+[
+"Perhatikan tabel berikut :\n<img src='https://i.imgur.com/tr5CGqs.png'><br>\n<img src='https://i.imgur.com/fFhW9ho.png'><br><img src='https://i.imgur.com/Erad8sq.png'><br>\nUrutan jenis ikatan pada ketiga senyawa ini berturut-turut adalah ... .",
+[
+"A. Lihat sesuai gambar",
+"B. Lihat sesuai gambar",
+"C. Lihat sesuai gambar",
+"D. Lihat sesuai gambar",
+"E. Lihat sesuai gambar"
+]
+],
+[
+"Senyawa yang terbentuk dari unsur A dengan nomor atom 6 dan B dengan nomor atom 17, maka struktur atom yang terbentuk dan sifatnya adalah...",
+[
+"A. Tetrahedral dan polar",
+"B. Piramida trigonal dan polar",
+"C. Bipiramida trigonal dan polar",
+"D. Tetrahedral dan nonpolar",
+"E. Piramida trigonal dan non polar"
+]
+],
+[
+"Diketahui 3 buah notasi unsur dengan konfigurasi elektronnya sebagai berikut :\n<img src='https://i.imgur.com/rw8XAC2.png'><br>\nPasangan data berisi letak unsur dan urutan ketiga unsur berdasarkan kenaikan energi ionisasi dalam tabel periodik yang paling tepat adalah ....",
+[
+"A. Lihat sesuai gambar",
+"B. Lihat sesuai gambar",
+"C. Lihat sesuai gambar",
+"D. Lihat sesuai gambar",
+"E. Lihat sesuai gambar"
+]
+],
+[
+"Diberikan sifat-sifat unsur sebagai berikut :\n<img src='https://i.imgur.com/Z0C0xzj.png'><br>\nSifat-sifat tersebut dimiliki oleh unsur ... .",
+[
+"A. Alkali",
+"B. Gas mulya",
+"C. Halogen",
+"D. Alkali Tanah",
+"E. Golongan oksigen"
+]
+],
+[
+"Pada reaksi asam basa menurut Bronsted-Lowry di bawah ini :\n1. RNH₂ + H₂O ⇌ RNH₃⁺ + OH⁻\n2. H₂PO₄⁻ + H₂O ⇌ HPO₄²⁻ + H₃O⁺\n3. HS⁻ + H₂O ⇌ H₂S + OH⁻\nH₂O yang yang bersifat asam terdapat pada reaksi ....",
+[
+"A. 1",
+"B. 2",
+"C. 3",
+"D. 1 dan 2",
+"E. 1 dan 3"
+]
+],
+[
+"Diketahui sifat-sifat unsur X, Y, dan Z sebagai berikut :\n<img src='https://i.imgur.com/cjszlMR.png'><br>\nUrutan ketiga logam tersebut berdasarkan kenaikan nomor atomnya adalah ....",
+[
+"A. X – Y – Z",
+"B. Y – X – Z",
+"C. Y – Z – X",
+"D. Z – X – Y",
+"E. X – Z – Y"
+]
+],
+[
+"Perhatikan struktur Lewis berikut :\n<img src='https://i.imgur.com/2v0mW4X.png'><br><img src='https://i.imgur.com/ROpR5PU.png'><br>\nSenyawa yang tidak memenuhi aturan oktet atau duplet adalah ....",
+[
+"A. (1)",
+"B. (2)",
+"C. (3)",
+"D. (4)",
+"E. (5)"
+]
+],
+[
+"Pernyataan-pernyataan berikut yang tidak benar adalah ....",
+[
+"A. Potensial ionisasi pertama dari logam alkali lebih rendah daripada logam alkali tanah dalam periode yang sama dari susunan berkala",
+"B. Dalam periode yang sama dalam susunan berkala logam alkali tanah mempunyai energi ionisasi yang lebih besar daripada logam alkali disebabkan karena orbital s telah terisi 2 elektron",
+"C. Logam alkali biasanya dibuat dengan cara elektrolisis lelehan garamnya",
+"D. Logam alkali adalah pereduksi yang baik",
+"E. Logam alkali tanah adalah pengoksidasi yang baik"
+]
+],
+
+[
+"Perhatikan reaksi kimia organik berikut!<br>\n(1) CH₃–CH₂–OH + HCl (pekat) → CH₃–CH₂–Cl + H₂O<br>\n(2) CH₃–CH₂Cl + CH₃OK → CH₂ = CH₂ + CH₃OH<br>\n(3) CH₂ = CH₂ + HCl → CH₃–CH₂Cl<br>\n(4) CH₃–CH₃ + Cl₂ → CH₃–CH₂Cl<br>\n(5) CH₃COOH + CH₃OH → CH₃COOCH₃ + H₂O<br>\nReaksi eliminasi terdapat pada persamaan reaksi nomor ....",
+[
+"A. (1)",
+"B. (2)",
+"C. (3)",
+"D. (4)",
+"E. (5)"
+]
+],
+[
+"Diketahui suatu polimer seperti gambar di samping.<br>\n<img src='https://i.imgur.com/nfl6rcJ.png'><br>\nMonomer pembentuk senyawa polimer tersebut adalah ....<br>\n<img src='https://i.imgur.com/NzJMaph.png'> A. CH₃–C₆H₅<br>\n<img src='https://i.imgur.com/ByrflEl.png'> B. H₂C–CH₃–C₆H₅<br>\n<img src='https://i.imgur.com/a5I5GA1.png'> C. C≡CH–C₆H₅<br>\n<img src='https://i.imgur.com/ZCnyk3q.png'> D. HC=CH₂–C₆H₅<br>\n<img src='https://i.imgur.com/aBl5ISA.png'> E. H₂C–C–CH₃–C₆H₅",
+[
+"A. CH₃–C₆H₅",
+"B. H₂C–CH₃–C₆H₅",
+"C. C≡CH–C₆H₅",
+"D. HC=CH₂–C₆H₅",
+"E. H₂C–C–CH₃–C₆H₅"
+]
+],
+[
+"Suatu senyawa turunan benzena mempunyai sifat sebagai berikut:<br>\n1. Berupa cairan minyak berwarna kuning pucat dan tidak larut dalam air<br>\n2. Berbau seperti biji kenari<br>\n3. Bahan dasar pembuatan dinamit (TNT) dan sebagai pelarut<br>\nSifat-sifat tersebut dimiliki oleh senyawa ....",
+[
+"A. Nitrobenzena",
+"B. Asam benzoat",
+"C. Benzaldehid",
+"D. Anilina",
+"E. Fenol"
+]
+],
+[
+"Perhatikan gambar di samping!<br>\n<img src='https://i.imgur.com/va5yKtS.png'><br>\nKeterangan gambar:<br>- 9 mL larutan C₃H₇COOH<br>- 9 mL larutan CH₃OH<br>- 10 tetes larutan H₂SO₄ pekat<br>\nSenyawa yang dihasilkan dari reaksi tersebut adalah ....",
+[
+"A. Metoksi butana",
+"B. Propil metanoat",
+"C. Metil propanoat",
+"D. Butil metanoat",
+"E. Metil butanoat"
+]
+],
+[
+"Tabel berikut menunjukkan data hasil percobaan uji protein pada beberapa sampel makanan berprotein.<br>\n<img src='https://i.imgur.com/MdpW09T.png'><br>\nMakanan berprotein yang mengandung cincin benzena adalah ....",
+[
+"A. Tahu dan ikan",
+"B. Tahu dan susu",
+"C. Susu dan ikan",
+"D. Putih telur dan ikan",
+"E. Susu dan putih telur"
+]
+],
+];
+
+const soalUraian = [
+"Natrium hidroksida (NaOH) adalah salah satu basa yang umum digunakan di laboratorium. Namun, larutan NaOH harus distandarisasi terlebih dahulu sebelum digunakan dalam kerja analitis yang memerlukan keakuratan. Salah satu asam yang sering digunakan untuk analisis ini adalah kalium hidrogen ftalat (KHP). KHP adalah zat padat berwarna putih yang dapat larut yang secara komersial tersedia dalam keadaan sangat murni. KHP merupakan asam monoprotik dengan rumus kimia KH(C₈H₄O₄). Reaksi antara KHP dengan natrium hidroksida adalah:<br><br>KH C₈H₄O₄(aq) + NaOH(aq) → KNa C₈H₄O₄(aq) + H₂O(l)<br><br>Dalam percobaan titrasi, seorang siswa memerlukan 25 mL larutan NaOH untuk secara tuntas menetralisir 1,02 gram KHP. Berapa konsentrasi (molaritas) larutan NaOH tersebut? (Ar K = 39 gr/mol, H = 1 gr/mol, C = 12 gr/mol, O = 16 gr/mol, Na = 23 gr/mol)",
+
+`Lengkapi tabel di bawah ini!<br><br>
+<table border="1" style="border-collapse:collapse;text-align:center;">
+<tr><th>No</th><th>Rumus Kimia</th><th>Asal Asam</th><th>Asal Basa</th><th>Hidrolisis</th><th>Sifat Garam</th></tr>
+<tr><td>1</td><td>(NH₄)₂SO₄</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td>NH₄CN</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>3</td><td>Na₂CO₃</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>4</td><td>Pb(NO₃)₂</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>5</td><td>NaCl</td><td></td><td></td><td></td><td></td></tr>
+</table><br>`,
+
+"Sebutkan semua 5 tahapan / proses terjadinya reaksi kimia!",
+
+"Diketahui:<br>H₂(g) + ½ O₂(g) → H₂O(g) ΔH = –a kJ<br>H₂(g) + ½ O₂(g) → H₂O(l) ΔH = –b kJ<br>H₂(g) + ½ O₂(g) → H₂O(s) ΔH = –c kJ<br><br>Hitung berapa kalor yang diperlukan untuk menyublim 9 gram H₂O padat!",
+
+"Diketahui bilangan kuantum unsur sebagai berikut:<br>Unsur P, n = 4, l = 0, m = 0, s = –½<br>Unsur Q, n = 4, l = 1, m = 0, s = –½<br>Unsur R, n = 4, l = 2, m = 0, s = –½<br>Unsur S, n = 1, l = 0, m = 0, s = –½<br><br>Berdasarkan data di atas bagaimana perbandingan sifat periodisitas unsur di atas:<br>A. Jari-jari atom<br>B. Energi ionisasi<br>C. Afinitas elektron<br>D. Keelektronegatifan"
+];
+
+let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60;
+let isBypass = false;
+
+// 🔥 FLAG KEAMANAN
+let isUploading = false;
+let isDialogOpen = false;
+
+let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [] };
+let audioCtx, oscillator;
+
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+function bypassSecurity() {
+    isBypass = true;
+    setTimeout(() => { isBypass = false; }, 15000);
+}
+
+function saveAns(q, a) { 
+    savedData.pg['q'+q] = a; 
+    localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+}
+
+function saveFileSingle(input) {
+    isUploading = true;
+    bypassSecurity();
+
+    const file = input.files[0];
+    if (!file) {
+        isUploading = false;
+        return;
+    }
+
+    const status = document.getElementById('status_upload');
+    status.innerText = "⏳ Memproses...";
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        savedData.files.push(e.target.result);
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData));
+        status.innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
+
+        setTimeout(() => {
+            isUploading = false;
+        }, 2000);
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function renderSoal() {
+    let pgHtml = "";
+    SoalPG.forEach((s, i) => {
+        let saved = savedData.pg['q'+i];
+        pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+        s[1].forEach((opt, idx) => {
+            let chk = (saved !== undefined && saved == idx) ? 'checked' : '';
+            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${chk} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+        });
+        pgHtml += `</div>`;
+    });
+    document.getElementById('renderPG').innerHTML = pgHtml;
+
+    let uHtml = "";
+    soalUraian.forEach((soal, i) => { 
+        uHtml += `<div style="margin-bottom:15px;"><b>${i + 1}.</b> ${soal}</div>`; 
+    });
+    document.getElementById('renderUraianTeks').innerHTML = uHtml;
+
+    if(savedData.files.length > 0)
+        document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
+
+    if(window.MathJax) MathJax.typeset();
+}
+
+// 🛡️ UPGRADE: VALIDASI NAMA SERVER-SIDE
+async function goToTab(n) {
+    const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+    const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+
+    if(n === 2) {
+        if(!nama || token !== TOKEN_VALID) { 
+            alert("Nama Lengkap dan Token harus diisi!"); 
+            return; 
+        }
+
+        // Animasi Loading
+        const btn = event.target;
+        const textAwal = btn.innerText;
+        btn.innerText = "🔍 Cek Status...";
+        btn.disabled = true;
+
+        try {
+            const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+            const status = await resp.text();
+
+            if(status === "AKTIF") {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById('tab2').classList.add('active');
+            } else if(status === "TERBLOKIR") {
+                alert("AKSES DITOLAK! Nama Anda terblokir. Hubungi Admin.");
+                window.location.href = `https://wa.me/${WA_ADMIN}?text=Halo%20Admin%20RNJ,%20nama%20saya%20${nama}%20terblokir%20dari%20ujian.`;
+            } else {
+                alert("Nama tidak terdaftar di database peserta!");
+            }
+        } catch (e) {
+            alert("Gagal terhubung ke server keamanan. Cek koneksi.");
+        } finally {
+            btn.innerText = textAwal;
+            btn.disabled = false;
+        }
+        return;
+    }
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab'+n).classList.add('active');
+}
+
+async function mulaiUjian() {
+    isBypass = true;
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('videoPreview').srcObject = stream;
+    } catch (e) {}
+
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab3').classList.add('active');
+    document.getElementById('examHeader').style.display = 'flex';
+    document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+    document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+
+    renderSoal();
+    startTimer();
+
+    setTimeout(() => {
+        isBypass = false;
+        setupSecurity();
+    }, 3000);
+}
+
+function setupSecurity() {
+    window.onblur = () => {
+        if (!isBypass && !isUploading && !isDialogOpen) {
+            handleViolation();
+        }
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && !isBypass && !isUploading && !isDialogOpen) {
+            handleViolation();
+        }
+    });
+}
+
+// 🛡️ UPGRADE: AUTO-BLOCK KE SERVER
+function handleViolation() {
+    violationCount++;
+    playAlarm();
+
+    const nama = document.getElementById('namaSiswa').value;
+    document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+    document.getElementById('overlay').style.display = 'block';
+
+    if(violationCount >= MAX_VIOLATIONS) {
+        // Kirim perintah blokir ke Server secara otomatis
+        fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+
+        document.getElementById('btnTutupMandiri').style.display = 'none';
+        document.getElementById('infoKesempatan').innerHTML = `ANDA TERBLOKIR!`;
+        document.getElementById('inputGuruArea').style.display = 'block';
+        
+        // Ubah area input kode menjadi tombol WA Admin
+        document.getElementById('inputGuruArea').innerHTML = `
+            <p>Sistem mendeteksi pelanggaran berulang. Nama Anda telah dikunci.</p>
+            <a href="https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir%20karena%20melanggar%20aturan%20ujian." 
+               style="background:#25D366; color:white; padding:15px; border-radius:12px; text-decoration:none; display:block; font-weight:700; text-align:center;">
+               HUBUNGI ADMIN VIA WHATSAPP
+            </a>
+            <p style="margin-top:15px; font-size:11px; color:#666;">Status: Locked by Server</p>
+        `;
+    }
+}
+
+function playAlarm() {
+    if (!audioCtx) initAudio();
+    oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+    oscillator.start();
+    oscillator.stopInt = setInterval(() => {
+        gain.gain.value = (gain.gain.value === 0 ? 0.3 : 0);
+    }, 200);
+}
+
+function tutupOverlay() {
+    document.getElementById('overlay').style.display = 'none';
+    if(oscillator) {
+        oscillator.stop();
+        clearInterval(oscillator.stopInt);
+    }
+}
+
+function startTimer() {
+    setInterval(() => {
+        if(timeLeft > 0) {
+            timeLeft--;
+            let m = Math.floor(timeLeft/60),
+                s = timeLeft%60;
+            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+        }
+    }, 1000);
+}
+
+function finishExam() {
+    isDialogOpen = true;
+
+    if(Object.keys(savedData.pg).length < SoalPG.length) {
+        alert("HARAP ISI SEMUA PG!");
+        isDialogOpen = false;
+        return;
+    }
+
+    if(savedData.files.length === 0) {
+        alert("UPLOAD FOTO WAJIB!");
+        isDialogOpen = false;
+        return;
+    }
+
+    if(!confirm("Kumpulkan jawaban?")) {
+        isDialogOpen = false;
+        return;
+    }
+
+    isBypass = true;
+
+    const btn = document.getElementById('btnKirim');
+    btn.disabled = true;
+    btn.innerText = "MENGIRIM...";
+
+    const payload = { 
+        nama: document.getElementById('namaSiswa').value, 
+        mapel: NAMA_MAPEL, 
+        pg: savedData.pg, 
+        files: savedData.files 
+    };
+
+    // MENGGUNAKAN SCRIPT_URL LAMA UNTUK JAWABAN
+    fetch(SCRIPT_URL_JAWABAN, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        alert("SUKSES!");
+        localStorage.removeItem(SESSION_KEY);
+        location.reload();
+    })
+    .catch(() => {
+        alert("GAGAL!");
+        btn.disabled = false;
+        btn.innerText = "KUMPULKAN SEMUA JAWABAN";
+        isBypass = false;
+    })
+    .finally(() => {
+        isDialogOpen = false;
+    });
+}
+</script>
+</body>
+</html>

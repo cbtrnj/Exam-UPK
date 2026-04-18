@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK MASTER - PKBM Ristek Nusantara Jaya</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* TEXTAREA LEBAR UNTUK SEMUA MAPEL */
+        .jawaban-uraian { 
+            width: 100%; 
+            min-height: 250px; 
+            padding: 15px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            resize: vertical; 
+            background: #F9FAFB;
+            line-height: 1.5;
+        }
+        .jawaban-uraian:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.75rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka aplikasi lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;"></div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">NAMA SISWA</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">SEJARAH PEMINATAN</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b>Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar melalui Server Admin IT TEAM RNJ.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    const NAMA_MAPEL = "SEJARAH PEMINATAN"; 
+    const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+    
+    const WA_ADMIN = "6285888157682";
+    const TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "UPK_MASTER10_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+      const SoalPG = [
+[
+`Suatu penulisan sejarah yang menghasilkan penjelasan yang tidak terpaku terhadap proses atau akhirnya saja, namun dari kondisi objek dan lingkungan sekitarnya menggunakan metode....`,
+[
+"Diakronik dan kausalitas",
+"Sinkronik dan kausalitas",
+"Periodisasi dan sinkronik",
+"Periodisasi dan diakronik",
+"Sinkronik dan diakronik"
+]
+],
+
+[
+`Perhatikan data berikut ini !
+1. Ruang   2. Waktu   3. Periode   4. Perubahan   5. Manusia
+Dari data tersebut yang termasuk dalam unsur-unsur sejarah dan konsep pendukung peristiwa-peristiwa sejarah adalah nomor….`,
+[
+"1, 4, 3",
+"2, 3, 4",
+"2, 1, 4",
+"1, 2, 5",
+"2, 1, 3"
+]
+],
+
+[
+`Dalam melakukan penelitian sejarah seorang sejarawan harus mengikuti langkah-langkah penelitian sejarah. Di antara langkah-langkah tersebut salah satunya Heuristik. Heuristik adalah tahap mencari, menemukan, serta mengumpulkan sumber-sumber atau berbagai data yang relevan dengan topik penelitian. Hal ini dilakukan guna mengetahui segala bentuk peristiwa atau kejadian sejarah masa lampau. Jika seorang sejarawan ingin melakukan penelitian tentang peran tokoh tertentu dalam reformasi di Indonesia maka untuk mendapatkan sumber yang relevan dapat dilakukan menggunakan metode ….`,
+[
+"mengunjungi situs-situs bersejarah tentang reformasi",
+"melakukan wawancara guna melengkapai data yang ada",
+"studi pustaka untuk membandingkan penelitian lainnya",
+"pengecekan terhadap berbagai sumber yang telah dihimpun",
+"identifikasi terhadap sumber sejarah yang telah dikumpulkan"
+]
+],
+
+[
+`Di bawah ini yang dimaksud dengan sumber sekunder dalam sejarah adalah sumber….`,
+[
+"Pokok yang sudah ditafsirkan dengan ahli sejarah",
+"Pokok yang merupakan asli dari sumber yang menyaksikan dengan langsung peristiwa sejarah",
+"yang mampu menafsirkan sejarah",
+"ketiga yang memberikan keterangan dan gambaran tentang masa lampau.",
+"Kedua dan dapat menjadikan dasar penafsiran sejarah"
+]
+],
+
+[
+`Perang Padri yang terjadi di Minangkabau, Sumatera Barat digerakkan oleh para pembaru Islam yang sedang konflik dengan kaum adat. Adanya pertentangan tersebut telah memberikan peluang intervensi pasukan Belanda dalam kehidupan masyarakat Minangkabau. Hal ini menyebabkan beberapa kali perlawanan antara kaum Padri dengan pasukan Belanda. Peristiwa tersebut yang merupakan konsep berpikir sinkronik dalam sejarah karena....`,
+[
+"adanya pertentangan antara kaum Padri dan kaum adat menyebabkan campur tangan Belanda dalam mengatur beberapa nagari",
+"intervensi dari pihak Belanda sangat dominan yaitu pada fase pertama dan kedua terjadinya perang Padri",
+"kehidupan masyarakat Minangkabau didominasi oleh aturan adat tradisional yang diwarnai unsur-unsur Islam",
+"pembaruan sistem pemerintahan oleh para kaum Padri meredam pertentangannya dengan kaum adat",
+"masyarakat Minangkabau yang masih kuat adat tradisionalnya mudah berakulturasi dengan kebudayaan Islam"
+]
+],
+
+[
+`Perhatikan data berikut ini!
+1. Interpretasi   2. Verifikasi   3. Heuristik   4. Historiografi
+Dari data tersebut urutan dan tahapan penelitian dalam ilmu sejarah ditunjukkan dengan nomor….`,
+[
+"1, 2, 3, 4",
+"3, 2, 4, 1",
+"2, 1, 4, 3",
+"3, 2, 1, 4",
+"2, 1, 3, 4"
+]
+],
+
+[
+`Perhatikan ciri-ciri berikut ini!
+1. Budayanya sangat primitif dan sederhana   (4) Sudah mengenal bercocok tanam
+2. Peninggalan merupakan kebudayaan tertua   (5) Manusianya tinggal di gua-gua
+3. Alat-alat kehidupannya berupa kapak genggam
+Ciri kehidupan manusia praaksara masa Paleolitikum ditunjukkan pada nomor ....`,
+[
+"(1), (2), dan (3)",
+"(1), (2), dan (4)",
+"(1), (3), dan (5)",
+"(2), (4), dan (5)",
+"(3), (4), dan (5)"
+]
+],
+
+[
+`Perhatikan pernyataan di bawah ini!
+1. Memiliki tulang pipi yang tebal   3. Tidak memiliki dagu   5. Memakan semuanya
+2. Tinggi tubuhnya kurang lebih 165 – 180 cm   4. Hidup antara 1,5 – 2,5 juta tahun yang lalu
+Berdasarkan pernyataan tersebut yang merupakan ciri-ciri Pithecanthropus adalah …..`,
+[
+"1, 2, dan 3",
+"2, 3, dan 4",
+"2, 4, dan 5",
+"3, 4, dan 5",
+"1, 3, dan 5"
+]
+],
+
+[
+`Perhatikan data berikut ini!
+1. Adanya serangan bangsa Dravida   4. Adanya pemberontakan daerah Vasal
+2. Adanya serangan bangsa Arya   5. Adanya perang perebutan tahta
+3. Adanya banjir yang melanda Mohenjodaro dan Harappa
+Berdasarkan data tersebut yang menyebabkan runtuhnya kebudayaan Mohenjodaro dan Harappa ditunjukkan pada nomor. …`,
+[
+"1 dan 3",
+"2 dan 3",
+"2 dan 4",
+"3 dan 4",
+"3 dan 5"
+]
+],
+
+[
+`Lembah sungai Hoang Ho (Cina) terletak di Asia bagian Timur di sebelah Barat dan Utara berbatasan dengan daerah Siberia dan Mongolia (Gurun Gobi). Lembah ini menjadi pusat kebudayaan dan pemerintahan disebabkan ...`,
+[
+"Letaknya strategis",
+"Tanahnya subur",
+"Menjadi pertemuan suku-suku bangsa",
+"Masyarakatnya maju",
+"Terdapat benteng pertahanan yang kuat"
+]
+],
+
+[
+`Proses masuk dan berkembangnya agama Islam di Indonesia telah membawa perubahan besar di dalam struktur sosial masyarakat Indonesia yang sebelumnya berkarakteristik Hindu-Buddha. Kehadiran agama Islam dapat diterima baik oleh sebagian besar masyarakat Indonesia. Faktor penyebab Islam berkembang pesat di Indonesia adalah ....`,
+[
+"Pengaruh Hindu-Buddha hanya terdapat di kalangan istana",
+"Hindu terdapat perbedaan status seseorang dalam masyarakat",
+"Penyebaran agama Islam di masyarakat dilakukan secara damai dan tidak mengenal kelas atau kasta",
+"Ajaran agama Islam mudah dipelajari oleh bangsa Indonesia",
+"Agama Islam dikenalkan melalui seni"
+]
+],
+
+[
+`Kerajaan Sriwijaya berdiri diperkirakan pada abad ke-7 (tujuh), karena letaknya strategis di tepi sungai Musi maka kerajaan ini berkembang dengan pesat. Kerajaan Sriwijaya mengalami masa kejayaan dan menjadi pusat perdagangan bahkan menjadi pusat penyebaran agama Budha di Asia Tenggara pada masa pemerintahan ….`,
+[
+"Dapunta Hiyang",
+"Balaputra Dewa",
+"Jayashadu Warmadewa",
+"Jayasinga Warmadewa",
+"Wijayatunggawarman"
+]
+],
+
+[
+`Kerajaan Majapahit sebagai salah satu dari kerajaan maritim Hindu-Buddha di Nusantara memiliki banyak keragaman diantaranya penganut agama yang berbeda. Meskipun demikian rakyat Majapahit dapat hidup rukun dan berdampingan. Raja selalu berusaha agar ketentraman masyarakatnya dapat berjalan baik sehingga keragaman dalam keharmonisan dari masyarakat kerajaan Majapahit berpengaruh hingga saat ini dengan semboyan Bhineka Tunggal Ika. Dampak keragaman tersebut terhadap kehidupan masyarakat Indonesia masa kini adalah ....`,
+[
+"terciptanya keharmonisan dalam persamaan antarpenduduk terutama pada sistem pertahanan dan keamanan negara",
+"Indonesia menjadi bangsa yang besar dan kuat karena selalu menjaga kerukunan antarsuku bangsa",
+"hidup saling berdampingan antarpenduduk sehingga berpengaruh terhadap kelangsungan sistem pemerintahan",
+"munculnya sikap toleransi dan empati dari masyarakat yang berbeda latar belakang status",
+"keragaman antarpenduduk berpengaruh terhadap penyelenggaraan pembangunan nasional bangsa Indonesia"
+]
+],
+
+[
+`Merkantilisme berkembang di Eropa diperkirakan pada abad ke-16, tujuan merkantilisme adalah menggumpulkan logam mulia sebanyakbanyaknya dengan melakukan perdagangan yang diatur oleh negara. Berikut ini yang tidak termasuk dalam latar belakang merkantilisme adalah…`,
+[
+"dengan adanya negara-negara merdeka di Eropa seperti Perancis, Inggris, Jerman, Belanda dan Italia",
+"negara-negara tersebut ingin mempertahankan kesejahteraan, kedaulatan dan kebebasan rakyatnya",
+"dibutuhkan suatu kondisi perekonomian yang kuat agar ditetapkan logam mulia sebagai standar ukuran kekayaan suatu negara",
+"dibuka jaringan perdagangan ke luar negeri dan eksploitasi serta diadakan pelayaran ke wilayah-wilayah yang baru",
+"ditetapkannya rempah-rempah sebagai ukuran kemakmuran suatu negara"
+]
+],
+
+[
+`Perhatikan data berikut ini!
+1. Munculnya revolusi sosial   3. Lahirnya kelas buruh   5. Timbulnya imperialisme modern
+2. Munculnya paham sosialisme   4. Munculnya partai politik
+Berdasarkan data tersebut yang merupakan dampak revolusi industri dalam bidang politik adalah….`,
+[
+"1, 3, 5",
+"1, 4, 2",
+"2, 4, 5",
+"2, 3, 4",
+"3, 4, 5"
+]
+],
+
+[
+`Revolusi Prancis dilatarbelakangi adanya krisis keuangan, kehidupan raja dan bangsawan yang hidup dalam kemewahan dan kemegahan. Berikut ini ciri-ciri dari monarki absolut pada masa pemerintahan Louis XVI yaitu….`,
+[
+"kekuasaan raja bersifat antikolonialisme",
+"kekuasaan raja bersifat demokrasi",
+"raja menginspirasi pembangunan peradaban",
+"kekuasaan raja tidak dibatasi undang-undang",
+"raja menginspirasi kaum revolusioner"
+]
+],
+
+[
+`Revolusi Industri adalah perubahan cara pembuatan barang yang dahulu dikerjakan dengan tenaga manusia diganti dengan tenaga mesin. Di bawah ini yang tidak termasuk penyebab langsung terjadinya revolusi industri adalah….`,
+[
+"adanya dukungan pemerintah dan keamanan",
+"masyarakat banyak tinggal di dekat pabrik",
+"tersedia bahan baku industri",
+"adanya modal yang cukup",
+"tersedia tenaga ahli"
+]
+],
+
+[
+`Perang Dunia I tidak hanya berpengaruh bagi masyarakat Eropa, tetapi pengaruhnya menyebar hingga ke seluruh dunia. Dalam bidang politik, Perang Dunia I menyebabkan terjadinya perubahan teritorial yang disebabkan oleh ....`,
+[
+"dominasi paham-paham diktator seperti Nazi di Jerman dan Fasisme di Italia yang ingin menguasai dunia",
+"munculnya negara-negara baru di kawasan Asia dan Afrika sehingga mempengaruhi peta dunia",
+"keinginan para negara sekutu menaklukkan wilayah Asia dan Afrika menjadi bagian pemerintahannya",
+"kekalahan negara-negara sentral seperti Jerman, Turki, Bulgaria dan Austria yang harus menyerahkan wilayahnya",
+"adanya paham baru yang menimbulkan adanya pembagian kekuasaan yaitu komunis dan demokrasi"
+]
+],
+
+[
+`Perang Dunia II (dua) yang terjadi pada tahun 1939-1945 banyak menimbulkan dampak negatif bagi kehidupan dunia. Salah satu faktor yang menyebabkan munculnya Perang Dunia II (dua) adalah….`,
+[
+"kurangnya biaya dan persenjataan yang dimiliki tentara Jepang",
+"adanya kegiatan teroris yang meresahkan dunia",
+"revolusi industri di Inggris",
+"krisis di parlemen Amerika Serikat",
+"kegagalan LBB menciptakan perdamaian"
+]
+],
+
+[
+`Perhatikan pernyataan berikut ini!
+1. Penghapusan pajak feodal   4. Undang-undang merupakan kekuasaan tertinggi
+2. Penghapusan masyarakat feodal   5. Timbulnya paham demokrasi dan liberalisme
+3. Timbulnya nasionalisme
+Pernyataan yang merupakan dampak Revolusi Prancis dalam bidang politik adalah....`,
+[
+"1, 2, dan 3",
+"2, 3, dan 4",
+"3, 4, dan 5",
+"1, 4, dan 5",
+"1, 2, dan 5"
+]
+],
+
+[
+`Perhatikan pernyataan berikut ini:
+1. Bersifat radikal   4. Bersifat modern
+2. Non kooperatif   5. Bersifat kedaerahan
+3. Menuju Indonesia merdeka   6. Mengembangkan perekonomian
+Berdasarkan pernyataan tersebut, yang termasuk strategi pergerakan nasional Indonesia pada masa kebangkitan nasional (19081942) adalah … .`,
+[
+"1, 2, dan 3",
+"2, 3, dan 6",
+"1, 3, dan 4",
+"2, 3, dan 4",
+"4, 5, dan 6"
+]
+],
+
+[
+`Deklarasi kemerdekaan yang ditandatangani pada tanggal 4 Juli 1776 oleh ketiga belas koloni di wilayah Amerika mengandung makna kebebasan hak asasi manusia. Pernyataan ini telah menimbulkan ketegangan bahkan peperangan antara kaum kolonis Amerika dan pihak Inggris. Revolusi Amerika telah membakar semangat kebangsaan hingga ke negara lain seperti Indonesia hingga saat ini. Dampak peristiwa tersebut terhadap sistem pemerintahan Indonesia saat ini adalah ....`,
+[
+"berkembangnya pemerintahan sentralisasi dengan berdasar pada otoritas tertinggi pada lembaga eksekutif",
+"terbentuknya sistem kabinet pemerintahan sebagai perwakilan dari partai politik yang mendukung lembaga eksekutif",
+"adanya Dewan Perwakilan Rakyat (DPR) sebagai wakil rakyat yang ditentukan berdasarkan jumlah penduduk",
+"rakyat memiliki hak dan kewajiban tertinggi dalam sistem penyelenggaraan negara sehingga lembaga eksekutif bertanggung jawab kepada rakyat",
+"adanya sistem parlemen negara dalam menata arus mobilitas kepartaian sehingga tidak terjadi konflik kepentingan antarpartai"
+]
+],
+
+[
+`Indische Partij adalah organisasi pergerakan nasional yang didirikan oleh tiga tokoh yang dikenal dengan sebutan tiga serangkai, yaitu Douwes Dekker, Cipto Mangunkusumo, dan Suwardi Suryaningrat. Organisasi ini berdiri pada tahun 1912 dan organisasi ini bersifat politik. Indische Partij menunjukkan garis politik secara jelas dan tegas serta menginginkan suatu kesatuan penduduk yang multirasial. Hal ini disebabkan karena ....`,
+[
+"organisasi ini diketuai tokoh yang berpendidikan Belanda",
+"Indische Partij menuntut persamaan hak dalam berbangsa",
+"Indische Partij dalam perjuangannya bersikap moderat",
+"Indische Partij memperjuangkan kemerdekaan Indonesia",
+"berjuang untuk memperbesar pengaruh pro Hindia Belanda"
+]
+],
+
+[
+`Adanya peristiwa “Black Armada” yang terjadi pada 24 September 1945 dimana pada saat itu terjadi boikot besar-besaran terhadap kapal-kapal milik Belanda di Pelabuhan Brisbane, Sidney, Melbourne, dan Fremantle yang membawa persenjataan milik Belanda menuju Indonesia. Hal ini merupakan salah satu bentuk dukungan pengakuan kemerdekaan Indonesia yang di lakukan oleh Negara….`,
+[
+"Mesir",
+"India",
+"Australia",
+"Arab Saudi",
+"Yaman"
+]
+],
+
+[
+`Hubungan kerjasama antara negara-negara kawasan Utara dan selatan bermula sejak diadakannya pertemuan negara-negara produsen minyak dengan negara-negara konsumennya di Paris, pada tanggal 7 April 1975. Pertemuan tersebut diprakarsai oleh dua negara yaitu…`,
+[
+"Prancis dan Inggris",
+"Prancis dan Jerman",
+"Prancis dan Amerika Serikat",
+"Inggris dan Jerman",
+"Kanada dan Inggris"
+]
+],
+
+[
+`Hasil perjuangan diplomasi Indonesia:
+1. Ditariknya Tentara Republik Indonesia dari daerah-daerah yang diduduki Belanda
+2. Dibentuk negara RIS dan Belanda akan menyerahkan kedaulatan kepada RIS pada akhir Desember 1949.
+3. RIS dan Belanda akan tergabung dalam Uni Indonesia–Belanda.
+4. Diakuinya Sumatera, Banten dan Yogyakarta
+5. Pemerintahan RI dikembalikan ke Jogjakarta, penghentian perang gerilya dan pembebasan semua tahanan politik.
+6. Indonesia dan Belanda bekerja sama dalam mengembalikan perdamaian dan menjaga ketertiban dan keamanan.
+7. Masalah Irian Barat akan diselesaikan setahun setelah pengakuan kedaulatan
+Dari pernyataan di atas, yang merupakan hasil perundingan Konferensi Meja Bundar (KMB) adalah....`,
+[
+"1, 2, dan 3",
+"1, 2, dan 4",
+"2, 3, dan 5",
+"2, 3, dan 7",
+"3, 4, dan 7"
+]
+],
+
+[
+`Pendudukan Jepang di Indonesia menimbulkan kesengsaraan bagi rakyat Indonesia. Hal ini disebabkan Jepang mengadakan eksploitasi baik di bidang ekonomi maupun sosial. Pada bulan Maret 1943 pemerintah Jepang membentuk Pusat Tenaga Rakyat (Putera) yang dipimpin oleh empat serangkai, yaitu Ir. Soekarno, Drs. Moh. Hatta, Ki Hajar Dewantara, dan K. H. Mas Mansur. Melalui Putera, para pemimpin Indonesia dapat berhubungan dengan rakyat secara langsung, baik melalui rapat-rapat maupun media massa milik Jepang. Pada perkembangan organisasi Putera dimanfaatkan oleh para pemimpin Indonesia dalam proses perjuangan Indonesia, karena ....`,
+[
+"menarik perhatian bangsa Indonesia agar membantu pasukan Jepang dalam perang Asia Timur Raya",
+"membangkitkan semangat nasionalisme serta menumbuhkan rasa percaya diri serta harga diri sebagai bangsa",
+"membujuk kaum nasionalis sekuler dan kaum intelektual agar dapat mengerahkan tenaga untuk melawan Jepang",
+"menggerakkan rakyat Indonesia untuk mendukung peperangan Jepang menghadapi Sekutu",
+"mempersatukan rakyat Jawa dalam menghadapi serangan sekutu dalam perang Asia Timur Raya"
+]
+],
+
+[
+`28. Perhatikan data pada tabel di bawah ini!
+Sistem ekonomi
+1 Sistem ekonomi gerakan Benteng   4 Sistem ekonomi Ali Baba
+2 Nasionalisasi De Javasche Bank   5 Devaluasi mata uang rupiah
+3 Mengeluarkan ORI
+Dalam rangka mengatasi permasalahan ekonomi pada masa Demokrasi Liberal, Indonesia mengeluarkan beberapa kebijakan. Kebijakan tersebut ditunjukkan oleh nomor ….`,
+[
+"1, 2, dan 3",
+"1, 2, dan 4",
+"1, 2, dan 5",
+"1, 3, dan 5",
+"1, 4, dan 5"
+]
+],
+
+[
+`Dinamika kehidupan politik pada masa awal kemerdekaan diwarnai masa-masa pelaksanaan Demokrasi Liberal. Pada masa ini pemerintahan RI berbentuk parlementer, dimana kedaulatan rakyat disalurkan melalui wakil-wakil partai politik yang menduduki Parlemen. Salah satu ciri masa pemerintahan tersebut adalah seringnya terjadi pergantian kabinet yang disebabkan oleh….`,
+[
+"mosi tidak percaya anggota parlemen terhadap kinerja kabinet.",
+"kabinet terdiri dari orang-orang yang tidak ahli dalam bidangnya.",
+"sikap apatis para anggota kabinet terhadap upaya pembangunan.",
+"pemerintah mencurahkan perhatian pada upaya pembebasan Irian Barat.",
+"seringnya terjadi pemberontakan menyita perhatian anggota kabinet."
+]
+],
+
+[
+`Pada masa Demokrasi Terpimpin, Indonesia keluar dari keanggotaan PBB. Kebijakan ini terjadi sebagai dampak politik luar negeri RI yang bersifat anti imperialisme/kolonialisme. Hal ini menyebabkan Indonesia terkucil dari dunia internasional. Salah satu upaya yang dilakukan pemerintah Orde Baru untuk mengembalikan citra Indonesia di mata dunia antara lain dengan ….`,
+[
+"menyetujui pembentukan negara federal Malaysia.",
+"mencari dukungan dari negara-negara di Asia Tenggara.",
+"memulihkan hubungan diplomatik dengan Malaysia.",
+"memutuskan hubungan dengan negara berhaluan kiri.",
+"mempererat hubungan diplomatik dengan negara-negara lain."
+]
+],
+
+[
+`Perhatikan pernyataan di bawah ini.
+1. Belanda mengakui secara de facto RI dengan wilayah kekuasaan hanya Sumatera, Jawa, dan Madura .
+2. RI dan Belanda akan membentuk negara RIS
+3. RIS dan Belanda akan membentuk Uni Indonesia Belanda.
+4. Presiden Indonesia dibawah kekuasaan Ratu Belanda
+5. Indonesia menjadi negara Persemakmuran Belanda.
+Dari data di atas, hasil perjanjian Linggarjati pada tanggal 10 November 1946 antara RI dengan Belanda adalah . ...`,
+[
+"1, 2, dan 3",
+"2, 4, dan 5",
+"1, 3, dan 5",
+"1, 3, dan 4",
+"3, 4, dan 5"
+]
+],
+
+[
+`Proklamasi Kemerdekaan Indonesia belum mengantarkan Indonesia memiliki kedaulatan penuh atas negaranya. Terjadinya Agresi Militer I dan II di Indonesia oleh Belanda telah menarik perhatian India dalam mendukung perjuangan Indonesia dalam mempertahanakan kemerdekaan. Dukungan India terhadap kemerdekaan Indonesia tidak terjadi secara spontanitas bermula dari simpati India saat memberikan bantuan beras kepada India. Respon India terhadap kemerdekaan Indonesia adalah ....`,
+[
+"India memberikan dukungan penuh terhadap perjuangan bangsa Indonesia akibat Agresi Militer II Belanda",
+"India bersimpati terhadap perjuangan kemerdekaan Indonesia dengan memasok kebutuhan hidup sehari-hari seperti beras dan pakaian",
+"India menjadi negara mengecam aksi Agresi Militer I dengan menuduh Belanda melakukan agresi militer terhadap Indonesia",
+"India mendukung penuh perjuangan bangsa Indonesia dalam mempertahankan kemerdekaannya dengan dukungan PBB",
+"India mengupayakan para petinggi Indonesia untuk melakukan diplomasi dengan negara Amerika dan Uni Soviet yang saat itu berkuasa agar dapat membantu Indonesia melawan Belanda"
+]
+],
+
+[
+`Bukti bahwa Indonesia sebagai anggota ASEAN telah melaksanakan politik luar negeri yang bebas aktif antara lain turut serta berpartisipasi dalam meredakan pertikaian antarfaksi di Kamboja pada tahun 1988 dengan cara ….`,
+[
+"memberi bantuan senjata kepada kelompok independen.",
+"mengirim pasukan Garuda sebagai pasukan Dewan Keamanan PBB.",
+"memberi bantuan ekonomi dan obat-obatan bagi rakyat Kamboja.",
+"menyediakan tempat untuk pelaksanaan Jakarta Informal Meeting ( JIM ).",
+"menjadi penengah antara keempat faksi yang sedang bertikai."
+]
+],
+
+[
+`Indonesia tergabung dalam AFTA (Asean Free Trade Area) yang bertujuan menyediakan kawasan ASEAN sebagai tempat produksi yang kompetitif sehingga produk ASEAN memiliki daya saing kuat di pasar global. AFTA memberikan banyak manfaat bagi bangsa Indonesia dan berpengaruh terhadap perekonomian Indonesia. Peran Indonesia dalam AFTA adalah ....`,
+[
+"Indonesia menjadi pelopor organisasi AFTA dalam meningkatkan perekonomian di wilayah Asia Tenggara sebagai kawasan bebas perdagangan",
+"Indonesia melakukan kolaborasi dengan negara-negara yang tergabung dalam AFTA secara intensif sehingga dapat meningkatkan aspek ekonomi dan budaya bangsa Indonesia",
+"Indonesia berkontribusi dalam kegiatan perdagangan bebas dunia yang dilaksanakan AFTA sebagai organisasi ekonomi yang bergerak secara internasional",
+"Indonesia berperan aktif sebagai anggota AFTA sehingga memberikan kemudahan mengakses modal investasi dari luar negeri",
+"Indonesia mendukung keanggotaan AFTA sebagai bentuk kawasan bebas perdagangan dalam rangka meningkatkan daya saing ekonomi dunia"
+]
+],
+
+[
+`Perhatikan pernyataan berikut ini!
+1. Kesenjangan ekonomi semakin parah, GDP Ceko selalu mengungguli Slowakia
+2. Transfer payments dihentikan oleh Ceko pada tahun 1991
+3. Bangsa Slowakia menginginkan desentralisasi
+4. Partai Nasional Slowakia menghendaki kemerdekaan penuh
+5. Partai komunis Cekoslowakia menghendaki kemerdekaan penuh
+Kondisi politik dan ekonomi Cekoslowakia sebelum terjadinya perpecahan ditunjukkan oleh nomor ....`,
+[
+"1, 2, dan 3",
+"2, 3, dan 5",
+"1, 2, dan 4",
+"3, 4, dan 5",
+"2, 3, dan 4"
+]
+],
+
+[
+`Perhatikan pernyataan berikut ini !
+1. Mencegah anggota keluarganya untuk terlibat dalam pemerintahan 4. Mengalahkan lawan politiknya dengan tindakan melanggar HAM
+2. Mengekang kebebasan dan hak-hak kaum sipil 5. Menolak kehadiran militer dalam pemerintahannya
+3. Menjadikan media massa sebagai alat bagi kepentingan pemerintah
+Tindakan Marcos yang dianggap diktator ditunjukkan nomor ....`,
+[
+"1, 2, dan 3",
+"1, 3, dan 5",
+"2, 3, dan 4",
+"2, 3, dan 5",
+"3, 4, dan 5"
+]
+],
+
+[
+`Perhatikan tokoh-tokoh berikut!
+1. Maria Corazon ‘Cory’ Sumulong Cojuangco Aquino 3. Jaime Kardinal Sin 5. Vladimir Meclar
+2. Jenderal Fidel Valdez Ramos 4. Enrille dan Ramos 
+Tokoh-tokoh di balik gerakan people power di Filipina adalah ....`,
+[
+"1, 2, 3",
+"1, 3, 5",
+"2, 3, 5",
+"2, 3, 4",
+"3, 4, 5"
+]
+],
+
+[
+`Lahirnya Republik Khmer atau Republik Kamboja dilatarbelakangi oleh....`,
+[
+"Keberhasilan Lon Nol merebut kekuasaan dari Norodom Sihanouk",
+"Keberhasilan rezim Pol Pot menggulingkan kekuasaan Lon Nol",
+"Keberhasilan pasukan Vietnam menggulingkan rezim Pol Pot",
+"Meninggalnya Norodom Suramarit",
+"Adanya Perang Dingin"
+]
+],
+
+[
+`Berikut yang tidak termasuk dalam faktor-faktor yang menjadi penyebab perpecahan di Yugoslavia adalah….`,
+[
+"Bangsa Serbia selalu mendominasi suku bangsa lainnya.",
+"Suku-suku bangsa di Yugoslavia sudah memiliki bibit permusuhan",
+"Kesatuan Yugoslavia selama enam dasawarsa terakhir lebih disebabkan oleh adanya kecemasan terhadap ancaman Nazi jerman, fasisme Italia, dan komunisme Uni soviet",
+"Adanya tokoh pemimpin yang mampu menggantikan peran presiden Josib Broz Tito.",
+"Adanya kemunduran ekonomi sejak tahun 1980."
+]
+],
+
+[
+`Perhatikan pernyataan berikut ini !
+1. Terbatasnya ketersediaan infrastruktur inovasi IPTEK
+2. Belum optimalnya mekanisme sinergi pelaku inovasi iptek.
+3. Rendahnya kualitas SDM untuk inovasi iptek dan rekayasa sosial
+4. Ketidakmampuan bersaing pascaproduksi dengan negara tetangga
+5. Dilarangnya masyarakat dalam menggunakan hasil inovasi IPTEK nasional
+Dari pernyataan di atas, yang merupakan faktor-faktor yang menyebabkan rendahnya perkembanganan IPTEK di sebuah negara termasuk Indonesia ditunjukkan oleh nomor …`,
+[
+"1, 2, dan 3",
+"1, 2, dan 4",
+"1, 3, dan 5",
+"2, 3, dan 4",
+"2, 3, dan 5"
+]
+]
+];
+
+    const soalUraian=[
+"Sejarah merupakan sebuah peristiwa yang terjadi di masa lampau. Secara umum, sejarah terdapat beberapa ruang lingkup yang mendasari pengertian dan definisi sejarah itu sendiri. Jelaskan 4 (empat) ciri-ciri sejarah sebagai sebagai seni!",
+"Pergerakan Nasionalisme India di pelopori oleh Mahatma Gandhi pada tahun 1914. Beliau menanamkan ajaran-ajaran yang berpengaruh besar bagi nasionalisme di India, sebutkan dan jelaskan 4 paham perjuangan Mahatma Gandhi tersebut!",
+"Dalam rangka memperbaiki kehidupan ekonomi dan politik di Uni Soviet, Mikhail Gorbachev (1985-1991) melakukan perubahan besar-besaran dalam bentuk kebijakan-kebijakan. Jelaskan 2 (dua) kebijakan yang ditempuh oleh Mikhail Gorbachev!",
+"Pada masa pendudukan Jepang di Indonesia banyak organisasi yang dibentuk oleh pemerintah Jepang. Sebutkan salah satu organisasi bentukan Jepang yang perkembangannya sangat membantu Indonesia dalam meraih kemerdekaan dan berikan alasannya!",
+"Perang Dingin merupakan peristiwa dalam bentuk ketegangan sebagai perwujudan dari kepentingan dan perebutan supremasi serta perbedaan antara blok barat yang dipimpin oleh Amerika Serikat dan Blok Timur yang dipimpin oleh Uni Soviet. Sehingga Perang Dingin merupakan pertikaian antara kedua blok tersebut. Sebutkan 3 (tiga) latar belakang terjadinya Perang Dingin!"
+    ];
+
+    // --- 3. CORE SYSTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+            s[1].forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid var(--primary);">
+                        <b>Uraian ${i + 1}.</b><br>${soal}<br>
+                        <textarea class="jawaban-uraian" placeholder="Ketik langkah pengerjaan dan jawaban akhir di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        if(window.MathJax) MathJax.typeset();
+    }
+
+    // --- 4. SECURITY & LOGIC ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopInt = setInterval(() => { gainNode.gain.value = gainNode.gain.value === 0 ? 0.4 : 0; }, 200);
+    }
+    function stopAlarm() { if (oscillator) { oscillator.stop(); clearInterval(oscillator.stopInt); } }
+    
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 20000); }
+
+    async function goToTab(n) {
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+        if(n === 2) {
+            if(!nama || token !== TOKEN_VALID) { alert("Nama & Token Wajib Diisi!"); return; }
+            const btn = event.target; btn.innerText = "🔍 Validasi Server..."; btn.disabled = true;
+            try {
+                const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+                const status = await resp.text();
+                if(status === "AKTIF") {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab2').classList.add('active');
+                } else {
+                    alert("AKSES DITOLAK! Status: TERBLOKIR.");
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                }
+            } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
+            return;
+        }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab'+n).classList.add('active');
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('videoPreview').srcObject = s; } catch(e){}
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        violationCount++; playAlarm();
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
+            document.getElementById('inputGuruArea').innerHTML = `
+                <h2 style="color:red">ANDA TERBLOKIR</h2>
+                <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
+                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+        }
+    }
+
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+
+    function startTimer() { setInterval(() => { if(timeLeft > 0){ timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer').innerText=`${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        isBypass = true;
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        if(confirm("Yakin ingin mengumpulkan semua jawaban?")) {
+            const btn = document.getElementById('btnKirim'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value.trim().toUpperCase(), 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL_JAWABAN, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; isBypass = false; });
+        }
+    }
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

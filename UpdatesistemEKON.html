@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK MASTER - PKBM Ristek Nusantara Jaya</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* TEXTAREA LEBAR UNTUK SEMUA MAPEL */
+        .jawaban-uraian { 
+            width: 100%; 
+            min-height: 250px; 
+            padding: 15px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            resize: vertical; 
+            background: #F9FAFB;
+            line-height: 1.5;
+        }
+        .jawaban-uraian:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.75rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka aplikasi lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;"></div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">NAMA SISWA</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">EKONOMI</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b>Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar melalui Server Admin IT TEAM RNJ.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    const NAMA_MAPEL = "EKONOMI"; 
+    const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+    
+    const WA_ADMIN = "6285888157682";
+    const TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "UPK_MASTER09_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+    const SoalPG = [
+[
+"Dalam sepuluh tahun terakhir, persediaan kayu ulin untuk diolah para produsen semakin berkurang. Beberapa penyebab seperti berkurangnya lahan, pasokan kayu dari daerah-daerah penghasil kayu merosot tajam, dan kapal-kapal pengangkut kayu antar pulau yang juga semakin berkurang. Sementara dilain pihak, permintaan untuk kebutuhan furniture terus meningkat seiring berbagai proyek properti yang gencar dilaksanakan.<br><br>Berdasarkan ilustrasi di atas, dampak kelangkaan kayu ulin terhadap pengrajin kayu adalah ....",
+[
+"Merasa perlu mengundang para investor untuk membuka lahan baru sebagai sarana menanam kayu",
+"Terpaksa mengganti kayu untuk bangunan dengan bahan yang kurang tahan lama seperti bahan plastik",
+"Berkreasi mengolah dan menggunakan kayu sejenis atau kayu daur ulang dari sisa bahan bangunan",
+"Perlu menggunakan kayu impor yang didatangkan dari luar negeri walaupun dengan harga mahal",
+"Terpaksa berhenti berprofesi sebagai pengrajin kayu dan beralih profesi ke yang lain"
+]
+],
+
+[
+"Dari waktu ke waktu permasalahan ekonomi selalu muncul seiring dengan perkembangan kehidupan manusia. Semakin lama persoalan tersebut semakin kompleks, hal ini disebabkan oleh ....",
+[
+"Meningkatnya perkembangan ilmu pengetahuan dan teknologi",
+"Tersedianya sumber daya alam yang sangat melimpah",
+"Pemenuhan kebutuhan yang dapat memuaskan manusia",
+"Pertambahan penduduk dan meningkatnya pertumbuhan produksi",
+"Terbatasnya sumber daya alam dan tidak terbatasnya kebutuhan"
+]
+],
+
+[
+"Ciri-ciri kurva permintaan dan penawaran adalah sebagai berikut:<br>1. Semakin tinggi harga barang, maka jumlah barang akan berkurang,<br>2. Bergerak dari kiri atas menuju kanan bawah.<br>3. Harga berbanding terbalik dengan jumlah barang.<br>4. Rumus fungsi digambarkan dengan P = a − bQ.<br>5. Memiliki angka koefisien negatif.<br><br>Berdasarkan ciri-ciri kurva di atas, yang termasuk ciri kurva permintaan adalah ....",
+[
+"1, 2, 3",
+"1, 3, 5",
+"2, 3, 4",
+"2, 3, 5",
+"3, 4, 5"
+]
+],
+
+[
+"Pak Haris adalah seorang pengusaha kerajinan rotan yang ingin mengembangkan usahanya agar dapat meningkatkan keuntungan perusahaan. Masalah ekonomi modern yang dihadapi oleh pak Haris adalah ....",
+[
+"Untuk siapa produk kerajinan rotan itu diproduksi",
+"Siapa yang membuat produk kerajinan rotan",
+"Kapan produk kerajinan rotan tersebut digunakan",
+"Bagaimana cara memproduksi agar lebih efisien",
+"Dimana produk kerajinan rotan tersebut akan diproduksi"
+]
+],
+
+[
+"Perhatikan gambar berikut:Bagan interaksi rumah tangga produksi dan rumah tangga konsumsi <br><img src='https://i.imgur.com/B7q8hXj.png' style='max-width:100%; margin-top:10px;'><br>Kegiatan yang dilakukan konsumen dalam pasar input adalah ....",
+["1","2","3","4","5"]
+],
+
+[
+"Diketahui fungsi permintaan suatu barang Qd = - P + 12 sedangkan fungsi penawarannya Qs = 2P - 6 tentukan berapakah harga dan jumlah keseimbangan pasarnya ....",
+[
+"(6,6)",
+"(6,2)",
+"(6,6)",
+"(2,6)",
+"(4,2)"
+]
+],
+
+[
+"Berikut ini data harga minyak goreng di Pasar Jaya Pondok Ireng pada September 2017:<br><img src='https://i.imgur.com/oLlgdt7.png' style='max-width:100%; margin-top:10px;'><br>Berdasarkan data di atas, maka titik keseimbangan pasar (Q;P) adalah ....",
+[
+"(200; 10.000)",
+"(250; 15.000)",
+"(450; 35.000)",
+"(15.000; 250)",
+"(35.000; 450)"
+]
+],
+
+[
+"Jika harga terigu Rp 5.000,00/kg, penjual bersedia menawarkan 10 kg. Jika harga terigu naik menjadi Rp 7.000,00/kg, penjual bersedia menawarkan 30 kg. Berdasarkan data tersebut, fungsi penawaran terhadap terigu adalah ....",
+[
+"Q = 1/100 P − 40",
+"Q = 1/100 P + 40",
+"Q = 1/100 P − 20",
+"Q = 100 P + 4.000",
+"Q = 100 P − 40"
+]
+],
+
+[
+"Pengangguran musiman merupakan pengangguran yang terjadi secara berkala karena seseorang tidak bekerja disaat ia menunggu datangnya musim panen, umumnya terjadi pada sektor pertanian. Ada upaya yang dapat dilakukan untuk mengatasi pengangguran semacam ini. Adapun upaya pemerintah dalam mengatasi pengangguran di Indonesia antara lain :<br>1. Mendirikan industri padat karya<br>2. Menciptakan lapangan kerja baru<br>3. Menggalakkan pembangunan sektor informal, seperti home industry<br>4. Menutup perusahaan asing<br>5. Memberikan pelatihan/keterampilan melalui BLK<br><br>Dari data di atas yang merupakan upaya pemerintah dalam mengurangi pengangguran musiman adalah ....",
+[
+"1, 2, dan 3",
+"1, 3, dan 4",
+"2, 3, dan 4",
+"2, 3, dan 5",
+"3, 4, dan 5"
+]
+],
+
+[
+`Berikut ini merupakan instrument Kebijakan pemerintah di bidang moneter dan fiskal dalam mengatasi inflasi adalah :
+1. Kebijakan diskonto
+2. Pajak
+3. Subsidi
+4. Kebijakan pasar terbuka
+5. Pinjaman publik
+6. Kebijakan cash rasio
+Yang termasuk kebijakan Fiskal adalah ....`,
+[
+"1, 2, dan 3",
+"1, 3, dan 4",
+"2, 3, dan 5",
+"2, 4, dan 5",
+"3, 4, dan 5"
+]
+],
+
+[
+`Menurut UU Nomor 21 Tahun 2011, Otoritas Jasa Keuangan (OJK) dibentuk dengan tujuan agar keseluruhan kegiatan di dalam sektor jasa keuangan mampu terselenggara secara teratur, adil, transparan, dan akuntabel. OJK dibentuk untuk mewujudkan sistem keuangan yang tumbuh secara berkelanjutan, stabil, serta melindungi kepentingan konsumen dan masyarakat. Berikut ini salah satu fungsi OJK bagi masyarakat adalah ....`,
+[
+"Menaikan tingkat literasi dan inklusi di kalangan masyarakat",
+"Memberikan pembinaan tentang kinerja pegawai lembaga bank",
+"Menggalakkan kegiatan suka menabung kepada pelajar dan masyarakat",
+"Mengarahkan konsumen menuntut ketidaknyamanan di lembaga keuangan",
+"Mewajibkan lembaga keuangan mengadakan pencatatan di setiap kegiatan"
+]
+],
+
+[
+`Berikut fungsi dan tujuan APBN:
+1. Untuk meningkatkan produksi, kesempatan kerja dan pertumbuhan ekonomi yang cukup tinggi.
+2. Pedoman untuk kegiatan penyelenggaraan negara.
+3. Pedoman penerimaan dan pengeluaran negara, agar terjadi keseimbangan yang dinamis.
+4. Pedoman pendapatan dan belanja negara dalam melaksanakan tugas negara.
+5. Alat stabilisator ekonomi nasional untuk memelihara dan mengupayakan keseimbangan fundamental ekonomi.
+Yang merupakan fungsi APBN adalah ....`,
+[
+"(2), (3), dan (4)",
+"(1), (2), dan (3)",
+"(1), (3), dan (4)",
+"(1), (4), dan (5)",
+"(3), (4), dan (5)"
+]
+],
+
+[
+`Penerimaan pemerintah pusat dan pemerintah daerah adalah sebagai berikut:
+1) Pajak Bumi dan Bangunan
+2) PPh dan Cukai
+3) Retribusi daerah
+4) Pajak hotel dan pajak restoran
+5) Dana perimbangan
+Sumber Penerimaan pemerintah daerah dalam APBD ditunjukkan oleh nomor....`,
+[
+"1), 2), dan 3)",
+"1), 2), dan 5)",
+"1), 3), dan 4)",
+"2), 4), dan 5)",
+"3), 4), dan 5)"
+]
+],
+
+[
+`Berikut ini data yang digunakan untuk perhitungan pendapatan nasional Negara Surya Kencana.
+– Upah Rp 850 miliar
+– Bunga modal Rp 200 miliar
+– Laba usaha Rp 200 miliar
+– Sewa tanah Rp 350 miliar
+
+– Pengeluaran rumah tangga Rp 800 miliar
+– Belanja pemerintah Rp 500 miliar
+– Investasi Rp 600 miliar
+– Impor Rp 50 miliar
+
+Jika pendapatan nasional dihitung dengan pendekatan pengeluaran menghasilkan Rp 1.950 miliar, maka nilai ekspor adalah ….`,
+[
+"Rp 50 miliar",
+"Rp 100 miliar",
+"Rp 500 miliar",
+"Rp 550 miliar",
+"Rp 600 miliar"
+]
+],
+
+[
+`Negara Glier memiliki data kecepatan peredaran uang sebesar 0,25 dan harga pasar di kisaran Rp70.000,00. Jika jumlah transaksi yang terjadi pada periode tertentu adalah 300.000 unit, maka besar jumlah uang beredar adalah ….`,
+[
+"Rp 5.750.000.000,00",
+"Rp 57.500.000.000,00",
+"Rp140.000.000.000,00",
+"Rp 84.000.000.000,00",
+"Rp 8.400.000.000,00"
+]
+],
+
+[
+`Perhatikan tabel yang berisi daftar harga hasil pertanian pada 5 daerah berikut ini! (dalam rupiah)
+<br><br>
+<img src="https://i.imgur.com/AvIurF9.png" style="max-width:100%; border-radius:10px;">
+<br><br>
+Sedangkan data Indeks Bayar (IB) petani pada tahun 2016 sebagai berikut:
+– Kutaraja = 121 %
+– Kutabaru = 128 %
+– Kutagede = 139 %
+– Kutajaya = 128 %
+– Kutamaju = 125 %
+
+Berdasarkan data di atas, maka kesimpulan yang tepat adalah …`,
+[
+"Petani Desa Kutaraja lebih sejahtera dibandingkan petani Desa Kutagede.",
+"Petani Desa Kutabaru lebih sejahtera dibandingkan petani Desa Kutamaju.",
+"Petani Desa Kutagede tidak lebih sejahtera dibandingkan petani Desa Kutabaru.",
+"Kesejahteraan petani Desa Kutamaju paling tinggi daripada desa lainnya.",
+"Kesejahteraan petani Desa Kutaraja paling rendah dari pada desa lainnya Rp 1.550.000,00"
+]
+],
+
+[
+`Tuan Ahmad di sebuah perusahaan menjabat sebagai manajer personalia. Bagian dari kegiatan yang dilakukannya adalah merencanakan penerimaan pegawai baru. Untuk merealisasikan rencananya, tuan Ahmad melakukan kegiatan mulai dari menyusun panitia penerimaan pegawai, menentukan tugas dan tanggung jawab masing-masing, serta merencanakan pendelegasian wewenang kepada bawahannya.
+Kegiatan-kegiatan yang dilakukan tuan Amir sesuai dengan fungsi manajemen ....`,
+[
+"Forecasting",
+"Controlling",
+"Planning",
+"Organizing",
+"Actuating"
+]
+],
+
+[
+`Ciri-ciri koperasi sebagai salah satu bentuk badan usaha diantaranya:
+1) beranggotakan minimal 20 orang
+2) beranggotakan badan hukum koperasi
+3) berkedudukan di tingkat propinsi
+4) ada di desa maupun kota
+5) mempunyai kegiatan multi usaha
+
+Ciri-ciri tersebut di atas yang merupakan ciri koperasi Primer yaitu ....`,
+[
+"1), 2) dan 3)",
+"1), 2) dan 4)",
+"1), 3) dan 5)",
+"2), 3) dan 4)",
+"2), 4) dan 5)"
+]
+],
+
+[
+`Pada saat merencanakan mendirikan perusahaan perlu memperhatikan kebaikan dan kelemahan badan usaha yang akan didirikan. Berikut ini kelebihan dan kelemahan suatu badan usaha :
+(1) Modal lebih mudah didapat dengan cara menjual saham.
+(2) Hasil keputusan lebih baik, karena merupakan hasil musyawarah di antara sekutu.
+(3) Dapat diadakan pembagian kerja antar sekutu sesuai keahliannya.
+(4) Perhatian sekutu terhadap sangat besar, karena tindakan sekutu yang satu akan menjadi tanggung jawab semuanya.
+(5) Dapat menempatkan orang-orang yang profesional untuk mengurus perusahaan.
+(6) Terdapat efisiensi dalam pengelolaan sumber dana dan pimpinan
+
+Berdasarkan pernyataan di atas, yang termasuk kebaikan badan usaha yang berbentuk firma adalah ....`,
+[
+"(1), (2), dan (3)",
+"(1), (3), dan (5)",
+"(2), (3), dan (4)",
+"(2), (4), dan (6)",
+"(3), (5), dan (6)"
+]
+],
+
+[
+`Berikut ini berbagai aktivitas dalam transaksi modal dan transaksi berjalan negara “X”:
+(1) Bea cukai menerima pemasukan dana dari para TKI yang pulang ke tanah air.
+(2) Pemerintah meningkatkan ekspor CPO (Crude Palm Oil) kenegara-negara Amerika.
+(3) Pemerintah melakukan impor beras pada saat panen raya tengah berlangsung.
+(4) Pemerintah menyatakan akan mencairkan dividen saham luar negeri karena telah jatuh tempo.
+(5) Para importir barang elektronik menambah volume perdagangannya.
+
+Berdasarkan aktivitas tersebut, yang dapat dijadikan sumber devisa ditunjukkan nomor ....`,
+[
+"(1), (2), dan (3)",
+"(1), (2), dan (4)",
+"(2), (3), dan (4)",
+"(2), (4), dan (5)",
+"(3), (4), dan (5)"
+]
+],
+
+[
+`Perhatikan pernyataan-pernyataan berikut :
+1. Nasabah di bank swasta nasional semakin besar
+2. Indonesia melakukan impor beras sebesar 300 ton selama bulan September 2014 karena kekeringan yang terjadi di daerah
+3. Investasi yang dilakukan oleh pengusaha Indonesia ke Negara Vietnam selama triwulan pertama 2016 mengalami peningkatan sebesar US $ 1,5 juta.
+4. TKI yang bekerja di Korea Selatan semakin lama semakin banyak setelah Presiden berkunjung ke Korea Selatan.
+5. Ekspor di sektor agraris kita mengalami peningkatan setelah diberlakukannya MEA.
+Dari pernyataan tersebut, yang berkaitan dengan kebijakan untuk meningkatkan penerimaan devisa dalam negeri adalah ....`,
+[
+"1 dan 2",
+"2 dan 3",
+"3 dan 4",
+"4 dan 5",
+"5 dan 1"
+]
+],
+
+[
+`Perhatikan data neraca pembayaran Negara Makmur Sejahtera tahun 2017 berikut ini!
+A. Transaksi Berjalan (current account)
+1. Impor barang Rp 55.000.000.000,00
+2. Impor jasa Rp 35.000.000.000,00
+3. Ekspor barang Rp 69.000.000.000,00
+4. Ekspor jasa Rp 31.500.000.000,00
+B. Lalu Lintas Modal (capital account)
+1. Pembayaran deviden ke LN Rp 56.700.000.000,00
+2. Pendapatan penanaman modal LN Rp 78.900.000.000,00
+C. Lalu Lintas Moneter
+1. Terima bunga pinjaman LN Rp 84.600.000.000,00
+2. Bayar bunga pinjaman utang ke LN Rp 99.500.000.000,00
+
+Jika negara yang bertransaksi dengan Negara Makmur Sejahtera menggunakan mata uang Poundsterling (£) dengan kurs jual Rp17.500,00 dan kurs beli Rp17.300,00, maka pernyataan yang paling tepat adalah ....`,
+[
+"Total penerimaan negara dalam valuta asing adalah £ 15.260.115,61",
+"Total penerimaan negara dalam valuta asing adalah £ 14.057.142,86",
+"Total pengeluaran negara dalam valuta asing adalah £ 14.231.213,87",
+"Total pengeluaran negara dalam valuta asing adalah £ 15.085.714,29",
+"Total neraca pembayaran dalam valuta asing adalah defisit £ 1.202.972,75"
+]
+],
+
+[
+`Tuan Khairul menjual kerajinan rotan ke Jepang seharga Rp 20 juta. Ia juga membeli barang elektronik dari Jepang senilai 120.000 yen. Kurs jual dan beli BI per 1,00 yen pada tanggal tersebut adalah Rp 118 dan Rp115. Dan kurs tengah BI untuk 1 yen adalah Rp 117. Berdasarkan kesepakatan pembayaran dilakukan oleh pihak bank, karena pembeli dan penjual merupakan nasabah bank tersebut besar Rupiah yang diterima tuan Khairul adalah ....`,
+[
+"Rp 5.840.000",
+"Rp 5.960.000",
+"Rp 6.200.000",
+"Rp 6.360.000",
+"Rp 5.690.000"
+]
+],
+
+[
+`Neraca pembayaran suatu Negara pada tahun 2017 ditunjukkan dengan transaksi (miliar rupiah)
+– Ekspor Rp 8.000 miliar
+– Impor Rp 7.000 miliar
+– Neraca perdagangan Rp 1.700 miliar
+– Pinjaman otonom Rp 1.300 miliar
+– Pinjaman akomodatif Rp 1.000 miliar
+
+Berdasarkan data tersebut, neraca pembayaran tersebut mengalami …..`,
+[
+"Defisit Rp 400 miliar",
+"Surplus Rp 400 miliar",
+"Defisit Rp 1.300 miliar",
+"Surplus Rp 1.300 miliar",
+"Defisit Rp 3.000 miliar"
+]
+],
+
+[
+`Manfaat informasi keuangan bagi para pemakai adalah:
+1. Untuk pertimbangan dalam menyusun perencanaan dan pengawasan terhadap keuangan perusahaan
+2. Untuk pertimbangan pemberian kredit
+3. Untuk evaluasi kinerja perusahaan
+4. Sebagai dasar perhitungan pajak
+5. Untuk menyusun target usaha tahun depan
+
+Yang merupakan manfaat informasi akuntansi bagi pihak-pihak internal Perusahaan adalah….`,
+[
+"1, 2 dan 3",
+"1, 3 dan 5",
+"2, 3 dan 4",
+"2, 4 dan 5",
+"3, 4 dan 5"
+]
+],
+
+[
+    `Pada tanggal 21 September 2016 perusahaan mengangsur utang kepada bank Utama sebesar Rp 4.000.000,00 dengan tingkat bunga bank Rp 300.000,00. Pencatatan transaksi tersebut kedalam jurnal umum yang benar adalah ....
+
+<br><br>
+
+<b>A.</b><br>
+<img src="https://i.imgur.com/2zuo1QY.png" style="max-width:100%; margin-bottom:15px;">
+
+<b>B.</b><br>
+<img src="https://i.imgur.com/YuSadM7.png" style="max-width:100%; margin-bottom:15px;">
+
+<b>C.</b><br>
+<img src="https://i.imgur.com/FufoyFA.png" style="max-width:100%; margin-bottom:15px;">
+
+<b>D.</b><br>
+<img src="https://i.imgur.com/9RE6bPg.png" style="max-width:100%; margin-bottom:15px;">
+
+<b>E.</b><br>
+<img src="https://i.imgur.com/NKbxGtc.png" style="max-width:100%;">
+
+<br><br>
+<i>Jawab dengan memilih kolom PG dibawah ini.....</i>
+`,
+[
+"A",
+"B",
+"C",
+"D",
+"E"
+]
+],
+
+[
+`Perhatikan data Salon Sholehah berikut ini,
+– Pendapatan jasa Rp 15.000,00                 – Beban perlengkapan Rp 600,00
+– Pendapatan diterima dimuka Rp 2.500,00      – Gaji dibayar dimuka Rp 800,00
+– Beban gaji Rp 4.000,00                      – Modal awal Sholehah Rp 36.000,00
+– Beban lain-lain Rp 1.200,00                 – Prive Sholehah Rp 3.000,00
+
+Berdasarkan data tersebut maka modal akhir Sholehah sebesar ....`,
+[
+"Rp 48.200,00",
+"Rp 45.500,00",
+"Rp 45.000,00",
+"Rp 42.200,00",
+"Rp 40.500,00"
+]
+],
+
+[
+`Oktin membuka usaha antar jemput anak sekolah. Oleh karena itu, ia memulai usahanya dengan menyerahkan mobil minibusnya senilai Rp 60.000.000,00 sebagai modal, ia juga meminjam uang di bank Volo sebesar Rp10.000.000,00 untuk menambah dana usahanya. Pengaruh transaksi tersebut terhadap persamaan dasar akuntansi adalah....`,
+[
+"Kas (+) Rp70.000.000,00, Utang (+) Rp10.000.000,00 dan modal (+) Rp 60.000.000,00",
+"Kas (+) Rp 60.000.000,00, Utang (+) Rp10.000.000,00 dan modal (+) Rp 60.000.000,00",
+"Kendaraan (+) Rp 60.000.000,00, Utang (+) Rp10.000.000,00 dan modal (+) Rp 70.000.000,00",
+"Kas (+) Rp10.000.000,00, Peralatan (+) Rp 60.000.000,00, Utang (+) Rp 10.000.000,00 dan modal (+) Rp 60.000.000,00",
+"Kas (+) Rp10.000.000,00, Kendaraan (+) Rp 60.000.000,00, Utang (+) Rp 10.000.000,00 dan modal (+) Rp 60.000.000,00"
+]
+],
+
+[
+`Salon Al - Amira memiliki data keuangan per 31 Desember 2017 sebagai berikut:
+– Modal awal Rp 20.000.000,00                 – Beban iklan Rp 10.000.000,00
+– Modal akhir Rp 50.000.000,00                – Beban sewa Rp 2.000.000,00
+– Pendapatan jasa Rp 40.000.000,00            – Beban listrik Rp 500.000,00
+– Pendapatan diluar usaha Rp 5.000.000,00     – Beban gaji karyawan Rp 4.000.000,00
+– Pendapatan komisi Rp 5.000.000,00
+
+Berdasarkan data di atas, besarnya jumlah laba sebesar ....`,
+[
+"Rp 50.000.000,00",
+"Rp 23.500.000,00",
+"Rp 16.500.000,00",
+"Rp 33.500.000,00",
+"Rp 30.000.000,00"
+]
+],
+
+[
+`Sebagian Neraca Saldo Salon “Cantik” per 31 Desember 2017 sebagai berikut:
+– Kas Rp 185.000.000,00                     – Iklan dibayar dimuka Rp 12.000.000,00
+– Asuransi dibayar dimuka Rp 24.000.000,00  – Perlengkapan Rp 8.500.000,00
+
+Data penyesuaian per 31 Desember 2016:
+1. Premi asuransi pada tanggal 1 Mei 2016 untuk dua tahun
+2. Tersedia perlengkapan Rp 3.500.000,00
+3. Iklan dibayar untuk 24 edisi, sampai dengan 31 Desember 2017 baru diterbitkan 18 kali
+
+Jurnal penyesuaian yang benar adalah ....`,
+[
+"Perlengkapan Rp 5.000.000,00 / Beban perlengkapan Rp 5.000.000,00",
+"Beban asuransi Rp 14.000.000,00 / Asuransi dibayar dimuka Rp 14.000.000,00",
+"Asuransi dibayar dimuka Rp 14.000.000,00 / Beban asuransi Rp 14.000.000,00",
+"Beban iklan Rp 3.000.000,00 / Iklan dibayar dimuka Rp 3.000.000,00",
+"Beban perlengkapan Rp 5.000.000,00 / Perlengkapan Rp 5.000.000,00"
+]
+],
+
+[
+`JURNAL PENGELUARAN KAS (Rp 000,00)
+
+<br><br>
+
+<img src="https://i.imgur.com/R3ihqPH.png" style="max-width:100%; border-radius:10px;">
+
+<br><br>
+
+Transaksi yang tepat berdasarkan jurnal pengeluaran kas di atas adalah....`,
+[
+"2 Oktober dibeli barang dagang senilai Rp3.500.000,00 dengan syarat 2/10, n/30 dari Toko “Lia”.",
+"3 Oktober dilunasi utang kepada Fa. Kenari seharga Rp1.500.000,00 atas transaksi seminggu yang lalu, syarat 2/10, n/30.",
+"5 Oktober dibayar gaji 2 orang karyawan @ Rp2.250.000,00.",
+"6 Oktober dibeli peralatan seharga Rp2.500.000,00 dengan potongan Rp500.000,00.",
+"8 Oktober dibayar cicilan utang tanggal 3 Oktober kepada Fa. Kenari seharga Rp1.700.000,00 dengan potongan 2%"
+]
+],
+
+[
+`Sebagian jurnal umum yang dibuat oleh Biro Jasa Rahmatul Ummah pada bulan November 2018:
+
+<br><br>
+
+<img src="https://i.imgur.com/XrvW7gb.png" style="max-width:100%; border-radius:10px;">
+
+<br><br>
+
+Berdasarkan data di atas, maka posting ke buku besar yang benar adalah....
+
+<br><br>
+
+<img src="https://i.imgur.com/X5B9LAC.png" style="max-width:100%; border-radius:10px;">
+`,
+[
+"A",
+"B",
+"C",
+"D",
+"E"
+]
+],
+
+[
+`Data Akuntansi Toko Berlian sebagai berikut:
+– Persediaan barang dagang awal Rp. 15.000.000,00
+– Beban angkut pembelian Rp. 1.250.000,00
+– Beban angkut penjualan Rp. 1.000.000,00
+– Pembelian Rp. 10.000.000,00
+– Persediaan barang dagang akhir Rp. 5.000.000,00
+– Retur pembelian Rp. 500.000,00
+– Potongan pembelian dan Pot. harga Rp. 750.000,00
+– Penjualan Rp. 20.000.000,00
+– Potongan Penjualan Rp. 750.000,00
+
+Dari data di atas, besar Harga Pokok Penjualan adalah....`,
+[
+"Rp 22.500.000,-",
+"Rp 20.000.000,-",
+"Rp 17.500.000,-",
+"Rp 21.250.000,-",
+"Rp 1.700.000,-"
+]
+],
+
+[
+`Sebagian data keuangan UD. Kaya Raya sebagai berikut:
+
+AKUN – JUMLAH
+Kas Rp 870.000.000,00
+Piutang Rp 23.000.000,00
+Perlengkapan Rp 17.000.000,00
+Utang Rp 55.000.000,00
+Prive Rp 2.000.000,00
+Modal Rp 150.000.000,00
+Pendapatan bunga Rp 3.000.000,00
+Pendapatan usaha Rp 50.100.000,00
+Beban gaji Rp 2.150.000,00
+Beban asuransi Rp 1.350.000,00
+
+Jika laba bersih sebelum pajak Rp 67.100.000,00, maka besar pendapatan di luar usaha UD Kaya Raya adalah....`,
+[
+"Rp 70.650.000,00",
+"Rp 20.500.000,00",
+"Rp 17.500.000,00",
+"Rp 7.060.000,00",
+"Rp 3.000.000,00"
+]
+],
+
+[
+`Neraca Saldo (sebagian) “JAYA Rental” per 31 Desember 2017
+
+<br><br>
+
+<img src="https://i.imgur.com/33pv9vQ.png" style="max-width:100%; border-radius:10px;">
+
+<br><br>
+
+Catatan data penyesuaian pada akhir tahun:
+Perlengkapan tersisa senilai Rp1.500.000,00
+Premi asuransi dibayar pada tanggal 1 Mei 2017 untuk dua tahun.
+Sewa gedung dibayar pada tanggal 2 Maret 2017 untuk setahun
+
+<br><br>
+
+Dari data di atas disusun kertas kerja sebagai berikut:
+
+<br><br>
+
+<img src="https://i.imgur.com/g6i98pz.png" style="max-width:100%; border-radius:10px;">
+
+<br><br>
+
+Penyusunan kertas kerja yang tepat terdapat pada nomor....`,
+[
+"(1), (2), dan (3)",
+"(1), (3), dan (5)",
+"(2), (3), dan (5)",
+"(2), (4), dan (6)",
+"(3), (4), dan (6)"
+]
+],
+
+];
+
+const soalUraian = [
+    // Soal Nomor 1
+    `Data permintaan dan penawaran:<br>
+    <img src="https://i.imgur.com/vsZdr87.png" style="max-width:100%; border-radius:10px; margin:10px 0;"><br>
+    Dari tabel di atas tentukan harga keseimbangannya dan gambarkan kurva permintaan dan penawaran!`,
+
+    // Soal Nomor 2
+    `Data untuk menghitung Pendapatan Nasional tahun 2017 (dalam jutaan):<br>
+    <img src="https://i.imgur.com/oihFxC4.png" style="max-width:100%; border-radius:10px; margin:10px 0;"><br>
+    Hitunglah besar pendapatan nasional dengan pendekatan pengeluaran!`,
+
+    // Soal Nomor 3 (Hanya Teks)
+    `Negara Indonesia merupakan bagian dari Negara-negara yang ada di Dunia... <br><br> Sebutkan (minimal 3) manfaat perdagangan internasional dan apa saja faktor yang mendorongnya!`,
+
+    // Soal Nomor 4
+    `Berikut ini sebagian data laporan keuangan 3 perusahaan Jasa:<br>
+    <img src="https://i.imgur.com/h9HFmCc.png" style="max-width:100%; border-radius:10px; margin:10px 0;"><br>
+    Hitung dan urutkan jumlah modal akhir ketiga perusahaan dari yang terkecil hingga terbesar!`,
+
+    // Soal Nomor 5
+`Berikut ini Neraca Saldo disesuaikan sebagian dari UD "Kurnia Ilahi" Periode 31 Desember 2018 (dalam ribuan rupiah):<br>
+    <img src="https://i.imgur.com/2nuk7gB.png" style="max-width:100%; border-radius:10px; margin:10px 0;"><br>
+    <b>Susunlah jurnal penutup UD "Kurnia Ilahi" Periode 31 Desember 2018!</b>`    
+];
+    // --- 3. CORE SYSTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+            s[1].forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid var(--primary);">
+                        <b>Uraian ${i + 1}.</b><br>${soal}<br>
+                        <textarea class="jawaban-uraian" placeholder="Ketik langkah pengerjaan dan jawaban akhir di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        if(window.MathJax) MathJax.typeset();
+    }
+
+    // --- 4. SECURITY & LOGIC ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopInt = setInterval(() => { gainNode.gain.value = gainNode.gain.value === 0 ? 0.4 : 0; }, 200);
+    }
+    function stopAlarm() { if (oscillator) { oscillator.stop(); clearInterval(oscillator.stopInt); } }
+    
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 20000); }
+
+    async function goToTab(n) {
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+        if(n === 2) {
+            if(!nama || token !== TOKEN_VALID) { alert("Nama & Token Wajib Diisi!"); return; }
+            const btn = event.target; btn.innerText = "🔍 Validasi Server..."; btn.disabled = true;
+            try {
+                const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+                const status = await resp.text();
+                if(status === "AKTIF") {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab2').classList.add('active');
+                } else {
+                    alert("AKSES DITOLAK! Status: TERBLOKIR.");
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                }
+            } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
+            return;
+        }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab'+n).classList.add('active');
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('videoPreview').srcObject = s; } catch(e){}
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        violationCount++; playAlarm();
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
+            document.getElementById('inputGuruArea').innerHTML = `
+                <h2 style="color:red">ANDA TERBLOKIR</h2>
+                <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
+                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+        }
+    }
+
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+
+    function startTimer() { setInterval(() => { if(timeLeft > 0){ timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer').innerText=`${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        isBypass = true;
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        if(confirm("Yakin ingin mengumpulkan semua jawaban?")) {
+            const btn = document.getElementById('btnKirim'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value.trim().toUpperCase(), 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL_JAWABAN, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; isBypass = false; });
+        }
+    }
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK MASTER - PKBM Ristek Nusantara Jaya</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* TEXTAREA LEBAR UNTUK SEMUA MAPEL */
+        .jawaban-uraian { 
+            width: 100%; 
+            min-height: 250px; 
+            padding: 15px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            resize: vertical; 
+            background: #F9FAFB;
+            line-height: 1.5;
+        }
+        .jawaban-uraian:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.75rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka aplikasi lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;"></div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">NAMA SISWA</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">GEOGRAFI</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b>Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar melalui Server Admin IT TEAM RNJ.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    const NAMA_MAPEL = "GEOGRAFI"; 
+    const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+    
+    const WA_ADMIN = "6285888157682";
+    const TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "UPK_MASTER13_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+      const SoalPG = [
+    [
+        "Setiap gejala yang dipelajari selalu memiliki hubungan dengan gejala lain atau dengan ruang yang ditempati. Gejala seperti ini dikaji geografi dengan menggunakan prinsip ....", 
+        ["deskripsi", "spasial", "interelasi", "korologi", "penyebaran"]
+    ],
+    [
+        "Di bawah ini merupakan aspek-aspek yang dikaji dalam geografi, yang termasuk kedalam aspek sosial adalah….", 
+        [
+            "Persebaran flora dan fauna di dunia, kenegaraan, benda-benda langit", 
+            "Persebaran bangsa-bangsa, kenegaraan, upaya pemenuhan kebutuhan", 
+            "Persebaran bangsa-bangsa, antariksa, unsur-unsur kimiawi", 
+            "Antariksa, unsur-unsur kimiawi, kekuasaan (politis)", 
+            "Kekuasaan (politis), upaya pemenuhan kebutuhan, antariksa"
+        ]
+    ],
+    [
+        "Setiap wilayah memiliki potensi yang berbeda dengan wilayah lain. Potensi tersebut dimanfaatkan penduduk untuk menunjang kehidupan. Misalnya, penduduk daerah pegunungan memanfaatkan lahan di wilayahnya untuk mencari nafkah dengan bercocok tanam sayur dan buah. Ada juga penduduk dari wilayah lain yang memanfaatkan wilayah pegunungan untuk rekreasi. Konsep geografi yang sesuai untuk mengkaji fenomena tersebut adalah ....", 
+        ["aglomerasi", "nilai kegunaan", "keterjangkauan", "pola", "morfologi"]
+    ],
+    [
+        "Badan Meteorologi Klimatologi dan Geofisika memastikan bahwa gempa di Pulau Lombok bagian utara, Nusa Tenggara Barat bersumber dari Flores Back Arc Thrust. Bermagnitudo 6,4 sebagai foreshock tanggal 29 Juli 2018 dan bermagnitudo 7 untuk mainshock tanggal 5 Agustus 2018. Korban meninggal mencapai 555 jiwa dan pengungsi lebih dari 300.000 jiwa. Prinsip geografi yang berkaitan dengan fenomena tersebut menggunakan ....", 
+        ["prinsip korologi", "prinsip distribusi", "prinsip interaksi", "prinsip interelasi", "prinsip deskripsi"]
+    ],
+
+    [
+        "Kulit bumi dari waktu ke waktu selalu mengalami perubahan. Perhatikan pergerakan lempeng berikut!<br><img src='https://i.imgur.com/vb3602G.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Berdasarkan gambar tersebut, pernyataan berikut yang sesuai dengan ilustrasi di atas adalah ....", 
+        [
+            "Pergerakan lempeng dimana lempeng-lempeng bergerak saling mendekati sehingga membentuk pegunungan", 
+            "Pergerakan lempeng dimana lempeng-lempeng bergerak saling berpapasan seperti sesar Andreas di Amerika Serikat", 
+            "Pergerakan naiknya suatu daratan sehingga permukaan air laut seolah-olah turun", 
+            "Pergeseran lapisan kulit bumi yang berlangsung secara lambat dan meliputi wilayah yang luas", 
+            "Pergerakan lempeng yang bergerak saling menjauh menyebabkan naiknya magma dari pusat bumi dan membentuk kerak samudera"
+        ]
+    ],
+    [
+        "Siska dan Reni sedang melakukan kegiatan pengamatan untuk meneliti pencemaran air yang ada di sungai Citarum Jakarta. Kegiatan yang dilakukan Siska dan Reni tersebut adalah..", 
+        ["Observasi", "Wawancara", "Merumuskan tujuan", "Membuat latar belakang", "Melakukan hipotesis data"]
+    ],
+    [
+        "Matahari terdiri dari massa gas yang besar sekali, suatu saat melintas bintang lain. Karena pengaruh gaya gravitasi sebagian materi terlempar dan membentuk gumpalan-gumpalan yang pada akhirnya mengelilingi matahari. Teori tersebut dikenal dengan istilah.....", 
+        ["Teori Nebula", "Teori Bintang Kembar", "Teori Pasang Surut", "Teori Planetesimal", "Teori Big Bang"]
+    ],
+// Lanjutan Soal Nomor 8 - 10
+    [
+        "Jika jarak x – y = 4 cm, x – z = 10 cm, maka ketinggian titik y dan jenis vegetasi yang sesuai untuk dibudidayakan seperti gambar adalah ....<br><img src='https://i.imgur.com/GpHCUQ1.png' style='max-width:100%; border-radius:10px; margin:10px 0;'>", 
+        [
+            "660 m, jagung", 
+            "667 m, padi", 
+            "675 m, karet", 
+            "725 m, kina", 
+            "750 m, sayuran"
+        ]
+    ],
+    [
+        "Faktor utama yang menyebabkan Indonesia sering mengalami gempa tektonik adalah ....", 
+        [
+            "Banyaknya gunung api di Indonesia yang banyak tersebar di pulau sumatera dan jawa", 
+            "Letak Indonesia di antara dua benua dan dua samudera", 
+            "Indonesia merupakan negara kepulauan yang terletak di antara lempeng eurasaia, antartika dan pasifik", 
+            "Pertemuan tiga lempeng tektonik di Indonesia yaitu lempeng eurasia, indo-australia dan lempeng pasifik", 
+            "Pertemuan dua lempeng tektonik di Indonesia yaitu eurasia dan indo-australia"
+        ]
+    ],
+    [
+        "Pertengahan taahun 2015, Indonesia mengalami musim kemarau yang panjang yang cukup kering, sehingga memicu terjadinya kebakaran hutan dan gagal panen bagi para petani. Kondisi tersebut dipengaruh oleh anomaly iklim ......", 
+        ["El nino", "La nina", "Efek rumah kaca", "Angin fohn", "Angin siklon"]
+    ],
+
+    // Lanjutan Soal Nomor 11 - 20
+    [
+        "Sebuah pesawat komersial bermesin jet yang mempunyai jalur penerbangan Jakarta – Singapura akan memilih terbang pada lapisan .... karena .....", 
+        [
+            "Troposfer, menghindari suhu yang tinggi", 
+            "Startosfer, menghindari gangguan cuaca", 
+            "Mesosfer, menghindari jatuhnya meteor", 
+            "Ionosfer, memperlancar komunikasi dan navigasi pesawat", 
+            "Eksosfer, mengurangi gravitasi yang diterima pesawat"
+        ]
+    ],
+    [
+        "Perhatikan ciri-ciri berikut!<br>1) Terdapat pada struktur batuan yang resisten dan keras<br>2) Anak sungai berkelok-kelok membentuk sudut tegak lurus dengan sungai utama<br>3) Di Indonesia banyak ditemukan di daerah Sumatera bagian barat<br><br>Pernyataan tersebut menunjukkan ciri pola aliran sungai ....", 
+        ["rektangular", "trellis", "annular", "radial sentrifugal", "radial sentripetal"]
+    ],
+    [
+        "Daerah yang cocok untuk dijadikan pusat perkembangbiakan ternak sapi di Indonesia dapat ditemukan di wilayah ……", 
+        [
+            "Kalimantan, Jawa Tengah dan Jawa Timur", 
+            "Sumatera, Kalimantan, Papua dan Jawa", 
+            "Sumatera, Kalimantan Barat dan Papua", 
+            "Sumatera Barat, Jawa dan Sulawesi", 
+            "Madura, Bali, dan Nusa Tenggara Barat"
+        ]
+    ],
+    [
+        "Berikut ini yang bukan manfaat flora dan fauna sebagai sumber daya alam adalah……", 
+        [
+            "Menjaga keseimbangan ekologis", 
+            "Sebagai pengganti infrastruktur dan bangunan kota", 
+            "Memberikan nilai estetika", 
+            "Mengembangkan ekonomi local", 
+            "Sebagai atraksi pariwisata bagi turis mancanegara"
+        ]
+    ],
+    [
+        "Sebagian besar tanah di wilayah Utara Pulau Jawa berasal dari pengendapan yang dibawa oleh sungai yang berhulu di pegunungan bagian tengah Pulau Jawa. Jenis tanah di wilayah tersebut didominasi oleh ....", 
+        ["tanah gambut", "tanah litosol", "tanah aluvial", "tanah vulkanik", "tanah andosol"]
+    ],
+    [
+        "Upaya mitigasi bencana gempa bumi dengan prinsip pembuatan rumah tahan gempa melalui....", 
+        [
+            "rumah sederhana berbentuk panggung", 
+            "bahan bangunan sekuat mungkin", 
+            "konstruksi penahan beban harus memadai", 
+            "struktur pondasi sangat dalam dari bata merah", 
+            "struktur pondasi cakar ayam yang kuat"
+        ]
+    ],
+    [
+        "Sumber daya alam seperti tanah, air, batuan dan mineral, termasuk kategori sumber daya alam …………..", 
+        ["Hayati (biotik)", "Non Hayati (abiotik)", "Ruang", "Energi", "Tidak dapat diperbaharui"]
+    ],
+    [
+        "Salah satu instrument pencegahan pencemaran dan atau kerusakan lingkungan hidup adalah analisis mengenai dampak lingkungan (amdal).<br><br>Kalimat tersebut merupakan isi…..", 
+        [
+            "Undang Undang Dasar Republik Indonesia Tahun 1945", 
+            "Undang Undang Republik Indonesia No. 41 Tahun 1999", 
+            "Undang Undang Republik Indonesia No. 10 Tahun 2009", 
+            "Undang Undang Republik Indonesia No. 32 Tahun 2009", 
+            "Undang Undang Republik Indonesia No.18 Tahun 2013"
+        ]
+    ],
+    [
+        "Semua bahan yang didapat dari sumber daya alam dan atau yang diperoleh dari usaha manusia untuk dimanfaatkan lebih lanjut, merupakan definisi……", 
+        ["Bahan baku", "Bahan mentah", "Bahan setengah jadi", "Bahan jadi", "Bahan penolong"]
+    ],
+    [
+        "Berikut ini yang bukan termasuk industri ekstraktif adalah industri…..", 
+        ["pertanian", "pertambangan", "perikanan", "pakaian jadi", "perkebunan"]
+    ],
+
+    // Lanjutan Soal Nomor 21 - 24
+    [
+        "Perhatikan gambar berikut!<br><img src='https://i.imgur.com/1Lf5HQd.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Berdasarkan ilustrasi tersebut, maka skala pada Peta A adalah ....", 
+        ["1 : 20.000", "1 : 40.000", "1 : 55.000", "1 : 120.000", "1 : 180.000"]
+    ],
+    [
+        "Pak Supriyadi merupakan pensiunan pegawai swasta pada salah satu industri otomotif di Kota Bekasi. Selama 30 tahun ia bekerja sebagai teknisi pada industri tersebut. Setelah pensiun pak Supriyadi menghabiskan masa tuanya di tanah kelahirannya. Migrasi penduduk yang dilakukan Pak Supriyadi adalah ....", 
+        ["imigrasi", "emigrasi", "urbanisasi", "ruralisasi", "transmigrasi"]
+    ],
+    [
+        "Bonus demografi merupakan bonus yang dinikmati suatu Negara karena besarnya proporsi penduduk produktif dalam evolusi kependudukan. Indonesia akan mencapai puncak bonus demografi pada tahun......", 
+        ["2015-2020", "2020-2025", "2020-2030", "2030-2045", "2045-2055"]
+    ],
+    [
+        "Prinsip pengelolaan hutan berdasarkan prinsip pembangunan berkelanjutan adalah ....", 
+        [
+            "melakukan pemanfaatan dan membiarkan hutan tanpa sentuhan", 
+            "menindak pelaku pengerusakan dan pembajakan kawasan hutan", 
+            "memberi kebebasan dalam mengeksploitasi hutan dan lingkungan", 
+            "menjamin ketersediaan di masa kini dan masa yang akan datang", 
+            "mengutamakan efektifitas dan efisiensi dalam pengelolaan hutan"
+        ]
+    ],
+
+    // Lanjutan Soal Nomor 25 - 26
+    [
+        "Wilayah dengan tanda bintang seperti gambar merupakan daerah penghasil tambang ....<br><img src='https://i.imgur.com/Dl1EQz4.png' style='max-width:100%; border-radius:10px; margin:10px 0;'>", 
+        [
+            "tembaga dan gas alam", 
+            "emas dan tembaga", 
+            "uranium dan aspal", 
+            "batubara dan nikel", 
+            "perak dan bijihbesi"
+        ]
+    ],
+    [
+        "Perhatikan tabel berikut ini!<br><img src='https://i.imgur.com/LIHDLqw.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Berdasarkan data di atas angka beban ketergantungannya adalah ....", 
+        ["1,9", "6,3", "17,2", "45,8", "52,1"]
+    ],
+
+// Lanjutan Soal Nomor 27 - 32
+    [
+        "Perhatikan karakteristik masyarakat berikut!<br>1. materialistis<br>2. homogen<br>3. heterogen<br>4. kekerabatan kuat<br>5. individualistis<br>6. ikatan adat kuat<br><br>Karakteristik masyarakat desa ditunjukkan nomor……", 
+        ["1), 2), dan 3)", "1), 3), dan 5)", "2), 4), dan 5)", "2), 4), dan 6)", "1), 4), dan 6)"]
+    ],
+    [
+        "Banyak penduduk desa yang telah mendapat pengaruh sosial dari perkotaan melakukan urbanisasi. Meskipun demikian, penduduk yang telah bermigrasi dan menetap di perkotaan menganggap desa asal sebagai second home. Kondisi ini memberi dampak bagi kehidupan masyarakat desa.<br><br>Berdasarkan wacana di atas, dampak negatif urbanisasi bagi masyarakat desa adalah . . . .", 
+        [
+            "menurunnya rasa kekeluargaan antar penduduk desa", 
+            "lambatnya perkembangan sosial di perdesaan", 
+            "maraknya alih fungsi lahan pertanian menjadi permukiman", 
+            "menurunnya pendapatan penduduk akibat sempitnya lapangan usaha", 
+            "berkurangnya penduduk usia produktif di desa"
+        ]
+    ],
+    [
+        "Perhatikan gambar berikut!<br><img src='https://i.imgur.com/pAJDnsj.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Berdasarkan gambar di atas, daerah manufaktur dan pemukiman kelas rendah ditunjukkan pada angka ....", 
+        ["1 dan 2", "1 dan 3", "2 dan 3", "3 dan 4", "4 dan 5"]
+    ],
+    [
+        "Perhatikan kota-kota berikut!<br>1) Solo<br>2) Jakarta<br>3) Yogyakarta<br>4) Surakarta<br>5) Tembagapura<br><br>Kota yang berkembang dari pusat administrasi pemerintahan ditunjukkan nomor . . . .", 
+        ["1 dan 3", "1 dan 2", "2 dan 3", "3 dan 4", "4 dan 5"]
+    ],
+    [
+        "Kepulauan Bangka Belitung merupakan kawasan penghasil tambang timah sejak zaman kolonial Belanda yang bekas penambangannya berlubang-lubang sehingga menjadi pemandangan yang mengenaskan serta merusak lingkungan hidup.<br><br>Upaya yang dapat dilakukan untuk mengatasi kerusakan lingkungan tersebut adalah ....", 
+        [
+            "melakukan reklamasi yang digunakan sebagai upaya reboisasi", 
+            "membuat kolam-kolam di tambang bekas galian untuk budidaya ikan", 
+            "mengupayakan penambangan tertutup sehingga tidak merusak", 
+            "menjadikan lubang-lubang galian sebagai sumber air rumah tangga", 
+            "memindahkan lokasi penambangan ke lokasi jauh dari permukiman"
+        ]
+    ],
+    [
+        "Dalam interpretasi citra, ciri yang dihasilkan antara energi elektromagnetik dengan objek yang biasanya dinyatakan dalam bentuk rona dan warna adalah ....", 
+        ["ciri temporal", "asosiasi", "ciri spasial", "tekstur", "ciri spektral"]
+    ],
+
+// Lanjutan Soal Nomor 33 - 40 (FINAL PG)
+    [
+        "Perhatikan ilustrasi berikut!<br><img src='https://i.imgur.com/kxGnizO.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Nilai indeks konektivitas dari gambar di atas adalah ....", 
+        ["0,68", "0,85", "0,95", "1,05", "1,16"]
+    ],
+    [
+        "Pernyataan:<br>(1) tanah subur dan sumber air melimpah;<br>(2) kenyamanan dan keamanan tempat tinggal;<br>(3) adanya faktor tekanan adat;<br>(4) kekeringan dan paceklik di desa;<br>(5) generasi muda memajukan pendidikan.<br><br>Faktor pendorong interaksi desa dan kota terdapat pada angka ....", 
+        ["(1), (2), dan (3)", "(1), (2), dan (4)", "(1), (3), dan (5)", "(2), (4), dan (5)", "(3), (4), dan (5)"]
+    ],
+    [
+        "Perhatikan gambar berikut!<br><img src='https://i.imgur.com/gL3c49Q.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Jenis simbol yang digunakan dalam peta tersebut adalah …….", 
+        ["bidang atau area", "statistik", "numerik", "titik", "garis"]
+    ],
+    [
+        "Karakteristik wilayah:<br>(1) memiliki garis pantai yang panjang;<br>(2) morfologi pegunungan di pesisir;<br>(3) merupakan negara kepulauan;<br>(4) memiliki laut dengan palung yang dalam dan ombak yang besar;<br>(5) terletak di antara Samudera Pasifik dan Samudera Hindia.<br><br>Karakteristik wilayah yang tepat sebagai pendukung poros maritim dunia terdapat pada angka ....", 
+        ["(1), (2), dan (3)", "(1), (3), dan (4)", "(1), (3), dan (5)", "(2), (3), dan (4)", "(3), (4), dan (5)"]
+    ],
+    [
+        "Panjang garis A–B pada peta adalah 4 cm dan skala yang digunakan dalam penggambaran adalah 1 : 150.000. Jarak sebenarnya garis A–B adalah…..", 
+        ["2 km", "4 km", "6 km", "8 km", "10 km"]
+    ],
+    [
+        "Kondisi fisik wilayah:<br>(1) dataran rendah;<br>(2) curah hujan tinggi;<br>(3) merupakan daerah aliran sungai.<br><br>Penggunaan wilayah sesuai kondisi fisik tersebut adalah sebagai daerah ....", 
+        ["perkebunan", "pertanian", "waduk irigasi", "pembangkit listrik", "industri pemintalan"]
+    ],
+    [
+        "Perhatikan karakteristik negara berikut!<br>1) Pendapatan perkapita tinggi.<br>2) Kepadatan penduduk tinggi.<br>3) Tingkat pengangguran tinggi.<br>4) Perekonomian di sektor primer.<br>5) dependency ratio rendah<br><br>Karakteristik kependudukan di negara berkembang ditunjukkan oleh nomor . . . .", 
+        ["1), 2), dan 3)", "1), 3), dan 4)", "1), 4), dan 5)", "2), 3) dan 4)", "2), 3) dan 5)"]
+    ],
+    [
+        "Perhatikan gambar berikut!<br><img src='https://i.imgur.com/RlX02Wt.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Berdasarkan gambar di atas yang merupakan negara maju adalah . . . .", 
+        ["Indonesia", "Jepang", "Malaysia", "Taiwan", "Singapura"]
+    ]
+];
+
+
+    const soalUraian=[
+    // Soal Nomor 41
+    "Jelaskan proyeksi peta berdasarkan sifat asli yang dipertahankan!",
+
+    // Soal Nomor 42
+    `Gempa Palu terjadi pada tanggal 28 September 2018 pukul 17.10 WITA dengan magnitudo 7,4. Gempa tersebut menyebabkan terjadinya tsunami kecil dan likuifaksi di Kota Palu. Dan tercatat korban jiwa lebih dari 1.300 orang meninggal.<br><br><b>Jelaskan:</b><br>a. Mekanisme penyebab gempa sampai terjadinya tsunami dan likuifaksi di lokasi tersebut!<br>b. Pengaruhnya terhadap permukaan Bumi di lokasi tersebut secara fisik!`,
+
+    // Soal Nomor 43
+    "Sebutkan faktor-faktor yang mempengaruhi persebaran flora dan fauna!",
+
+    // Soal Nomor 44
+    "Sebuah minimarket akan dibangun di antara kota X dan kota Y. Jarak kedua kota tersebut 26 km. Kota X berpenduduk 9.000 jiwa dan kota Y berpenduduk 81.000 jiwa. Berdasarkan teori titik henti, bangunan minimarket paling tepat didirikan di ....",
+
+    // Soal Nomor 45
+    "Degradasi kualitas dan kerusakan daerah aliran sungai (DAS) dapat mengganggu keseimbangan ekosistem. Oleh karena itu diperlukan usaha pelestarian DAS agar kerusakan yang terjadi tidak semakin parah. Tuliskan tindakan yang dapat dilakukan sebagai upaya konservasi DAS?"
+];
+
+
+    // --- 3. CORE SYSTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+            s[1].forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid var(--primary);">
+                        <b>Uraian ${i + 1}.</b><br>${soal}<br>
+                        <textarea class="jawaban-uraian" placeholder="Ketik langkah pengerjaan dan jawaban akhir di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        if(window.MathJax) MathJax.typeset();
+    }
+
+    // --- 4. SECURITY & LOGIC ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopInt = setInterval(() => { gainNode.gain.value = gainNode.gain.value === 0 ? 0.4 : 0; }, 200);
+    }
+    function stopAlarm() { if (oscillator) { oscillator.stop(); clearInterval(oscillator.stopInt); } }
+    
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 20000); }
+
+    async function goToTab(n) {
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+        if(n === 2) {
+            if(!nama || token !== TOKEN_VALID) { alert("Nama & Token Wajib Diisi!"); return; }
+            const btn = event.target; btn.innerText = "🔍 Validasi Server..."; btn.disabled = true;
+            try {
+                const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+                const status = await resp.text();
+                if(status === "AKTIF") {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab2').classList.add('active');
+                } else {
+                    alert("AKSES DITOLAK! Status: TERBLOKIR.");
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                }
+            } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
+            return;
+        }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab'+n).classList.add('active');
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('videoPreview').srcObject = s; } catch(e){}
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        violationCount++; playAlarm();
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
+            document.getElementById('inputGuruArea').innerHTML = `
+                <h2 style="color:red">ANDA TERBLOKIR</h2>
+                <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
+                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+        }
+    }
+
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+
+    function startTimer() { setInterval(() => { if(timeLeft > 0){ timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer').innerText=`${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        isBypass = true;
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        if(confirm("Yakin ingin mengumpulkan semua jawaban?")) {
+            const btn = document.getElementById('btnKirim'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value.trim().toUpperCase(), 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL_JAWABAN, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; isBypass = false; });
+        }
+    }
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

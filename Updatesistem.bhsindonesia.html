@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK MASTER - PKBM Ristek Nusantara Jaya</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* TEXTAREA LEBAR UNTUK SEMUA MAPEL */
+        .jawaban-uraian { 
+            width: 100%; 
+            min-height: 250px; 
+            padding: 15px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            resize: vertical; 
+            background: #F9FAFB;
+            line-height: 1.5;
+        }
+        .jawaban-uraian:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.75rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka aplikasi lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;"></div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">NAMA SISWA</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">BAHASA INDONESIA</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b>Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar melalui Server Admin IT TEAM RNJ.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    const NAMA_MAPEL = "BAHASA INDONESIA"; 
+    const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+    
+    const WA_ADMIN = "6285888157682";
+    const TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "UPK_MASTER04_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+   const SoalPG = [
+        ["Bacalah kutipan berikut: 'Teknologi digital telah mengubah cara orang berkomunikasi, bekerja, dan belajar. Namun, tantangan terbesar adalah bagaimana memanfaatkan teknologi secara bijak agar tidak menimbulkan dampak negatif.' Pernyataan di atas termasuk jenis paragraf...",["Narasi","Deskripsi","Argumentasi","Persuasi"]],
+        ["Berikut ini yang merupakan ciri utama teks prosedur adalah...",["Menguraikan langkah-langkah secara berurutan","Mengandung unsur cerita dan tokoh","Menjelaskan peristiwa secara ilmiah","Membujuk pembaca agar melakukan sesuatu"]],
+        ["Dalam teks pidato, fungsi kalimat pembuka adalah...",["Menyampaikan tujuan pidato","Mengucapkan salam dan sapaan","Memberikan argumen","Menyimpulkan isi pidato"]],
+        ["Bacalah kalimat berikut: 'Jika semua siswa membuang sampah pada tempatnya, sekolah akan menjadi bersih.' Makna implisit dari kalimat tersebut adalah...",["Siswa tidak peduli kebersihan","Kebersihan sekolah tergantung perilaku siswa","Tempat sampah tidak cukup","Sekolah tidak butuh tempat sampah"]],
+        ["Kata 'transparan' pada kalimat 'Pemerintah harus bersikap transparan dalam pengelolaan dana publik' berarti...",["Jelas dan terbuka","Tertutup rapat","Berbelit-belit","Sulit dimengerti"]],
+        ["Cermati teks berikut: 'Siswa SMA Negeri 1 Jakarta berhasil memenangkan lomba debat tingkat nasional.' Kata 'berhasil' dalam kalimat tersebut berfungsi sebagai...",["Kata benda","Kata sifat","Kata kerja","Kata keterangan"]],
+        ["Bacalah penggalan teks berikut: 'Selain itu, penggunaan kendaraan listrik dapat mengurangi polusi udara.' Ide pokok paragraf di atas adalah...",["Polusi udara meningkat","Kendaraan listrik menambah polusi","Penggunaan kendaraan listrik dapat mengurangi polusi udara","Kendaraan listrik tidak ramah lingkungan"]],
+        ["Dalam debat, penyampaian sanggahan yang baik harus disertai dengan...",["Emosi tinggi","Bukti dan alasan logis","Nada suara keras","Kata-kata kasar"]],
+        ["Kalimat efektif di bawah ini adalah...",["Karena hujan deras, sehingga banjir melanda kota","Banjir melanda kota karena hujan deras","Banjir karena hujan deras melanda kota","Karena banjir, hujan deras melanda kota"]],
+        ["Sinonim kata 'konklusi' adalah...",["Penjelasan","Kesimpulan","Perbandingan","Penyangkalan"]],
+        ["Dalam cerpen, konflik berfungsi untuk...",["Membuat cerita semakin menarik","Mengulang kejadian","Menjelaskan latar","Menambah jumlah tokoh"]],
+        ["Bacalah kalimat berikut: 'Dia membaca buku dengan sungguh-sungguh.' Kata yang berfungsi sebagai keterangan cara pada kalimat di atas adalah...",["Dia","Membaca","Buku","Sungguh-sungguh"]],
+        ["Teks negosiasi biasanya berisi tentang...",["Penyelesaian masalah bersama","Perdebatan tanpa akhir","Pengutaraan perasaan","Penjelasan ilmiah"]],
+        ["Bacalah kutipan berikut: 'Masyarakat harus sadar pentingnya penggunaan masker di masa pandemi.' Kata 'harus' pada kalimat tersebut bermakna...",["Anjuran","Larangan","Keinginan","Kewajiban"]],
+        ["Paragraf deduktif adalah paragraf yang...",["Ide pokoknya terletak di akhir paragraf","Ide pokoknya tersebar di seluruh paragraf","Ide pokoknya di awal paragraf","Tidak memiliki ide pokok"]],
+        ["Kata baku dari 'analisa' adalah...",["Analisa","Analisis","Menganalisa","Analisisan"]],
+        ["Teks eksposisi bertujuan untuk...",["Mempengaruhi pembaca","Menjelaskan informasi","Menghibur pembaca","Menyampaikan cerita"]],
+        ["Kalimat yang menggunakan majas personifikasi adalah...",["Matahari terbenam di ufuk barat","Angin berbisik lembut di telingaku","Air sungai mengalir deras","Langit berwarna biru cerah"]],
+        ["Dalam surat dinas, hal yang tidak boleh dilupakan adalah...",["Salam penutup","Nama penerima","Alamat pengirim","Tanda tangan"]],
+        ["Bacalah kalimat berikut: 'Para siswa diharapkan dapat meningkatkan literasi digital.' Kata 'literasi digital' bermakna...",["Kemampuan membaca buku fisik","Kemampuan menggunakan teknologi informasi","Belajar menulis tangan","Membaca novel daring"]],
+        ["Dalam cerpen, sudut pandang orang ketiga serba tahu berarti...",["Penulis sebagai tokoh utama","Narator mengetahui segala hal tentang tokoh","Cerita dari sudut pandang 'aku'","Tokoh menceritakan dirinya sendiri"]],
+        ["Kalimat berikut yang termasuk kalimat pasif adalah...",["Siswa membaca buku di perpustakaan","Buku itu dibaca oleh siswa","Guru menjelaskan materi pelajaran","Teman-teman bermain bola"]],
+        ["Bacalah kutipan berikut: 'Sampah plastik menimbulkan kerusakan lingkungan yang serius.' Kata 'menimbulkan' pada kalimat tersebut bermakna...",["Mengurangi","Membuat munculnya","Menghilangkan","Mengolah"]],
+        ["Dalam teks laporan hasil observasi, bagian pernyataan umum berisi tentang...",["Ciri-ciri khusus objek","Proses terjadinya objek","Penjelasan umum tentang objek","Hasil eksperimen"]],
+        ["Bacalah kalimat berikut: 'Karena tidak belajar, hasil ujian Rina kurang memuaskan.' Klausa sebab pada kalimat tersebut adalah...",["Karena tidak belajar","Hasil ujian Rina kurang memuaskan","Karena hasil ujian","Rina kurang memuaskan"]],
+        ["Kata 'implementasi' dalam kalimat 'Pemerintah mulai implementasi program kesehatan' berarti...",["Penolakan","Penundaan","Pelaksanaan","Penyempurnaan"]],
+        ["Bacalah penggalan teks berikut: 'Dengan membaca buku, wawasan kita akan bertambah.' Hubungan antar kalimat di atas adalah...",["Sebab-akibat","Perbandingan","Pertentangan","Penegasan"]],
+        ["Dalam menulis teks eksplanasi, penggunaan data ilmiah bertujuan untuk...",["Menghibur pembaca","Memperkuat penjelasan","Mengulang informasi","Menambah paragraf"]],
+        ["Sinonim kata 'urgensi' adalah...",["Kepentingan","Keraguan","Kebaikan","Keuntungan"]],
+        ["Bacalah kalimat berikut: 'Siswa itu rajin, tetapi nilainya tetap rendah.' Hubungan antar kalimat di atas adalah hubungan...",["Sebab-akibat","Pertentangan","Penegasan","Perbandingan"]],
+        ["Kata 'kreatif' berkaitan dengan kemampuan untuk...",["Mengikuti perintah","Meniru karya orang lain","Membuat sesuatu yang baru","Mengulang informasi"]],
+        ["Dalam membuat teks laporan, bagian simpulan berfungsi untuk...",["Merangkum hasil pengamatan","Memperpanjang laporan","Memperkenalkan objek","Menambah data baru"]],
+        ["Bacalah teks berikut: 'Banjir yang melanda kota tersebut disebabkan oleh buruknya sistem drainase.' Ide utama kalimat di atas adalah...",["Buruknya sistem drainase","Kota yang terkena banjir","Banjir disebabkan oleh sesuatu","Sistem drainase yang baik"]],
+        ["Kata baku dari 'praktek' adalah...",["Praktek","Praktik","Praktekan","Praktikan"]],
+        ["Bacalah kalimat berikut: 'Setelah rapat selesai, para peserta pulang ke rumah masing-masing.' Kata 'selesai' dalam kalimat tersebut berfungsi sebagai...",["Kata benda","Kata kerja","Kata sifat","Kata bilangan"]],
+        ["Dalam diskusi, moderator bertugas untuk...",["Membuat kesimpulan akhir","Menyampaikan pendapat pribadi","Mengatur jalannya diskusi","Menulis notulen"]],
+        ["Kalimat berikut yang mengandung makna konotatif adalah...",["Ayah bekerja di kantor","Hatiku berbunga-bunga saat bertemu sahabat","Ibu memasak di dapur","Kakak membaca buku"]],
+        ["Dalam teks persuasi, tujuan utamanya adalah...",["Meyakinkan pembaca agar melakukan sesuatu","Menjelaskan proses","Menghibur pembaca","Menguraikan data"]],
+        ["Bacalah kutipan berikut: 'Pendidikan karakter sangat penting untuk membentuk generasi bangsa yang berintegritas.' Ide pokok kalimat di atas adalah...",["Pendidikan karakter penting","Generasi bangsa berintegritas","Pendidikan karakter membentuk generasi bangsa","Integritas bangsa"]],
+        ["Kata 'efektif' dalam konteks pembelajaran berarti...",["Cepat selesai","Sesuai tujuan dan hasilnya optimal","Banyak materi","Sulit dipahami"]],
+        ["Bacalah kalimat berikut: 'Para siswa berpartisipasi aktif dalam kegiatan bakti sosial.' Kata 'berpartisipasi' berarti...",["Menonton acara","Ikut serta dalam kegiatan","Menyusun acara","Mengawasi kegiatan"]],
+        ["Dalam menulis teks ulasan film, bagian yang berisi penilaian terhadap film disebut...",["Orientasi","Tafsiran","Evaluasi","Koda"]],
+        ["Kata 'mencerminkan' pada kalimat 'Sikap jujur mencerminkan kepribadian baik' bermakna...",["Menyembunyikan","Menunjukkan","Menghilangkan","Menutupi"]],
+        ["Bacalah kutipan berikut: 'Pemerintah mengimbau masyarakat untuk tidak mudah percaya pada berita hoaks.' Kata 'hoaks' berarti...",["Informasi benar","Informasi palsu","Informasi lengkap","Informasi resmi"]],
+        ["Dalam teks diskusi, bagian yang memuat permasalahan disebut...",["Argumen","Isu","Kesimpulan","Saran"]]
+    ];
+
+    const soalUraian=[
+        "Jelaskan perbedaan utama antara teks eksposisi dan teks argumentasi beserta contohnya!",
+        "Analisis pentingnya penggunaan bahasa Indonesia yang baik dan benar di era digital!",
+        "Analisis fenomena siswa lebih suka video pembelajaran!",
+        "Buat paragraf argumentatif tentang literasi digital!",
+        "Jelaskan langkah-langkah membuat pidato efektif!"
+    ];
+
+    // --- 3. CORE SYSTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+            s[1].forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid var(--primary);">
+                        <b>Uraian ${i + 1}.</b><br>${soal}<br>
+                        <textarea class="jawaban-uraian" placeholder="Ketik langkah pengerjaan dan jawaban akhir di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        if(window.MathJax) MathJax.typeset();
+    }
+
+    // --- 4. SECURITY & LOGIC ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopInt = setInterval(() => { gainNode.gain.value = gainNode.gain.value === 0 ? 0.4 : 0; }, 200);
+    }
+    function stopAlarm() { if (oscillator) { oscillator.stop(); clearInterval(oscillator.stopInt); } }
+    
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 20000); }
+
+    async function goToTab(n) {
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+        if(n === 2) {
+            if(!nama || token !== TOKEN_VALID) { alert("Nama & Token Wajib Diisi!"); return; }
+            const btn = event.target; btn.innerText = "🔍 Validasi Server..."; btn.disabled = true;
+            try {
+                const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+                const status = await resp.text();
+                if(status === "AKTIF") {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab2').classList.add('active');
+                } else {
+                    alert("AKSES DITOLAK! Status: TERBLOKIR.");
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                }
+            } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
+            return;
+        }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab'+n).classList.add('active');
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('videoPreview').srcObject = s; } catch(e){}
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        violationCount++; playAlarm();
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
+            document.getElementById('inputGuruArea').innerHTML = `
+                <h2 style="color:red">ANDA TERBLOKIR</h2>
+                <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
+                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+        }
+    }
+
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+
+    function startTimer() { setInterval(() => { if(timeLeft > 0){ timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer').innerText=`${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        isBypass = true;
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        if(confirm("Yakin ingin mengumpulkan semua jawaban?")) {
+            const btn = document.getElementById('btnKirim'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value.trim().toUpperCase(), 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL_JAWABAN, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; isBypass = false; });
+        }
+    }
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

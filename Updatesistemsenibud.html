@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK MASTER - PKBM Ristek Nusantara Jaya</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* TEXTAREA LEBAR UNTUK SEMUA MAPEL */
+        .jawaban-uraian { 
+            width: 100%; 
+            min-height: 250px; 
+            padding: 15px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            resize: vertical; 
+            background: #F9FAFB;
+            line-height: 1.5;
+        }
+        .jawaban-uraian:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.75rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka aplikasi lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;"></div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">NAMA SISWA</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">SENI BUDAYA</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b>Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar melalui Server Admin IT TEAM RNJ.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    const NAMA_MAPEL = "SENI BUDAYA"; 
+    const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+    
+    const WA_ADMIN = "6285888157682";
+    const TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "UPK_MASTER11_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+      const SoalPG = [
+[
+`Seni yang dapat digunakan untuk mengkomunikasikan sesuatu seperti pesan, kritik, kebijakan, gagasan dan produk kepada orang banyak, merupakan fungsi karya seni rupa dalam bidang……..`,
+[
+"Komunikasi",
+"Edukasi/pendidikan",
+"Rekreasi/hiburan",
+"Religi/keagamaan",
+"Individual"
+]
+],
+
+[
+`Salah satu manfaat penyelenggaraan pameran bagi siswa adalah……...`,
+[
+"Egois",
+"Sombong",
+"Malas belajar",
+"Memperoleh uang",
+"Meningkatkan apresiasi"
+]
+],
+
+[
+`Dalam berkarya seni menggunakan alat mesin dan dalam jumlah yang banyak serta berwujud barang pakai, serin disebut seni…….`,
+[
+"Foto",
+"Komik",
+"Grafika",
+"Industri",
+"Ilustrasi"
+]
+],
+
+[
+`Gambar hitam bayangan suatu objek, dengan atau tanpa modifikasi disebut……….`,
+[
+"Lukisan",
+"Sketsa",
+"Karikatur",
+"Vinyet",
+"Siluet"
+]
+],
+
+[
+`Setelah tujuan pameran dirumuskan, selanjutnya adalah menentukan tema pameran. Penentuan tema berfungsi untuk…….`,
+[
+"Melakukan penafsiran",
+"Membuat analisis",
+"Melakukan evaluasi",
+"Membuat penilaian",
+"Menyusun deskripsi"
+]
+],
+
+[
+`Seni kriya termasuk seni rupa terapan (applied art), seni rupa yang tercipta untuk kegunaan dan fungsi praktis tertentu dalam……..`,
+[
+"Hobi",
+"Ekspresi seni",
+"Kesenangan",
+"Kebutuhan rohani",
+"Kehidupan manusia"
+]
+],
+
+[
+`Kesamaan seni kriya dan seni rupa terapan adalah………..`,
+[
+"Berbentuk",
+"Karya seni",
+"Memiliki fungsi praktis",
+"Memiliki warna",
+"Keduanya karya manusia"
+]
+],
+
+[
+`Menemukan, mencatat, dan menggambarkan segala sesuatu yang dilihat apa adanya dan berusaha melakukan analisis atau mengambil kesimpulan, merupakan tahapan dalam kritik karya seni rupa yaitu…………`,
+[
+"Menilai",
+"Menafsirkan",
+"Deskripsi",
+"Analisis",
+"Interpretasi"
+]
+],
+
+[
+`Teknik pembuatan karya seni kriya yang memiliki keistimewaan dapat membuat karya dengan bentuk yang sama dalam jumlah lebih dari satu adalah teknik……`,
+[
+"Ukir",
+"Cor",
+"Pahat",
+"Butsir",
+"Tenun"
+]
+],
+
+[
+`Di bawah ini merupakan tujuan dari diadakannya sebuah pameran, kecuali………`,
+[
+"Sarana pendidikan",
+"Sarana apresiasi",
+"Sarana spiritual",
+"Sarana hiburan",
+"Sarana prestasi"
+]
+],
+
+[
+`Di bawah ini merupakan salah satu langkah kreasi musik, adalah………..`,
+[
+"Harmoni rumit",
+"Musik emosional",
+"Pemakaian ornamentik dibatasi",
+"Vokal dan lirik merupakan bagian dari instrumen",
+"Mengaransemen lagu yang dipilih"
+]
+],
+
+[
+`Sikap mengembangkan kreativitas, mensintesiskan, belajar menggunakan alat dan media ungkap dalam berolah musik, serta membuat dan menyajikan karya seni musik disebut……..`,
+[
+"Keterampilan",
+"Eksekusi",
+"Perseptual",
+"Kreatif",
+"Inovatif"
+]
+],
+
+[
+`Karya cipta musik yang tidak tertulis, berlangsung sekali saja disebut….…`,
+[
+"Musisi",
+"Ekspresi",
+"Nyanyian",
+"Kreativitas",
+"Improvisasi"
+]
+],
+
+[
+`Berikut ini termasuk jenis musik non tradisional, kecuali……..…`,
+[
+"Karawitan",
+"Jazz",
+"Rock",
+"Keroncong",
+"Campur sari"
+]
+],
+
+[
+`Orang yang mahir bermain musik disebut…………`,
+[
+"Komponis",
+"Senior",
+"Arranger",
+"Kolektor",
+"Musisi"
+]
+],
+
+[
+`Salah satu teknik yang dipakai dalam membuat syair lagu adalah…..`,
+[
+"Menyelami perasaan",
+"Berlatih teknik vokal",
+"Menyusun aransemen",
+"Menggubah lagu",
+"Menyelami perasaan"
+]
+],
+
+[
+`Teori musik merupakan cabang ilmu yang menjelaskan tentang……`,
+[
+"Tokoh musik dunia",
+"Aransemen lagu",
+"Unsur-unsur musik",
+"Pembabakan musik dunia",
+"Sejarah musik di suatu daerah"
+]
+],
+
+[
+`Kata-kata dalam musik dapat berbentuk..…..`,
+[
+"Nada",
+"Tema",
+"Birama",
+"Syair lagu",
+"Isi lagu"
+]
+],
+
+[
+`Musik yang memiliki sifat formal dan disiplin tinggi, namun dihadiri oleh jumlah penonton yang jauh lebih besar daripada penyajian musik lainnya adalah……..`,
+[
+"Penyajian musik tunggal",
+"Penyajian musik elektrik",
+"Penyajian musik duet",
+"Penyajian musik orchestra",
+"Penyajian kelompok musik terbatas"
+]
+],
+
+[
+`Kegiatan memberi penghargaan pada hasil karya seni musik disebut………`,
+[
+"Apresiasi musik",
+"Pameran musik",
+"Pergelaran musik",
+"Orchestra",
+"Pertunjukan musik"
+]
+],
+
+[
+`Jenis panggung pertunjukan yang dilakukan di lapangan, di halaman rumah atau halaman lainnya adalah jenis panggung……….`,
+[
+"Arena",
+"Tertutup",
+"Tertata",
+"Prosenium",
+"Campuran"
+]
+],
+
+[
+`Di bawah ini merupakan fungsi musik dalam tarian, kecuali…….`,
+[
+"Memberi irama",
+"Memberi ilustrasi atau gambaran suasana",
+"Membantu mempertegas ekspresi gerak",
+"Rangsangan bagi penari",
+"Proses stilasi dan seleksi gerak"
+]
+],
+
+[
+`Rias yang memberikan tekanan pada pemain yang sudah mendekati peranan yang akan dimainkannya, merupakan ciri khas dari rias…….`,
+[
+"Rias aksen",
+"Rias jenis",
+"Rias bangsa",
+"Rias usia",
+"Rias temporal"
+]
+],
+
+[
+`Orang yang membuat konsep dari pertunjukan dan mengatur alur atau laku dai sebuah pertunjukan adalah……..`,
+[
+"Pimpinan artistik (art director)",
+"Sutradara/koreografer",
+"Stage manajer",
+"Penata panggung (scenery)",
+"Penata cahaya"
+]
+],
+
+[
+`Sedangkan orang yang menjadi layanan pemenuhan kepada penyaji karya seni dan tuntunan artistik garapan berdasarkan saran dari pimpinan artistik adalah…..…`,
+[
+"Pimpinan artistik (art director)",
+"Sutradara/koreografer",
+"Stage manajer",
+"Penata panggung (scenery)",
+"Penata cahaya"
+]
+],
+
+[
+`Hal-hal yang tidak perlu dipersiapkan dalam pertunjukan tari adalah…….`,
+[
+"Gerakan tari",
+"Busana",
+"Musik",
+"Panggung",
+"Dialog"
+]
+],
+
+[
+`Rangsangan yang muncul karena mata menangkap berbagai hal yang menarik untuk diungkapkan dalam bentuk gerak tari disebut rangsang…..…`,
+[
+"Visual",
+"Auditif",
+"Indra",
+"Langsung",
+"Verbal"
+]
+],
+
+[
+`Di bawah ini tahapan dalam mengeksplorasi gerak tari, kecuali………`,
+[
+"Mendengar",
+"Berfikir",
+"Berimajinasi",
+"Merasakan",
+"Merespons"
+]
+],
+
+[
+`Tahap dalam kritik tari yang melihat teknik-teknik gerakan tari dan teknik pencahayaan disebut tahap………`,
+[
+"Evaluasi",
+"Deteksi",
+"Deskripsi",
+"Interpretasi",
+"Analisis formal"
+]
+],
+
+[
+`Berikut ini yang tidak dibahas dalam pratinjau (preview) adalah………..`,
+[
+"Penari",
+"Koreografer",
+"Reaksi penonton",
+"Waktu dan tempat pergelaram",
+"Judul karya yang akan ditampilkan"
+]
+],
+
+[
+`Berikut ini yang bukan termasuk fungsi tata musik dalam pergelaran teater adalah………..`,
+[
+"Memberi selingan",
+"Memberi ilustrasi",
+"Membingungkan pemain",
+"Memberi warna psikologis",
+"Memberi latar belakang"
+]
+],
+
+[
+`Gagasan dasar cerita yang disampaikan oleh penulis cerita kepada penonton disebut………..`,
+[
+"Tema",
+"Lakon",
+"Naskah",
+"Blocking",
+"Sinopsis"
+]
+],
+
+[
+`Di bawah ini merupakan tugas sutradara, kecuali………..`,
+[
+"Menentukan nada dasar",
+"Memilih pemain atau meng-casting pemain",
+"Mengadakan latihan rutin",
+"Menduplikat kostum",
+"Membuat gambaran tentang tata teknik pentas"
+]
+],
+
+[
+`Penataan pentas yang harus dapat memberi pandangan yang menark bagi penonton, disebut………..`,
+[
+"Lokatif",
+"Ekspresif",
+"Atraktif",
+"Praktis",
+"Organis"
+]
+],
+
+[
+`Penonton teater tidak jarang merasa takjub melihat peristiwa pentas dengan segala propertinya yang mengesankan hasil dari kekreativitan para pekerja teater. Pernyataan tersebut menunjukkan nilai estetis teater yang berupa nilai…….`,
+[
+"Visual",
+"Verbal",
+"Spiritual",
+"Emosional",
+"Intelektual"
+]
+],
+
+[
+`Jenis panggung yang cocok digunakan untuk pementasan yang cenderung formal, Antara pemain dengan penonton terkesan ada jarak adalah panggung………..`,
+[
+"Prosenium",
+"Tapal kuda",
+"Segi empat",
+"Arena",
+"Kipas"
+]
+],
+
+[
+`Peran orang yang sederhana dapat diinterpretasikan dengan penggunaan……..`,
+[
+"Kemeja",
+"Perhiasan",
+"Pakaian yang lusuh",
+"Berbagai aksesoris",
+"Jas dan dasi"
+]
+],
+
+[
+`Penggambaran mengenai waktu, tempat, dan suasana yang terjadi pada peristiwa-peristiwa dalam suatu cerit disebut…………`,
+[
+"Kostum",
+"Tata cahaya",
+"Jenis panggung pementasan",
+"Tempat pementasan",
+"Setting"
+]
+],
+
+[
+`Berikut yang bukan merupakan ciri, tujuan, dan manfaat kostum adalah……..`,
+[
+"Menginterpretasikan status sosial",
+"Menyesuaikan tema cerita",
+"Memperkuat fokus cerita",
+"Memperkuat karakter",
+"Memeriahkan pertunjukan"
+]
+],
+
+[
+`Susunan lakon yang diperagakan oleh emeran disebut..…..`,
+[
+"Plot",
+"Alur",
+"Tema",
+"Adegan",
+"Skenario"
+]
+]
+];
+    const soalUraian=[
+"Sebutkan dan jelaskan tahapan dalam mengkritisi sebuah karya seni rupa!",
+"Apakah yang dimaksud dengan kritikus seni rupa!",
+"Sebutkan peranan musik tradisional mancanegara bagi kehidupan masyarakatnya!",
+"Berikan 3 (tiga) contoh pertanyaan yang dapat dikembangkan pada tahap pendeskripsian kritik tari!",
+"Terangkan fungsi kritik teater sebagai media edukasi!"
+];
+
+    // --- 3. CORE SYSTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+            s[1].forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid var(--primary);">
+                        <b>Uraian ${i + 1}.</b><br>${soal}<br>
+                        <textarea class="jawaban-uraian" placeholder="Ketik langkah pengerjaan dan jawaban akhir di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        if(window.MathJax) MathJax.typeset();
+    }
+
+    // --- 4. SECURITY & LOGIC ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopInt = setInterval(() => { gainNode.gain.value = gainNode.gain.value === 0 ? 0.4 : 0; }, 200);
+    }
+    function stopAlarm() { if (oscillator) { oscillator.stop(); clearInterval(oscillator.stopInt); } }
+    
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 20000); }
+
+    async function goToTab(n) {
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+        if(n === 2) {
+            if(!nama || token !== TOKEN_VALID) { alert("Nama & Token Wajib Diisi!"); return; }
+            const btn = event.target; btn.innerText = "🔍 Validasi Server..."; btn.disabled = true;
+            try {
+                const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+                const status = await resp.text();
+                if(status === "AKTIF") {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab2').classList.add('active');
+                } else {
+                    alert("AKSES DITOLAK! Status: TERBLOKIR.");
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                }
+            } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
+            return;
+        }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab'+n).classList.add('active');
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('videoPreview').srcObject = s; } catch(e){}
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        violationCount++; playAlarm();
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
+            document.getElementById('inputGuruArea').innerHTML = `
+                <h2 style="color:red">ANDA TERBLOKIR</h2>
+                <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
+                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+        }
+    }
+
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+
+    function startTimer() { setInterval(() => { if(timeLeft > 0){ timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer').innerText=`${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        isBypass = true;
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        if(confirm("Yakin ingin mengumpulkan semua jawaban?")) {
+            const btn = document.getElementById('btnKirim'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value.trim().toUpperCase(), 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL_JAWABAN, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; isBypass = false; });
+        }
+    }
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

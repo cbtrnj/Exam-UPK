@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK - PKBM Ristek Nusantara Jaya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root { --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2; --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall); margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none; }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header { display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; } .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;">
+        <p>Sistem Terkunci. Masukkan <b>KODE GURU</b>:</p>
+        <input type="text" id="kodeGuruInput" placeholder="Kode" style="text-align:center; width:200px;">
+        <button class="btn btn-primary" onclick="unlockExam()">BUKA</button>
+    </div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">Siswa</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div id="lifeCounter" style="color:red; font-size:0.75rem; font-weight:bold;">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span id="labelMapel" class="exam-badge">MATEMATIKA PEMINATAN (IPA)</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b style="color: rgb(19, 3, 67);">Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div class="card">
+            <h3>Soal Uraian</h3>
+            <div id="renderUraianTeks"></div>
+        </div>
+        <div class="card" style="text-align: center; border: 2px dashed var(--primary);">
+            <h3>Upload Jawaban Uraian</h3>
+            <p class="small">Wajib upload minimal 1 foto (lembar jawaban)</p>
+            <label class="btn btn-primary" style="background:#f59e0b; display:inline-block; width:auto; padding:10px 20px;" onclick="bypassSecurity()">
+                📸 Ambil Foto Jawaban
+                <input type="file" id="inputFile" accept="image/*" capture="camera" hidden onchange="saveFileSingle(this)">
+            </label>
+            <div id="status_upload" style="margin-top:10px; font-weight:bold; color:#10b981;">Belum ada foto yang diunggah</div>
+        </div>
+        <button id="btnKirim" class="btn btn-success" onclick="finishExam()" style="margin-bottom: 80px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+   // Link pengumpulan jawaban (yang sudah berjalan lama)
+const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+
+// Link server keamanan baru (yang Anda kirim barusan)
+const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+
+const WA_ADMIN = "6285888157682"; // GANTI dengan nomor WhatsApp Admin RNJ (Gunakan 62)
+const TOKEN_VALID = "RISTEK2026"; 
+const NAMA_MAPEL = "MATEMATIKA PEMINATAN (IPA)";
+
+const SESSION_KEY = "UPK_RISTEK_" + NAMA_MAPEL.replace(/\s+/g, '_');
+
+const SoalPG = [
+    ["Nilai x yang memenuhi \\(\\left(\\frac{1}{4}\\right)^{2x-6} < \\left(\\frac{1}{2}\\right)^{2x+8}\\) adalah ....",
+["x > 10","x < 10","x < 6","x > 4","x < 1"]],
+
+["Interval penyelesaian pertidaksamaan \\(\\left|x - 1\\right| < \\left|x + 2\\right|\\) adalah ...",
+["x < \\(\\frac{-3}{4}\\)","x < \\(\\frac{-1}{4}\\)","x > \\(\\frac{-3}{4}\\)","x < \\(\\frac{-5}{4}\\)","x > 1"]],
+
+["Return adalah keuntungan dari suatu investasi. Sebagai contoh, jika investasi berupa tabungan di bank, return adalah bunga bank; jika investasi berupa kepemilikan saham pada suatu perusahaan, return dapat berupa kenaikan harga saham maupun hasil bagi keuntungan perusahaan. Jika return yang diperoleh diinvestasikan kembali, berlaku hubungan berikut: \\(1 + R = (1 + r)^t\\) dengan R adalah return selama jangka waktu t, dan r adalah tingkat return per-unit waktu. Ayah berinvestasi pada suatu perusahaan sebesar Rp10.000.000,00 dengan return 15% per tahun. Saat pembagian keuntungan di tiap akhir tahun, Ayah menginvestasikan kembali keuntungan tersebut. Di akhir tahun ke-t, investasi ayah di perusahaan tersebut bernilai Rp15.200.000,00 (pembulatan ke ratusan ribu terdekat). Diketahui \\(\\log 1{,}52 = 0{,}18\\) dan \\(\\log 1{,}15 = 0{,}06\\). Nilai t adalah ....",
+["2","3","4","5","6"]],
+
+["Persamaan grafik fungsi seperti tampak pada gambar adalah .... <br><img src='https://i.imgur.com/YI2lKMX.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
+["\\( y = \\log_{3}x \\)", 
+        "\\( y = \\log_{\\frac{1}{3}}x \\)", 
+        "\\( y = \\left(-\\frac{1}{3}\\right)^x \\)", 
+        "\\( y = (1-3)^x \\)", 
+        "\\( y = 3^{-x} \\)"]],
+
+["Diketahui \\((x-1)\\) salah satu faktor dari persamaan suku banyak: \\(x^3 - 2x^2 - 5x + b = 0\\). Salah satu faktor lainnya adalah ....",
+["x - 3","x - 2","x + 1","x + 3","x + 6"]],
+
+["Alfin menabung sejumlah uang di bank, dan setelah dua tahun uangnya menjadi Rp5.292.000,00. Jika bunga majemuk 5\\% per tahun, maka jumlah awal uang yang ditabung adalah ....",
+["Rp4.400.000,00","Rp4.500.000,00","Rp4.600.000,00","Rp4.700.000,00","Rp4.800.000,00"]],
+
+["Jumlah dua bilangan positif adalah 32. Jika jumlah dari kebalikan setiap bilangan tersebut \\(\\frac{12}{15}\\), maka selisih kedua bilangan tersebut adalah ....",
+["16","12","10","8","7"]],
+
+["Nilai \\(\\displaystyle \\lim_{x \\to \\infty} \\left[\\sqrt{x(4x+5)} - \\sqrt{4x^2 - 3}\\right]\\) = ....",
+["\\(\\frac{1}{2}\\)",
+ "\\(\\frac{2}{3}\\)",
+ "\\(\\frac{2}{5}\\)",
+ "\\(\\frac{5}{3}\\)",
+ "\\(\\frac{5}{4}\\)"]],
+
+ ["Turunan pertama fungsi \\(f(x) = \\frac{\\sin x + \\cos x}{\\cos x}\\) adalah ....",
+["\\(1 - \\sec^2 x\\)",
+ "\\(\\sec^2 x\\)",
+ "\\(\\cot x + 1\\)",
+ "\\(\\cos ec^2 x\\)",
+ "\\(-\\sin x\\)"]],
+
+ ["Nilai \\(\\displaystyle \\lim_{x \\to 0} \\frac{\\sin 8x + \\sin 4x}{2x(\\cos 12x + \\cos 8x)}\\) = ....",
+["-3",
+ "-\\(\\frac{3}{10}\\)",
+ "\\(\\frac{1}{5}\\)",
+ "\\(\\frac{3}{10}\\)",
+ "3"]],
+
+ ["Luas daerah yang diarsir berikut adalah .... <br><img src='https://i.imgur.com/Y9eX02O.png' style='max-width:100%;margin-top:10px;border-radius:10px;'>",
+["\\(17\\frac{1}{2}\\)",
+ "\\(15\\frac{1}{2}\\)",
+ "\\(13\\frac{1}{2}\\)",
+ "\\(10\\frac{1}{2}\\)",
+ "9"]],
+
+ ["Diketahui garis g menyinggung kurva \\(y = \\sin x + \\cos x\\) di titik yang berabsis \\(\\frac{\\pi}{3}\\). Gradien garis yang tegak lurus pada garis g adalah ....",
+["\\(1 - \\sqrt{3}\\)",
+ "\\(1 + \\sqrt{3}\\)",
+ "1",
+ "\\(\\frac{1}{2}(\\sqrt{3} - 1)\\)",
+ "\\(\\frac{1}{2}(1 - \\sqrt{3})\\)"]],
+
+ ["Suatu mesin diprogram untuk menggerakkan sebuah alat penggores sedemikian hingga alat tersebut dinyatakan dengan \\(x = 3\\cos 4t\\) dan \\(y = 2\\cos 3t\\) (posisi dalam satuan cm dan waktu t satuan detik). Kecepatan gerak alat penggores pada saat t dinyatakan dengan \\(v = \\sqrt{\\left(\\frac{dx}{dt}\\right)^2 + \\left(\\frac{dy}{dt}\\right)^2}\\) dalam satuan cm/detik. Besar kecepatan gerak alat tersebut saat \\(t = \\frac{\\pi}{2}\\) detik adalah ....",
+["2 cm/detik",
+ "\\(\\sqrt{13}\\) cm/detik",
+ "6 cm/detik",
+ "\\(6\\sqrt{5}\\) cm/detik",
+ "12 cm/detik"]],
+
+ ["Jika \\(x = 2\\sin t\\), \\(y = 4 + \\cos t\\), maka \\(\\frac{dy}{dx}\\) dalam t adalah ....",
+["\\(-\\frac{2}{3}\\sin t\\)",
+ "\\(-\\frac{2}{3}\\tan t\\)",
+ "\\(\\frac{1}{2}\\tan t\\)",
+ "\\(-\\frac{1}{2}\\tan t\\)",
+ "\\(-\\frac{1}{2}\\sin t\\)"]],
+
+ ["Luas daerah yang dibatasi oleh kurva \\(y = 6x - x^2\\) dan \\(y = x^2 - 2x\\) adalah ....",
+["\\(\\frac{20}{3}\\) satuan luas",
+ "16 satuan luas",
+ "21 satuan luas",
+ "\\(\\frac{64}{3}\\) satuan luas",
+ "32 satuan luas"]],
+
+ ["Sebuah kota selama \\(t\\) tahun perkiraan jumlah penduduknya dapat dinyatakan oleh fungsi \\(P = \\frac{12000}{(3+t)^2} + 35000\\). Perkiraan jumlah penduduknya dalam jangka waktu yang sangat lama di masa yang akan datang adalah ....",
+["12.000",
+ "20.000",
+ "35.000",
+ "40.000",
+ "45.000"]],
+
+ ["Jika \\(\\sin \\alpha = \\frac{12}{13}\\), dengan \\(\\alpha\\) lancip, maka \\(\\sin 2\\alpha + \\cos 2\\alpha\\) = ....",
+["\\(\\frac{3}{144}\\)",
+ "\\(\\frac{2}{144}\\)",
+ "-\\(\\frac{1}{144}\\)",
+ "\\(\\frac{1}{169}\\)",
+ "\\(\\frac{2}{169}\\)"]],
+
+["Persamaan lingkaran yang melalui titik potong lingkaran \\(L_1 \\equiv x^2 + y^2 + 2x + 2y - 2 = 0\\) dan \\(L_2 \\equiv x^2 + y^2 + 4x - 8y + 4 = 0\\) serta melalui titik asal adalah ....",
+["\\(3x^2 + 3y^2 + 8x - 2y = 0\\)",
+ "\\(3x^2 + 3y^2 - 8x + 4y = 0\\)",
+ "\\(3x^2 + 3y^2 + 8x - 4y = 0\\)",
+ "\\(4x^2 + 4y^2 + 8x + 4y = 0\\)",
+ "\\(4x^2 + 4y^2 + 8x - 2y = 0\\)"]],
+
+["Himpunan penyelesaian persamaan \\(\\sin(3x + 30^\\circ) = \\frac{1}{2}\\sqrt{2}\\) pada interval \\(0^\\circ \\le x \\le 180^\\circ\\) adalah ....",
+["\\(\\{5^\\circ, 35^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 125^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 65^\\circ, 95^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 125^\\circ, 155^\\circ\\}\\)",
+ "\\(\\{5^\\circ, 35^\\circ, 95^\\circ, 155^\\circ\\}\\)"]],
+
+["Diketahui segitiga ABC siku-siku di B. Jika \\(\\sin A \\cdot \\sin C = \\frac{1}{10}\\) dan \\(\\sin(A - C) = \\frac{2}{5}x\\), maka nilai \\(x\\) adalah ....",
+["-2",
+ "-\\(\\frac{1}{2}\\)",
+ "\\(\\frac{1}{4}\\)",
+ "\\(\\frac{1}{2}\\)",
+ "2"]],
+
+ ["Diketahui vektor \\(\\begin{pmatrix} x \\\\ 2 \\\\ -1 \\end{pmatrix}\\), \\(\\mathbf{b} = \\begin{pmatrix} 4 \\\\ -3 \\\\ 6 \\end{pmatrix}\\), dan \\(\\mathbf{c} = \\begin{pmatrix} 2 \\\\ 0 \\\\ 3 \\end{pmatrix}\\). Jika \\(\\mathbf{a}\\) tegak lurus \\(\\mathbf{b}\\), hasil dari \\((3\\mathbf{a} - \\mathbf{b}) + 2\\mathbf{c}\\) adalah ....",
+["\\(\\begin{pmatrix} 9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ 9 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} -9 \\\\ 0 \\\\ -3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ 6 \\\\ 3 \\end{pmatrix}\\)",
+ "\\(\\begin{pmatrix} 9 \\\\ -9 \\\\ 3 \\end{pmatrix}\\)"]],
+
+["Alief, Abdul, dan Azzam sedang menerbangkan layang-layang, masing-masing berdiri pada koordinat \\((-1, 4, 8)\\), \\((1, 2, 3)\\), dan \\((5, y, z)\\) yang segaris. Maka posisi berdiri Azzam pada koordinat ....",
+["(5, -7, -2)",
+ "(5, -5, -2)",
+ "(5, -2, -7)",
+ "(5, 2, 7)",
+ "(5, 7, 9)"]],
+
+["Diketahui vektor \\(\\vec{a} = -2\\mathbf{i} + 3\\mathbf{j} + \\mathbf{k}\\) dan \\(\\vec{b} = 4\\mathbf{i} + 4\\mathbf{j} + m\\mathbf{k}\\). Jika panjang proyeksi vektor \\(\\vec{a}\\) pada \\(\\vec{b}\\) adalah \\(\\frac{1}{3}\\), nilai \\(m\\) yang memenuhi adalah ....",
+["-7",
+ "-5",
+ "2",
+ "5",
+ "7"]],
+
+[
+"Balok KLMN.OPQR mempunyai panjang rusuk KL = 16 cm, LM = 12 cm, dan MQ = 10 cm. Jarak titik P ke titik N adalah ....",
+["\\(10\\sqrt{6}\\ \\text{cm}\\)",
+ "\\(10\\sqrt{5}\\ \\text{cm}\\)",
+ "\\(10\\sqrt{3}\\ \\text{cm}\\)",
+ "\\(5\\sqrt{6}\\ \\text{cm}\\)",
+ "\\(5\\sqrt{5}\\ \\text{cm}\\)"]
+],
+
+[
+"Perhatikan gambar kubus berikut:<br><img src='https://i.imgur.com/Afmchd1.png' style='max-width:100%;margin-top:10px;border-radius:10px;'><br><br>Diketahui titik P merupakan perpotongan antara diagonal BG dan CF. Cermati beberapa pernyataan berikut.<br><br>(i) Titik P terletak pada bidang ACGE<br>(ii) Titik P terletak di luar bidang BCHE<br>(iii) Titik P terletak pada bidang CDEF<br>(iv) Titik P terletak pada bidang BCGF<br>(v) Titik P terletak di luar bidang ABGH<br><br>Pernyataan yang benar adalah ....",
+["(i), (ii), dan (iii)",
+ "(i), (iii), dan (v)",
+ "(i), (iv), dan (v)",
+ "(ii), (iii), dan (iv)",
+ "(ii), (iv), dan (v)"]
+],
+
+[
+"Dalam suatu ujian seorang siswa diharuskan menjawab soal multiple choice sebanyak tiga kali. Peubah acak banyaknya jawaban benar adalah ....",
+["\\(\\{0, 1\\}\\)",
+ "\\(\\{0, 1, 2\\}\\)",
+ "\\(\\{1, 2\\}\\)",
+ "\\(\\{1, 2, 3\\}\\)",
+ "\\(\\{0, 1, 2, 3\\}\\)"]
+],
+
+[
+"Dua buah dadu diundi bersama-sama sebanyak tiga kali. Peluang mendapatkan dua kali mata dadu berjumlah 9 adalah ....",
+["\\(\\frac{8}{81}\\)",
+ "\\(\\frac{16}{81}\\)",
+ "\\(\\frac{16}{243}\\)",
+ "\\(\\frac{8}{243}\\)",
+ "\\(\\frac{4}{243}\\)"]
+],
+
+[
+"Sepasang suami istri merencanakan untuk mempunyai 4 orang anak. Jika variabel acak \\(X\\) menyatakan banyak anak perempuan, nilai dari \\(P(X \\ge 2)\\) adalah ....",
+["\\(\\frac{4}{16}\\)",
+ "\\(\\frac{5}{16}\\)",
+ "\\(\\frac{6}{16}\\)",
+ "\\(\\frac{10}{16}\\)",
+ "\\(\\frac{11}{16}\\)"]
+],
+
+[
+`Sebuah toko sepatu mencatat jumlah sepatu yang terjual setiap hari. Misalkan \\(x\\) = jumlah sepatu yang terjual dalam sehari selama bulan November 2018 sebagai berikut:<br><br>
+
+<table style="border-collapse:collapse;margin:auto;">
+<tr><th style="border:1px solid #333;padding:6px 12px;">X</th><th style="border:1px solid #333;padding:6px 12px;">Jumlah hari</th></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">1</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">6</td></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">3</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">12</td></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">4</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">9</td></tr>
+<tr><td style="border:1px solid #333;padding:6px 12px;text-align:center;">5</td><td style="border:1px solid #333;padding:6px 12px;text-align:center;">3</td></tr>
+</table>
+
+<br>Distribusi peluang variabel acak \\(x\\) adalah ...`,
+
+[
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,4</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,1</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,4</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,1</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,2</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,3</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,1</td><td style="border:1px solid #333;padding:4px;">0,4</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,2</td></tr>
+</table>`,
+
+`<table style="border-collapse:collapse;">
+<tr><td style="border:1px solid #333;padding:4px;">x</td><td style="border:1px solid #333;padding:4px;">1</td><td style="border:1px solid #333;padding:4px;">3</td><td style="border:1px solid #333;padding:4px;">4</td><td style="border:1px solid #333;padding:4px;">5</td></tr>
+<tr><td style="border:1px solid #333;padding:4px;">f(x)</td><td style="border:1px solid #333;padding:4px;">0,1</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,3</td><td style="border:1px solid #333;padding:4px;">0,2</td></tr>
+</table>`
+]
+],
+
+[
+"Nilai ujian MTK yang diperoleh dalam satu kelas berdistribusi normal dengan rata-rata 70 dan simpangan baku 10. Jika remedial akan diberikan kepada 20% siswa dengan nilai terendah, nilai minimum siswa yang tidak mengikuti remedial adalah ....",
+["57,5",
+ "58,5",
+ "59,2",
+ "62,5",
+ "65,0"]
+],
+  
+];
+
+const soalUraian= [
+"Tentukanlah interval penyelesaian pertidaksamaan \\(|x + 2| \\ge 2|x - 1|\\)!",
+
+"Tentukan nilai dari \\(\\int (2x + 5)\\cos 2x \\, dx\\)!",
+
+`Gambar di bawah adalah sebuah trapesium ABCD dengan AD = CD = BC = m cm, dan ∠DAB = ∠CBA = 2α (α adalah sudut lancip).<br><br>
+
+<img src="https://i.imgur.com/Afmchd1.png" style="max-width:100%;margin:10px 0;border-radius:10px;"><br>
+
+Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah penyelesaiannya!`,
+
+"Tentukan batas-batas nilai a yang memenuhi agar titik P(8, -6) berada di dalam lingkaran \\(x^2 + y^2 = a^2\\)!",
+
+`Suatu variabel acak x memiliki distribusi probabilitas sebagai berikut:<br><br>
+
+<table style="border-collapse:collapse;margin:auto;">
+<tr>
+<td style="border:1px solid #333;padding:6px;">X = x</td>
+<td style="border:1px solid #333;padding:6px;">0</td>
+<td style="border:1px solid #333;padding:6px;">1</td>
+<td style="border:1px solid #333;padding:6px;">2</td>
+<td style="border:1px solid #333;padding:6px;">3</td>
+</tr>
+<tr>
+<td style="border:1px solid #333;padding:6px;">P(X = x)</td>
+<td style="border:1px solid #333;padding:6px;">k</td>
+<td style="border:1px solid #333;padding:6px;">k²</td>
+<td style="border:1px solid #333;padding:6px;">k² + k</td>
+<td style="border:1px solid #333;padding:6px;">3k² + 2k</td>
+</tr>
+</table>
+
+<br>Dengan k adalah konstanta. Tentukan nilai k!`
+
+];
+
+let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60;
+let isBypass = false;
+
+// 🔥 FLAG KEAMANAN
+let isUploading = false;
+let isDialogOpen = false;
+
+let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, files: [] };
+let audioCtx, oscillator;
+
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+function bypassSecurity() {
+    isBypass = true;
+    setTimeout(() => { isBypass = false; }, 15000);
+}
+
+function saveAns(q, a) { 
+    savedData.pg['q'+q] = a; 
+    localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+}
+
+function saveFileSingle(input) {
+    isUploading = true;
+    bypassSecurity();
+
+    const file = input.files[0];
+    if (!file) {
+        isUploading = false;
+        return;
+    }
+
+    const status = document.getElementById('status_upload');
+    status.innerText = "⏳ Memproses...";
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        savedData.files.push(e.target.result);
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData));
+        status.innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
+
+        setTimeout(() => {
+            isUploading = false;
+        }, 2000);
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function renderSoal() {
+    let pgHtml = "";
+    SoalPG.forEach((s, i) => {
+        let saved = savedData.pg['q'+i];
+        pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+        s[1].forEach((opt, idx) => {
+            let chk = (saved !== undefined && saved == idx) ? 'checked' : '';
+            pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${chk} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+        });
+        pgHtml += `</div>`;
+    });
+    document.getElementById('renderPG').innerHTML = pgHtml;
+
+    let uHtml = "";
+    soalUraian.forEach((soal, i) => { 
+        uHtml += `<div style="margin-bottom:15px;"><b>${i + 1}.</b> ${soal}</div>`; 
+    });
+    document.getElementById('renderUraianTeks').innerHTML = uHtml;
+
+    if(savedData.files.length > 0)
+        document.getElementById('status_upload').innerText = `✅ Tersimpan (${savedData.files.length} Foto)`;
+
+    if(window.MathJax) MathJax.typeset();
+}
+
+// 🛡️ UPGRADE: VALIDASI NAMA SERVER-SIDE
+async function goToTab(n) {
+    const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+    const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+
+    if(n === 2) {
+        if(!nama || token !== TOKEN_VALID) { 
+            alert("Nama Lengkap dan Token harus diisi!"); 
+            return; 
+        }
+
+        // Animasi Loading
+        const btn = event.target;
+        const textAwal = btn.innerText;
+        btn.innerText = "🔍 Cek Status...";
+        btn.disabled = true;
+
+        try {
+            const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+            const status = await resp.text();
+
+            if(status === "AKTIF") {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById('tab2').classList.add('active');
+            } else if(status === "TERBLOKIR") {
+                alert("AKSES DITOLAK! Nama Anda terblokir. Hubungi Admin.");
+                window.location.href = `https://wa.me/${WA_ADMIN}?text=Halo%20Admin%20RNJ,%20nama%20saya%20${nama}%20terblokir%20dari%20ujian.`;
+            } else {
+                alert("Nama tidak terdaftar di database peserta!");
+            }
+        } catch (e) {
+            alert("Gagal terhubung ke server keamanan. Cek koneksi.");
+        } finally {
+            btn.innerText = textAwal;
+            btn.disabled = false;
+        }
+        return;
+    }
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab'+n).classList.add('active');
+}
+
+async function mulaiUjian() {
+    isBypass = true;
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('videoPreview').srcObject = stream;
+    } catch (e) {}
+
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab3').classList.add('active');
+    document.getElementById('examHeader').style.display = 'flex';
+    document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+    document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+
+    renderSoal();
+    startTimer();
+
+    setTimeout(() => {
+        isBypass = false;
+        setupSecurity();
+    }, 3000);
+}
+
+function setupSecurity() {
+    window.onblur = () => {
+        if (!isBypass && !isUploading && !isDialogOpen) {
+            handleViolation();
+        }
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && !isBypass && !isUploading && !isDialogOpen) {
+            handleViolation();
+        }
+    });
+}
+
+// 🛡️ UPGRADE: AUTO-BLOCK KE SERVER
+function handleViolation() {
+    violationCount++;
+    playAlarm();
+
+    const nama = document.getElementById('namaSiswa').value;
+    document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+    document.getElementById('overlay').style.display = 'block';
+
+    if(violationCount >= MAX_VIOLATIONS) {
+        // Kirim perintah blokir ke Server secara otomatis
+        fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+
+        document.getElementById('btnTutupMandiri').style.display = 'none';
+        document.getElementById('infoKesempatan').innerHTML = `ANDA TERBLOKIR!`;
+        document.getElementById('inputGuruArea').style.display = 'block';
+        
+        // Ubah area input kode menjadi tombol WA Admin
+        document.getElementById('inputGuruArea').innerHTML = `
+            <p>Sistem mendeteksi pelanggaran berulang. Nama Anda telah dikunci.</p>
+            <a href="https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir%20karena%20melanggar%20aturan%20ujian." 
+               style="background:#25D366; color:white; padding:15px; border-radius:12px; text-decoration:none; display:block; font-weight:700; text-align:center;">
+               HUBUNGI ADMIN VIA WHATSAPP
+            </a>
+            <p style="margin-top:15px; font-size:11px; color:#666;">Status: Locked by Server</p>
+        `;
+    }
+}
+
+function playAlarm() {
+    if (!audioCtx) initAudio();
+    oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+    oscillator.start();
+    oscillator.stopInt = setInterval(() => {
+        gain.gain.value = (gain.gain.value === 0 ? 0.3 : 0);
+    }, 200);
+}
+
+function tutupOverlay() {
+    document.getElementById('overlay').style.display = 'none';
+    if(oscillator) {
+        oscillator.stop();
+        clearInterval(oscillator.stopInt);
+    }
+}
+
+function startTimer() {
+    setInterval(() => {
+        if(timeLeft > 0) {
+            timeLeft--;
+            let m = Math.floor(timeLeft/60),
+                s = timeLeft%60;
+            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+        }
+    }, 1000);
+}
+
+function finishExam() {
+    isDialogOpen = true;
+
+    if(Object.keys(savedData.pg).length < SoalPG.length) {
+        alert("HARAP ISI SEMUA PG!");
+        isDialogOpen = false;
+        return;
+    }
+
+    if(savedData.files.length === 0) {
+        alert("UPLOAD FOTO WAJIB!");
+        isDialogOpen = false;
+        return;
+    }
+
+    if(!confirm("Kumpulkan jawaban?")) {
+        isDialogOpen = false;
+        return;
+    }
+
+    isBypass = true;
+
+    const btn = document.getElementById('btnKirim');
+    btn.disabled = true;
+    btn.innerText = "MENGIRIM...";
+
+    const payload = { 
+        nama: document.getElementById('namaSiswa').value, 
+        mapel: NAMA_MAPEL, 
+        pg: savedData.pg, 
+        files: savedData.files 
+    };
+
+    // MENGGUNAKAN SCRIPT_URL LAMA UNTUK JAWABAN
+    fetch(SCRIPT_URL_JAWABAN, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        alert("SUKSES!");
+        localStorage.removeItem(SESSION_KEY);
+        location.reload();
+    })
+    .catch(() => {
+        alert("GAGAL!");
+        btn.disabled = false;
+        btn.innerText = "KUMPULKAN SEMUA JAWABAN";
+        isBypass = false;
+    })
+    .finally(() => {
+        isDialogOpen = false;
+    });
+}
+</script>
+</body>
+</html>

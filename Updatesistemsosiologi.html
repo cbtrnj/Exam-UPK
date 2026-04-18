@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK MASTER - PKBM Ristek Nusantara Jaya</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* TEXTAREA LEBAR UNTUK SEMUA MAPEL */
+        .jawaban-uraian { 
+            width: 100%; 
+            min-height: 250px; 
+            padding: 15px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            resize: vertical; 
+            background: #F9FAFB;
+            line-height: 1.5;
+        }
+        .jawaban-uraian:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.75rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka aplikasi lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;"></div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">NAMA SISWA</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">SOSIOLOGI</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b>Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar melalui Server Admin IT TEAM RNJ.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    const NAMA_MAPEL = "SOSIOLOGI"; 
+    const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+    
+    const WA_ADMIN = "6285888157682";
+    const TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "UPK_MASTER14_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+      const SoalPG = [
+    [
+        "Faktor utama yang mendorong lahirnya ilmu sosiologi adalah….", 
+        [
+            "Ilmu sosial lainnya dianggap gagal dalam menyelesaikan masalah sosial", 
+            "Perubahan-perubahan pada masyarakat Eropa", 
+            "Terjadinya migrasi besar-besaran bangsa eropa menuju Amerika", 
+            "Peperangan yang antar negara-negara Eropa pada Perang Dunia 1", 
+            "Berakhirnya kekuasaan Islam di Eropa"
+        ]
+    ],
+    [
+        "Penyebutan kata ‘’kamu’’ dalam berkomunikasi kepada orang tua bagi masyarakat Sumatera Selatan termasuk kategori bahasa yang dianggap sopan, namun bagi masyarakat Lampung penyebutan kata ‘’kamu’’ dalam berkomunikasi dengan orang tua dianggap kurang bahkan tidak sopan. Sebagai ilmu pengetahuan sosiologi menanggapi fenomena tersebut harus bersifat….", 
+        ["Emperis", "Nonetis", "Komulatif", "Teoritis", "Metodologis"]
+    ],
+    [
+        "Akhir-akhir ini terjadi gejala kelompok sosial yang ajarannya menyimpang dari norma umum. Masih banyak anggota masyarakat yang terkecoh dan masuk dalam kelompok tersebut. Penelitian sosial dilakukan untuk mengetahui sikap anggota masyarakat terhadap gejala tersebut dengan mewawancarai tokoh masyarakat. Dalam hal ini sosiologi berfungsi sebagai....", 
+        ["Perencanaan sosial", "Penelitian sosial", "Pemberdayaan sosial", "Pengevaluasi program", "Pendidik masyarakat"]
+    ],
+    [
+        "Seorang sosiolog melakukan penelitian untuk melihat penyebab tingginya laju urbanisasi di kota-kota besar pasca idul fitri. Hasilnya, ternyata meraka melakukan urbanisasi karena untuk meningkatkan ekonomi keluarga dan melanjutkan pendidikan. Berdasarkan uraian tersebut, yang menjadi pokok bahasan sosiologi adalah….", 
+        ["Tindakan sosial", "Fakta sosial", "Khayalan sosiologi", "Pengungkapan realitas sosial", "Masalah-masalah Sosial"]
+    ],
+    [
+        "Sebagian besar masyarakat mengunjungi pasar modern untuk berbelanja barang kebutuhan sehari-hari setiap akhir pekan. Ketika suasana antrian sangat padat dan tanpa adanya arahan oleh petugas, sangat mungkin terjadi hal-hal yang tidak sesuai norma sosial setempat. Berdasarkan deskripsi tersebut, norma sosial diciptakan dalam masyarakat untuk …. ", 
+        [
+            "Mengarahkan perubahan sosial dalam masyarakat modern", 
+            "Memperkuat identitas sosial kelompok dalam masyarakat", 
+            "Melaksanakan pengendalian sosial agar tercipta tertib sosial", 
+            "Membedakan kelompok sosial strata atas dan strata bawah", 
+            "Menghubungkan masyarakat lapis bawah dan lapis atas"
+        ]
+    ],
+    [
+        "Perhatikan gambar berikut !<br><img src='https://i.imgur.com/YMFFY1S.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Gambar di samping menunjukkan prilaku sosial yang menjunjung tinggi nilai….", 
+        [
+            "Keindahan, kedua pihak menggunakan pakaian seragam formal", 
+            "Kebendaan, karena kedua pihak menggunakan pakaian yang mahal", 
+            "Keilmuan, karena semua pihak menunjukkan capaian dalam studi", 
+            "Kerjasama, karena kedua pihak telah menetapkan kesepakatan", 
+            "Kasih sayang, karena kedua pihak menunjukkan ekspresi ceria"
+        ]
+    ],
+    [
+        "Untuk menghindari konflik yang semakin tajam, para pengurus OSIS di salah satu MA Negeri menerima unsur-unsur dalam kempimimpinan OSIS yang baru, seperti sopan dalam tutur sapa, rapat tepat waktu, dan penerapan sanksi pada pengurus yang tidak berprestasi sehingga terjalain kerjasama yang baik antara ketua dan pengurus. Kerjasama seperti ini tergolong dalam….", 
+        ["Koalisis", "Kooptasi", "Bargaining", "Gotong Royong", "Joint Venture"]
+    ],
+    [
+        "Perhatikan gambar berikut ini!<br><img src='https://i.imgur.com/9mtxgFW.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Gambar tersebut menunjukkan terjadi interaksi dalam bentuk...", 
+        [
+            "Kontak primer dan komunikasi langsung", 
+            "Kontak primer dan komunikasi tidak langsung", 
+            "Kontak primer melalui media secara langsung", 
+            "Kontak skunder dan komunikasi langsung", 
+            "Kontak sekunder dan komunikasi tidak langsung"
+        ]
+    ],
+    [
+        "Hampir setiap saat tayangan media televisi menawarkan barang kebutuhan sehari-hari dengan berbagai fungsi dan penampilan yang menarik. Banyak anggota masyarakat yang tertarik dan terpengaruh untuk membeli meskipun kondisi ekonominya tidak mendukung. Mereka memaksakan diri untuk memiliki barang mewah secara kredit sehingga terlilit utang. Dilihat dari proses interaksi sosial tertentu yang dialami, contoh penyimpangan perilaku tersebut berhubungan dengan ….", 
+        [
+            "Lingkungan pergaulan yang konsumtif", 
+            "Subbudaya menyimpang kelompok", 
+            "Peran lembaga ekonomi yang efektif", 
+            "Ekonomi keluarga yang sangat terbatas", 
+            "Pola dan kebiasaan hidup individu"
+        ]
+    ],
+    [
+        "Tejadinya tsunami di daerah sekitar Selat Sunda pada Desember 2018 menimbulkan banyak kerusakan dan meyembabkan korban jiwa. Karena peristiwa ini, siswa-siswi MA di Provinsi Lampung menggalang dana berupa uang dan bahan makanan pokok sehingga dana tersebut terkumpul dan disalurkan pada keluarga korban. Interaksi sosial dalam ilustrasi tersebut dipengaruhi oleh….", 
+        ["Simpati", "Empati", "Sugesti", "Identifikasi", "Imitasi"]
+    ],
+    [
+        "Beberapa anak kecil asyik bermain bersama teman-temannya. Ada yang menjadi penjual dan ada yang menjadi pembeli seperti layaknya sebuah pasar. Pembeli menggunakan uang dari daun dan barang yang dijual berupa pecahan genting. Sesungguhnya mereka belum mengerti makna sebenarnya dari kegiatan perdagangan tersebut. Contoh tersebut menunjukkan terjadi sosialisasi pada tahap....", 
+        ["Play stage", "Game stage", "Role Play", "Generalized others", "Preparatory stage"]
+    ],
+    [
+        "Perhatikan gambar berikut !<br><img src='https://i.imgur.com/fBBzCRK.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Dari kedua gambar tersebut, jika kita berperan sebagai siswa maka dapat kita bandingkan bahwa gambar 1 memiliki nilai yang lebih penting daripada gambar 2 karena ....", 
+        [
+            "Belajar mempunyai nilai dominan daripada bekerja", 
+            "Bekerja bukan merupakan tanggung jawab utama", 
+            "Belajar merupakan proses internalized value individu", 
+            "Belajar merupakan tuntutan zaman sekarang", 
+            "Belajar mempunyai nilai moral yang lebih tinggi"
+        ]
+    ],
+    [
+        "Seorang polisi memberhentikan dan memeriksa kelengkapan kendaraan, kemudian menindak yang melanggar. Pengendalian sosial ini disebut pengendalian …..", 
+        ["Preventif", "Regresif", "Rersuasif", "Koersif", "Represif"]
+    ],
+    [
+        "Perhatikan piramida struktur sosial berikut ini!<br><img src='https://i.imgur.com/g5Zx98k.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Keterangan :<br>1 = Raja dan Bangsawan<br>2 = Pegawai Kerajaan<br>3 = Rakyat Jelata<br><br>Struktur sosial dalam masyarakat tersebut dibedakan atas dasar faktor ....", 
+        ["Kelahiran dan kehormatan", "Kehormatan dan kekayaan", "Keturunan dan kekuasaan", "Kekuasaan dan kehormatan", "Kekayaan dan pengetahuan"]
+    ],
+    [
+        "Sebelum mengumpulkan data, peneliti perlu membuat instrumen pengumpulan data dalam bentuk daftar pertanyaan yang tersusun rapi sesuai dengan topik penelitian. Peneliti menemui sumber data untuk melakukan tanya jawab dan mencatat hasilnya. Berdasarkan cara memperolehnya, data penelitian tersebut tergolong jenis ….", 
+        ["Data primer", "Data sekunder", "Data empiris", "Data kuantitatif", "Data Kualitatif"]
+    ],
+    [
+        "Diferensiasi sosial masyarakat Indonesia diantaranya nampak dalam beragamnya budaya kesenian tradisional. Diferensiasi sosial tersebut membentuk struktur sosial horizontal, artinya hubungan sosial antara kelompok umat yang berbeda agama didasari prinsip....", 
+        [
+            "Keadilan sosial bagi masyarakat banyak", 
+            "Kesempatan mendapatkan penghidupan", 
+            "Kesamaan hak & kewajiban (derajat) sosial", 
+            "Kebebasan untuk menjalankan ajaran agama", 
+            "Kesesuaian dengan situasi dan kondisi masyarakat"
+        ]
+    ],
+    [
+        "Perhatikan gambar pelapisan sosial di bawah ini !<br><img src='https://i.imgur.com/6MAckC4.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Contoh yang sesuai dengan gambar tersebut yaitu…", 
+        [
+            "Seorang pangeran dinobatkan sebagai putra mahkota kerajaan", 
+            "Siswa yang rajin belajar akan memperoleh nilai yng bagus", 
+            "Pengusaha boutique dulunya bekerja sebagai buruh jahit", 
+            "Warga biasa dapat menjadi bupati jika dipercaya oleh rakyat", 
+            "Petani miskin yang ulet sekarang menjadi saudagar kedelai"
+        ]
+    ],
+    [
+        "Perhatikan ciri-ciri suatu kelompok di bawah ini:<br>1) Tidak terorganisir<br>2) Memiliki tujuan yang ingin dicapai<br>3) Adanya interaksi sosial<br>4) Memiliki struktur<br>5) Memiliki alat pengendalian sosial<br>6) Tidak memiliki alat pengendalian sosial<br><br>Berdasarkan pernyataan di atas yang membedakan kerumunan dengan kelompok sosial adalah nomor…", 
+        ["1, 2, 3 dan 4", "1, 2, 4 dan 5", "1, 3, 4 dan 5", "1, 3 dan 5", "1, 3 dan 6"]
+    ],
+    [
+        "Perhatikan pernyataan berikut!<br>1) Mendapatkan kendala jika peneliti tidak bisa hadir.<br>2) Mempunyai kesulitan dalam mengolah data yang terkumpul.<br>3) Hanya mendapatkan data yang dituliskan oleh responden.<br>4) Mengalami kesulitan dalam mengembangkan pertanyaan tambahan.<br>5) Hanya dapat digunakan pada sumber data yang mampu baca tulis.<br><br>Yang tergolong kekurangan/kelemahan metode kuesioner antara lain …. ", 
+        ["(1), (2), dan (3)", "(1), (2), dan (4)", "(1), (3), dan (5)", "(2), (4), dan (5)", "(3), (4), dan (5)"]
+    ],
+    [
+        "Penentuan judul penlitian sangat penting karena dalam judul tergambar objek dan subjek yang akan diteliti. Oleh karena itu, hal pertama yang harus diperhatikan dalam menentukan judul adalah….", 
+        ["Keterbacaan judul", "Keunikan masalah yang akan diteliti", "Keberlanjutan hasil penelitian", "Keterjangkauan peneliti", "Manfaat judul yang dipilih"]
+    ],
+    [
+        "Seorang peneliti melakukan penelitian mengenai perubahan sosail ekonomi masyarakat yang bermukim di sekitar pantai. Peneliti langsung ke daerah tersebut untuk mengetahui gambaran tentang kehidupan masyarakat di sana sekaligus untuk memperoleh data yang dibutuhkan. Berdasarkan metodenya , penelitia tersebut termasuk kedalam penelitian….", 
+        ["Survei", "Historik", "Observasi", "Eksploratif", "Eksperimen"]
+    ],
+    [
+        "Hasil tes mata pelajaran tertentu sebagai berikut:<br><table border='1' style='border-collapse: collapse; width: 100%; text-align: center;'><tr><th>Nilai</th><th>f (Frekuensi)</th></tr><tr><td>10</td><td>3</td></tr><tr><td>9</td><td>6</td></tr><tr><td>8</td><td>12</td></tr><tr><td>7</td><td>14</td></tr><tr><td>6</td><td>8</td></tr><tr><td>5</td><td>5</td></tr></table><br>Modus = 7. Dari data tersebut dapat diketahui bahwa modus 7 menggambarkan nilai….", 
+        ["Rata-rata", "Tertinggi", "Menengah", "Yang diperoleh siswa", "Terbanyak dicapai siswa"]
+    ],
+    [
+        "Yanti sangat tertarik pada kehidupan masyarakat Baduy di pedalaman Banten, sehingga ia ingin melakukan penelitian lebih lanjut. Untuk mendapatkan data yang valid, Yanti menggunakan dua teknik penumpulan data yaitu wawancara dan kuesioner. Wawancara dilakukan dengan menggunakan pedoman untuk melakukan tanya jawab dengan informan. Sedangkan kuesioner dilakukan pada masyarakat Baduy yang sudah bisa membaca sehingga pertanyaan dapat dijawab dengan baik. Setelah dilakukan pengumpulan data diketahui bahwa teknik pengumpulan data yang lebih efektif adalah ....", 
+        [
+            "Kuesioner karena data yang terkumpul lebih mendalam dan rinci", 
+            "Wawancara karena dapat mengumpulkan data lebih cepat dan murah", 
+            "Kuesioner karena masyarakat badui tidak ada yang bekerja secara formal", 
+            "Wawancara karena data yang didapatkan lebih detail dan mendalam", 
+            "Wawancara karena langsung dapat melihat peristiwa di masyarakat badui"
+        ]
+    ],
+    [
+        "Perhatikan gambar di samping !<br><img src='https://i.imgur.com/JQ9DY3e.png' style='max-width:100%; border-radius:10px; margin:10px 0;'><br>Gambar tersebut menunjukkan adanya mobilitas ....", 
+        ["Antargenerasi vertikal turun", "Antargenerasi vertikal naik", "Intra generasi vertikal turun", "Intragenerasi vertikal naik", "Antargenerasi horizontal"]
+    ],
+    [
+        "Perhatikan contoh berikut !<br>1) Terjadinya konflik antar kelompok/partai<br>2) Adanya intergrasi antar generasi<br>3) Penjarahan akibat ketimpangan ekonomi<br>4) Mempertahankan kepentingan status quo<br>5) Terjanya perselisihan antarwarga<br><br>Berdasarkan contoh di atas yang termasuk konsekuensi negatif dari mobilitas sosial ditunjukan Oleh nomor…..", 
+        ["1, 2 dan 3", "1, 2 dan 4", "1, 2 dan 5", "1, 3 dan 4", "1, 3 dan 5"]
+    ],
+    [
+        "Beberapa faktor yang memengaruhi mobilitas sosial yaitu:<br>1) Konflik dalam masyarakat yang tidak kunjung berhenti<br>2) Rasa tidak puas dengan keadaan yang ada pada dirinya<br>3) Tingkat kemiskinan dan kebodohan warga yang tinggi<br>4) Perbedaan antar keyakinan/agama yang dianut masyarakat<br>5) Keteguhan masyarakat untuk melestarikan budaya daerah<br><br>Dari faktor di atas yang merupakan penghambat terjadinya mobilitas sosial adalah ..", 
+        ["1, 2 dan 3", "1, 2 dan 4", "1, 3 dan 5", "2, 4 dan 5", "3, 4 dan 5"]
+    ],
+    [
+        "Pembangunan infrastruktur seperti pembangunan jalan sering menimbulkan pertentangan antara pihak pengembang dan para pemilik lahan yang sering disebut dengan konflik agraria. Konflik agraria ini kadang-kadang dapat diselesaikan dengan menghadirkan pemerintah selaku pihak ketiga namun banyak pula yang penyelesaiannya konflik berakhir di meja pengadilan atau hukum. Upaya penyelesaian konflik ini disebut dengan ….", 
+        ["Arbitrasi", "Adjudication", "Mediasi", "Stalemate", "Segregesi"]
+    ],
+    [
+        "Dalam kehidupan masyarakat yang heterogen konflik tidak hanya terjadi pada masyarakat yang pernah berinteraksi namun juga dapat terjadi pada kelompok yang belum pernah berinteraksi. Di bawah ini yang termasuk contoh konflik yang terjadi antara kelompok yang sebelumnya tidak pernah berinteraksi adalah….", 
+        ["Antara guru dengan murid baru", "Antara sahabat yang tidak pernah bertemu", "Antara kelompok yang telah lama berinteraksi", "Antara transmigran dengan penduduk asli setempat", "Antara pemburu dengan binatang buruan"]
+    ],
+    [
+        "Untuk memenuhi kebutuhan hidup yang terus meningkat, masyarakat harus mengubah cara dan sistem kerjanya. Dalam kegiatan mengolah hasil pertanian misalnya, masyarakat harus menggunakan teknologi modern untuk mendapatkan hasil yang lebih bermutu sehingga mendapatkan harga yang tinggi. Ilustrasi tersebut menegaskan tentang perlunya modernisasi bidang pertanian untuk ......", 
+        [
+            "Mendapatkan nilai tambah dari hasil pertanian", 
+            "Meningkatkan jumlah petani tanaman pangan", 
+            "Mengembangkan peralatan pertanian modern", 
+            "Memperluas lahan untuk kegiatan pertanian", 
+            "Membangun sistem pertanian monokultur"
+        ]
+    ],
+    [
+        "Pengaruh globalisasi dalam penyaluran barang/jasa sangat kuat untuk mengubah perilaku masyarakat. Berbagai pasar modern menjamur di tengah-tengah kehidupan masyarakat dengan memberikan kenyamanan berbelanja. Pengaruh gejala globalisasi dalam bidang ekonomi tersebut nampak dalam hal….", 
+        [
+            "Sentimen terhadap nilai mata uang asing dalam investasi", 
+            "Kebebasan dalam berbusana dan melonggarnya etika pergaulan remaja", 
+            "Mudahah memperoleh barang konsumtif dari dalam dan luar negeri", 
+            "Melemahnya pasar tradisional dalam usaha menarik konsumen lokal", 
+            "Berkembangnya penggunaan bahasa asing dalam pergaulan remaja"
+        ]
+    ],
+    [
+        "Keberhasilan modernisasi tidak ditentukan oleh suksesnya bidang ekonomi serta ilmu pengetahuan dan teknologi, tetapi modernisasi di bidang sikap dan nilai. Modenisasi dalam sikap dan nilai seperti ….", 
+        [
+            "Bersikap dan berprilaku seperti orang barat", 
+            "Menghargai kebudayaan yang berasal dari barat", 
+            "Menghargai waktu dan meningkatkan disiplin", 
+            "Mempertahankan etos budaya", 
+            "Mengunakan teknologi yang dimiliki dengan benar"
+        ]
+    ],
+    [
+        "Masyarakat Indonesia merupakan masyarakat yang memiliki berbagai macam latar belakang suku, ras, agama, dan budaya yang berbeda. Perbedaan itu disebabkan oleh beberapa faktor yang salah satunya karena kondisi geografis yang terdiri dari pulau-pulau. Dengan kondisi masyarakat seperti ilustrasi, Indonesia seharusnya menerapkan bentuk masyarakat yang ....", 
+        [
+            "Tersegmentasi dan berkelompok sesuai dengan kesamaan agama", 
+            "Membentuk komunitas sesuai dengan latar belakang suku", 
+            "Berteman dengan orang-orang yang memiliki ras sama", 
+            "Mau mewujudkan integrasi karena ada peraturan dan kepentingan", 
+            "Selalu mengembangkan sikap toleransi dan saling menghargai"
+        ]
+    ],
+    [
+        "Konsekuensi dari masyarakata yang cenderung majemuk yaitu setiap kelompok membawa indentitas budaya masing-masing, kemudian di praktekan di dalam masyarakat. Untuk itu di perlukan sikap pentingnya pendidikan multikultural sehingga potensi konflik horizontal di masyarakat dapat dikurangi atau dihindari. Berikut yang bukan menjadi acuan dalam pendidikan multikultural adalah….", 
+        [
+            "Kemajuan yang dicapai suatau kelompok dalam masyarakat dipandang kemajuan bagi kelompok yang lebih luas", 
+            "Adat istiadat merupakan tali pengikat kesatuan masyarakat", 
+            "Pluralism budaya dianggap sebagai suatu yang eksotis", 
+            "Pengakuaan akan indentitas budaya lain", 
+            "Menghargai dan mengakui kemajuan kelompok lain dalam suatu masyarakat."
+        ]
+    ],
+    [
+        "Pandangan mayarakat yang primodial merupakan salah satu faktor yang menghambat perkembangan masyarakat multikultural. Namun pandangn ini tidak akan muncul jika sikap masyarakat….", 
+        [
+            "Tidak menganggap budaya sendiri yang paling baik", 
+            "Tidak memandang remeh budaya masyarakat lain", 
+            "Membangun kesetraan gender dalam masyarakat", 
+            "Memiliki orientasi untuk mengambangkan budaya di dalam masyarakat", 
+            "Mencarai kebudayaan yang masih asli."
+        ]
+    ],
+    [
+        "Di sebuah kompleks perumahan terdapat warga dari beberapa suku bangsa. Mereka hidup dalam satu lingkungan dengan budaya yang berbeda-beda. Ketika bertemu dengan orang yang sedaerah maka mereka saling berinteraksi secara baik, tetapi cenderung acuh terhadap orang dari daerah yang berbeda. Bahkan kelompok tersebut cenderung sering membicarakan dan mengkritik kebiasan dari kelompok lainnya. Dari ilustrasi tersebut, perilaku yang seharusnya dilakukan agar terwujud harmoni sosial adalah ....", 
+        [
+            "Menghargai perbedaan dan mengembangkan sikap simpati", 
+            "Melakukan amalgamasi agar terjalin interaksi yang lebih dekat", 
+            "Etnis yang dominan seharusnya dapat memaksakan budayanya", 
+            "Menumbuhkan sikap kontravensi agar dari luar tetap terlihat baik", 
+            "Saling berkompetisi untuk menunjukkan siapa yang terbaik"
+        ]
+    ],
+    [
+        "Penemuan Benua Amerika oleh Cristoper Columbus membuka jalan baru bagi kemajuan peradaban dan kebudayaan benua. Banyak para imigran dari Eropa seperti Inggris, Perancis, Spanyol dan Portugis berdatangan dan menetap disana. Benua ini yang dahulu dihuni penduduk asli yaitu suku Indian, lama kelamaan menjadi terdesak karena datang para imigran tersebut. Bahkan kadang-kadang terjadi konfilk antara imigran dan penduduk asli. Dari lustrasi di atas yang menjadi faktor penyebab pertama terjadinya perubahan sosial budaya adalah….", 
+        ["Invention", "Descovery", "Konflik Sosial", "Bertambahnya jumlah penduduk", "migrasi"]
+    ],
+    [
+        "Perubahan mode pakaian dan mode rambut termasuk dalam katergori sebagai perubahan yang pengaruhnya kecil dengan ruang lingkup yang tidak luas dan tidak begitu berarti bagi masyarakat karena….", 
+        [
+            "Tidak bertentangan dengan keyakinan masyarakat", 
+            "Selalu menguntungkan pedagang dan jasa cukur rambut", 
+            "Hanya diikuti golongan tertentu", 
+            "Tidak ada hubungan dengan bidang kebudayaan", 
+            "Hanya berhubungan dengan kebutuhan sekunder"
+        ]
+    ],
+    [
+        "Berikut yang bukan faktor penghambat dari perubahan sosial budaya adalah….", 
+        [
+            "Terisoslasinya dengan masyarakat luar", 
+            "Adanya vested interest dalam masyarakat", 
+            "Kuatnya hubungan dengan masyarakat sekitar", 
+            "Prasangka terhadap hal-hal baru karena pernaha dijajah", 
+            "Rasa takut akan terjadinya kegoyahan pada integrasi kebudayaan"
+        ]
+    ],
+    [
+        "Dalam hubungan antar-bangsa, negara besar yang kaya dan kuat cenderung memberi pengaruh besar pada masyarakat negara berkembang. Dalam bidang seni musik misalnya, gaya dan jenis musik dari negara maju menjadi trend di negara berkembang. Bagi masyarakat Indonesia, fenomena hegemoni budaya menjadi tantangan yang problematis. Permasalahan dampak globalisasi tersebut perlu direspon dengan penguatan kapasitas komunitas lokal, misalnya ....", 
+        [
+            "Mengadakan kegiatan seni budaya yang banyak menampilkan potensi komunitas lokal", 
+            "Mengirim para pelajar untuk mempelajari semua cabang seni budaya masyarakat dunia", 
+            "Memberikan insentif atau hadiah kepada masyarakat yang peduli kebudayaan setempat", 
+            "Bekerja sama dengan banyak pihak yang mempunyai visi dan misi bagi komunitas budaya", 
+            "Menyalurkan bantuan untuk pengembangan kesejahteraan anggota komunitas budaya"
+        ]
+    ],
+    [
+        "Proses globalisasi yang terjadi sangat dikendalikan dan didominasi oleh negara maju. Produk industri barang dan jasa dari negara yang berbudaya bebas banyak membanjiri pasar masyarakat berkembang, termasuk Indonesia. Bagi negara berkembang, globalisasi tersebut menimbulkan dampak negatif dalam bentuk ....", 
+        ["Pola hidup konsumtif", "Gaya hidup liberal", "Ideologi sekuler", "Orientasi hedonis", "Sikap individualis"]
+    ]
+];
+
+    const soalUraian=[
+    "Norma adalah seperangkat aturan dengan sanksi tertentu yang digunakan untuk memberi dorongan seseorang atau kelompok dalam mencapai nilai-nilai. Sebutkan 3 fungsi norma dalam masyarakat?",
+    "Untuk menjawab permasalahan dalam penelitian diperlukan data yang tepat dan akurat. Berdasarkan cara memperolehnya data dibedakan menjadi dua yaitu data primer dan data sekunder. Jelaskan perbedaan cara memperoleh kedua data tersebut?",
+    "Harmoni sosial sangat diperlukan dalam kehidupan masyarakat, terlebih lagi kehidupan masyarakat yang majemuk seperti Indonesia. Harmoni sosial menunjukkan kondisi ketika individu hidup sejalan dan serasi dengan tujuan masyarakat, sehingga tercipta kondisi yang tertib, teratur, aman dan nyaman. Sebutkan 5 hal yang perlu dilakukan agar terciptanya harmoni sosial di masyarakat?",
+    "Salah satu faktor yang menyebabkan terjadinya perubahan sosial budaya adalah adanya inovasi atau penemuan baru. Jelaskan mengapa penemuan baru bisa mendorong terjadinya perubahan sosial?",
+    "Masyarakat dunia tidak dapat menghindarkan diri dari dampak globalisasi dalam bentuk ketimpangan antara negara kaya dan negara miskin. Sebagai negara berkembang, masyarakat Indonesia banyak menerima pengaruh dari dinamika ekonomi global yang diwarnai kompetisi.<br><br><b>Jelaskan 2 (dua) dampak globalisasi terhadap ekonomi masyarakat Indonesia dan 2 (dua) strategi komunitas lokal untuk mengatasinya!</b>"
+];
+
+
+    // --- 3. CORE SYSTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+            s[1].forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid var(--primary);">
+                        <b>Uraian ${i + 1}.</b><br>${soal}<br>
+                        <textarea class="jawaban-uraian" placeholder="Ketik langkah pengerjaan dan jawaban akhir di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        if(window.MathJax) MathJax.typeset();
+    }
+
+    // --- 4. SECURITY & LOGIC ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopInt = setInterval(() => { gainNode.gain.value = gainNode.gain.value === 0 ? 0.4 : 0; }, 200);
+    }
+    function stopAlarm() { if (oscillator) { oscillator.stop(); clearInterval(oscillator.stopInt); } }
+    
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 20000); }
+
+    async function goToTab(n) {
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+        if(n === 2) {
+            if(!nama || token !== TOKEN_VALID) { alert("Nama & Token Wajib Diisi!"); return; }
+            const btn = event.target; btn.innerText = "🔍 Validasi Server..."; btn.disabled = true;
+            try {
+                const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+                const status = await resp.text();
+                if(status === "AKTIF") {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab2').classList.add('active');
+                } else {
+                    alert("AKSES DITOLAK! Status: TERBLOKIR.");
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                }
+            } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
+            return;
+        }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab'+n).classList.add('active');
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('videoPreview').srcObject = s; } catch(e){}
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        violationCount++; playAlarm();
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
+            document.getElementById('inputGuruArea').innerHTML = `
+                <h2 style="color:red">ANDA TERBLOKIR</h2>
+                <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
+                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+        }
+    }
+
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+
+    function startTimer() { setInterval(() => { if(timeLeft > 0){ timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer').innerText=`${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        isBypass = true;
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        if(confirm("Yakin ingin mengumpulkan semua jawaban?")) {
+            const btn = document.getElementById('btnKirim'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value.trim().toUpperCase(), 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL_JAWABAN, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; isBypass = false; });
+        }
+    }
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

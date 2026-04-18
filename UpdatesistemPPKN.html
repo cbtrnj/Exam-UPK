@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UPK MASTER - PKBM Ristek Nusantara Jaya</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overall: #F1F4F9; --bg-card: #FFFFFF; --primary: #0A66C2;
+            --danger: #ef4444; --text-dark: #1F2937; --text-muted: #6B7280; --border: #E5E7EB;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-overall);
+            margin: 0; padding: 0; color: var(--text-dark); -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 10px; }
+        .exam-header {
+            display: none; background: white; padding: 12px 15px; position: sticky; top: 0; z-index: 1000;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card { background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .school-header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 80px; height: auto; margin-bottom: 10px; }
+        .school-name { font-size: 1.3rem; font-weight: 800; margin: 0; }
+        .exam-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-top: 5px; }
+        .exam-badge { display: inline-block; background: rgba(10,102,194,0.1); color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; margin-top: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        
+        .soal-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; line-height: 1.6; }
+        .opsi-item { display: flex; align-items: center; padding: 12px; border: 1px solid #f3f4f6; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+        
+        /* TEXTAREA LEBAR UNTUK SEMUA MAPEL */
+        .jawaban-uraian { 
+            width: 100%; 
+            min-height: 250px; 
+            padding: 15px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 12px; 
+            margin-top: 15px; 
+            font-family: inherit; 
+            font-size: 1rem; 
+            resize: vertical; 
+            background: #F9FAFB;
+            line-height: 1.5;
+        }
+        .jawaban-uraian:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+        #camContainer { width: 60px; height: 80px; background: #000; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; margin-left: 10px; }
+        #camContainer video { width: 100%; height: 100%; object-fit: cover; }
+        
+        #overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); color:white; text-align:center; z-index: 10000; padding: 15vh 20px; }
+        .timer-badge { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-family: monospace; }
+        .life-badge { font-size: 0.75rem; color: var(--danger); font-weight: 800; }
+        .footer-school { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; font-weight: 600; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+<div id="overlay">
+    <h1 style="color: var(--danger);">PERINGATAN!</h1>
+    <p>Dilarang meninggalkan halaman ujian atau membuka aplikasi lain!</p>
+    <div id="infoKesempatan" style="margin: 20px 0; font-weight: bold; color: #fbbf24; font-size: 1.5rem;"></div>
+    <div id="inputGuruArea" style="display:none;"></div>
+    <button id="btnTutupMandiri" class="btn btn-primary" onclick="tutupOverlay()">SAYA MENGERTI</button>
+</div>
+
+<div id="examHeader" class="exam-header">
+    <div style="flex:1">
+        <div id="displayNama" style="font-weight: 800;">NAMA SISWA</div>
+        <div id="displayMapelHeader" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;"></div>
+        <div class="life-badge" id="lifeCounter">Pelanggaran: 0/3</div>
+    </div>
+    <div style="display: flex; align-items: center;">
+        <div class="timer-badge" id="timer">90:00</div>
+        <div id="camContainer"><video id="videoPreview" autoplay playsinline muted></video></div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="tab1" class="tab-content active">
+        <div class="card">
+            <div class="school-header">
+                <img src="https://i.imgur.com/J1mKppg.png" class="logo">
+                <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
+                <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
+                <span class="exam-badge" id="mapelTitle">PPKN</span>
+            </div>
+            <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="goToTab(2)">Lanjut</button>
+            <div class="footer-school"><b>Exambro V.02.01.331. RNJ-PRO IT TEAM.</b></div>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="card">
+            <h2 style="text-align: center;">TATA TERTIB (BACA DENGAN TELITI)</h2>
+            <p>Pastikan koneksi stabil. Jangan keluar dari tab selama ujian berlangsung.</p>
+            <p>Jangan Meninggalkan Halaman Ujian. <b style="color: red;">Meninggalkan = Menyebabkan TERBLOKIR oleh sistem.</b></p>
+            <p>Sistem EXAM-RNJ.PRO memiliki sistem yang membaca siswa secara realtime dan mencatat segala kecurangan siswa yang bergerak dibelakang layar melalui Server Admin IT TEAM RNJ.</p>
+            <p>Ke JUJURAN adalah kunci kesuksesan diri.</p>
+            <button class="btn btn-primary" onclick="mulaiUjian()">MULAI UJIAN SEKARANG</button>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div id="renderPG"></div>
+        <div id="renderUraianTeks"></div>
+        <button id="btnKirim" class="btn btn-success" onmousedown="bypassSecurity()" onclick="finishExam()" style="margin-bottom: 80px; margin-top: 20px;">KUMPULKAN SEMUA JAWABAN</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION ---
+    const NAMA_MAPEL = "PPKN"; 
+    const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
+    const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
+    
+    const WA_ADMIN = "6285888157682";
+    const TOKEN_VALID = "RISTEK2026";
+    const SESSION_KEY = "UPK_MASTER06_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+
+    // --- 2. BANK SOAL ---
+    const SoalPG = [
+["Nilai-nilai yang terkandung dalam Pancasila bersifat...",["Individualistis","Universal","Sekuler","Kapitalis"]],
+["Undang-Undang Dasar Negara Republik Indonesia Tahun 1945 merupakan...",["Undang-undang biasa","Peraturan pemerintah","Hukum dasar tertulis","Keputusan presiden"]],
+["Lembaga negara yang memiliki wewenang menguji undang-undang terhadap UUD 1945 adalah...",["Dewan Perwakilan Rakyat","Mahkamah Konstitusi","Presiden","Komisi Yudisial"]],
+["Hak asasi manusia yang dijamin dalam UUD 1945 mencakup, kecuali...",["Hak hidup","Hak kepemilikan pribadi","Hak monopoli atas sumber daya alam","Hak berpendapat"]],
+["Prinsip demokrasi yang diterapkan di Indonesia adalah...",["Demokrasi liberal","Demokrasi terpimpin","Demokrasi pancasila","Demokrasi totaliter"]],
+["Berikut ini yang bukan merupakan ciri negara hukum adalah...",["Adanya perlindungan HAM","Pemerintah berdasarkan kekuasaan mutlak","Kekuasaan kehakiman yang bebas","Supremasi hukum"]],
+["Dalam sistem pemerintahan presidensial, presiden berperan sebagai...",["Kepala negara dan kepala pemerintahan","Hanya kepala negara","Hanya kepala pemerintahan","Ketua Mahkamah Agung"]],
+["Salah satu kewajiban warga negara menurut UUD 1945 adalah...",["Mendapatkan pendidikan","Membayar pajak","Memilih presiden","Mendapatkan pekerjaan"]],
+["Contoh perilaku yang mencerminkan sikap toleransi adalah...",["Memaksakan kehendak","Menghargai perbedaan pendapat","Menyebarkan berita hoaks","Mendiskriminasi kelompok minoritas"]],
+["Penegakan hukum di Indonesia sering terhambat oleh...",["Transparansi","Korupsi","Partisipasi publik","Supremasi hukum"]],
+["Salah satu tantangan demokrasi di era digital adalah...",["Kurangnya sumber daya manusia","Penyebaran disinformasi","Keterbatasan teknologi","Tingginya partisipasi pemilih"]],
+["Fungsi utama DPR adalah...",["Mengawasi presiden","Membentuk undang-undang","Melantik presiden","Mengadili pelanggaran HAM"]],
+["Pelanggaran hak asasi manusia dapat diadukan ke...",["Kementerian Pendidikan","Komnas HAM","Mahkamah Agung","KPU"]],
+["Salah satu bentuk ancaman terhadap integrasi nasional adalah...",["Persatuan bangsa","Konflik horizontal","Kerja sama antar daerah","Toleransi"]],
+["Hak berorganisasi diatur dalam...",["Pasal 28 UUD 1945","Pasal 31 UUD 1945","Pasal 33 UUD 1945","Pasal 37 UUD 1945"]],
+["Semboyan Bhinneka Tunggal Ika mencerminkan...",["Persatuan dalam perbedaan","Keseragaman budaya","Ketidakadilan sosial","Ketidaksetaraan gender"]],
+["Lembaga yang mengawasi pelaksanaan pemilu adalah...",["KPU","Bawaslu","DPR","Mahkamah Agung"]],
+["Salah satu bentuk partisipasi aktif warga negara adalah...",["Tidak memilih dalam pemilu","Terlibat dalam kegiatan sosial","Mengabaikan aturan lalu lintas","Membayar pungutan liar"]],
+["Prinsip persamaan di hadapan hukum berarti...",["Hukum hanya berlaku untuk pejabat","Semua orang sama di mata hukum","Hukum mudah diubah","Hukum tidak mengikat"]],
+["Salah satu dampak globalisasi terhadap identitas nasional adalah...",["Penguatan budaya lokal","Hilangnya budaya asli","Pemantapan nilai-nilai nasional","Meningkatnya nasionalisme"]],
+["Upaya menjaga kelestarian lingkungan merupakan bagian dari...",["Hak pribadi","Kewajiban sebagai warga negara","Tanggung jawab pemerintah saja","Hak asasi manusia"]],
+["Kewenangan Mahkamah Agung adalah...",["Mengadili sengketa hasil pemilu","Menguji undang-undang terhadap UUD","Mengadili kasasi perkara perdata dan pidana","Melantik presiden"]],
+["Salah satu tujuan otonomi daerah adalah...",["Memperkuat sentralisasi kekuasaan","Meningkatkan partisipasi masyarakat","Mengurangi peran DPRD","Menambah beban pemerintah pusat"]],
+["Penyalahgunaan kekuasaan oleh pejabat publik disebut juga...",["Demokrasi","Korupsi","Reformasi","Desentralisasi"]],
+["Contoh pengamalan nilai keadilan sosial adalah...",["Membeda-bedakan teman","Membantu korban bencana","Menolak membantu orang miskin","Mengabaikan hak orang lain"]],
+["Lembaga yang berfungsi sebagai pengawas eksternal pemerintah adalah...",["BPK","KPK","Polri","BIN"]],
+["Prinsip supremasi hukum berarti...",["Semua warga negara harus taat hukum","Hukum dibuat untuk pejabat saja","Hukum bersifat diskriminatif","Hukum bisa diabaikan"]],
+["Hak menyatakan pendapat secara bebas diatur dalam...",["Pasal 27 UUD 1945","Pasal 28E UUD 1945","Pasal 29 UUD 1945","Pasal 31 UUD 1945"]],
+["Salah satu bentuk perilaku anti korupsi adalah...",["Memberikan suap","Melaporkan tindak pidana korupsi","Menyembunyikan kejahatan","Membiarkan penyalahgunaan wewenang"]],
+["Kebebasan pers di Indonesia dijamin oleh...",["UUD 1945 Pasal 28F","UUD 1945 Pasal 33","UUD 1945 Pasal 36C","UUD 1945 Pasal 37"]],
+["Salah satu hak warga negara dalam bidang pendidikan adalah...",["Hak memperoleh pendidikan","Hak membatasi pendidikan","Hak memberhentikan guru","Hak membatasi akses informasi"]],
+["Peran aktif dalam menjaga persatuan bangsa dapat diwujudkan dengan...",["Menghargai perbedaan budaya","Saling mencela","Menghasut permusuhan","Mengabaikan aturan"]],
+["Kebijakan publik yang baik harus...",["Menguntungkan kelompok tertentu saja","Berdasarkan aspirasi masyarakat","Berlaku diskriminatif","Mengabaikan kepentingan rakyat"]],
+["Salah satu tantangan dalam penegakan HAM di Indonesia adalah...",["Lemahnya penegakan hukum","Banyaknya lembaga HAM","Terbatasnya jumlah penduduk","Rendahnya partisipasi masyarakat"]],
+["Hak memperoleh pekerjaan dan penghidupan yang layak dijamin dalam...",["Pasal 27 ayat 2 UUD 1945","Pasal 29 UUD 1945","Pasal 31 UUD 1945","Pasal 33 UUD 1945"]],
+["Tugas utama Komisi Yudisial adalah...",["Mengangkat hakim agung","Mengawasi perilaku hakim","Mengadili perkara pidana","Membentuk undang-undang"]],
+["Salah satu contoh pelanggaran HAM berat adalah...",["Pencurian","Pembunuhan massal","Penipuan","Perusakan fasilitas umum"]],
+["Lembaga yang menangani pemberantasan tindak pidana korupsi di Indonesia adalah...",["KPK","BPK","KPU","DPR"]],
+["Penerapan nilai gotong royong dalam kehidupan masyarakat dapat dilakukan dengan...",["Bekerja sama membersihkan lingkungan","Membiarkan sampah menumpuk","Meminta bantuan tanpa partisipasi","Mengabaikan kerja bakti"]],
+["Prinsip keadilan dalam demokrasi berarti...",["Semua kebijakan harus menguntungkan pemerintah","Setiap warga negara mendapat perlakuan sama","Hanya kelompok tertentu yang mendapat hak istimewa","Pemerintah berkuasa mutlak"]],
+["Pilihan yang mencerminkan pengamalan Pancasila sila kedua adalah...",["Saling membantu teman yang mengalami kesulitan","Menyebar kebencian di media sosial","Menolak berdiskusi","Mengabaikan hak orang lain"]],
+["Salah satu bentuk pelaksanaan nilai demokrasi dalam sekolah adalah...",["Pemilihan ketua OSIS secara langsung","Penunjukan ketua kelas oleh guru","Pengambilan keputusan oleh satu orang","Tidak melibatkan siswa dalam musyawarah"]],
+["Pentingnya supremasi hukum adalah untuk...",["Melindungi hak warga negara","Memperkuat kekuasaan","Mengurangi partisipasi masyarakat","Mengabaikan keadilan"]],
+["Salah satu hambatan dalam penerapan otonomi daerah adalah...",["Ketimpangan sumber daya","Tingginya partisipasi masyarakat","Peningkatan infrastruktur","Pelayanan publik meningkat"]],
+["Implementasi nilai-nilai Pancasila dalam kehidupan sehari-hari dapat diwujudkan melalui...",["Perilaku intoleran","Saling menghargai perbedaan","Menolak keragaman budaya","Mengutamakan kepentingan pribadi"]]
+];
+
+const soalUraian=[
+"Jelaskan bagaimana prinsip musyawarah mufakat dapat diterapkan dalam menyelesaikan konflik di lingkungan sekolah!",
+"Analisislah dampak positif dan negatif globalisasi terhadap integrasi nasional Indonesia!",
+"Bagaimana upaya yang dapat dilakukan masyarakat untuk mencegah pelanggaran hak asasi manusia di lingkungan sekitar?",
+"Berikan contoh konkret penerapan nilai keadilan sosial dalam kehidupan sehari-hari dan jelaskan alasannya!",
+"Jelaskan pentingnya peran serta generasi muda dalam menjaga persatuan dan kesatuan bangsa di era digital!"
+];
+
+    // --- 3. CORE SYSTEM ---
+    let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
+    let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
+    let audioCtx, oscillator;
+
+    function saveAns(q, a) { 
+        savedData.pg['q'+q] = a; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function saveUraian(u, txt) { 
+        savedData.uraian['u'+u] = txt; 
+        localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
+    }
+
+    function renderSoal() {
+        let pgHtml = "";
+        SoalPG.forEach((s, i) => {
+            let savedIdx = savedData.pg['q'+i];
+            pgHtml += `<div class="soal-card"><b>${i+1}.</b> ${s[0]}<br><br>`;
+            s[1].forEach((opt, idx) => {
+                let isChecked = (savedIdx !== undefined && savedIdx == idx) ? 'checked' : '';
+                pgHtml += `<label class="opsi-item"><input type="radio" name="pg${i}" ${isChecked} onclick="saveAns(${i}, ${idx})"> ${opt}</label>`;
+            });
+            pgHtml += `</div>`;
+        });
+        document.getElementById('renderPG').innerHTML = pgHtml;
+
+        let uHtml = "";
+        soalUraian.forEach((soal, i) => {
+            let savedText = savedData.uraian['u'+i] || "";
+            uHtml += `<div class="soal-card" style="border-left:4px solid var(--primary);">
+                        <b>Uraian ${i + 1}.</b><br>${soal}<br>
+                        <textarea class="jawaban-uraian" placeholder="Ketik langkah pengerjaan dan jawaban akhir di sini..." oninput="saveUraian(${i}, this.value)">${savedText}</textarea>
+                      </div>`;
+        });
+        document.getElementById('renderUraianTeks').innerHTML = uHtml;
+        
+        if(window.MathJax) MathJax.typeset();
+    }
+
+    // --- 4. SECURITY & LOGIC ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playAlarm() {
+        if (!audioCtx) initAudio();
+        oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stopInt = setInterval(() => { gainNode.gain.value = gainNode.gain.value === 0 ? 0.4 : 0; }, 200);
+    }
+    function stopAlarm() { if (oscillator) { oscillator.stop(); clearInterval(oscillator.stopInt); } }
+    
+    function bypassSecurity() { isBypass = true; setTimeout(() => { isBypass = false; }, 20000); }
+
+    async function goToTab(n) {
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        const token = document.getElementById('tokenUjian').value.trim().toUpperCase();
+        if(n === 2) {
+            if(!nama || token !== TOKEN_VALID) { alert("Nama & Token Wajib Diisi!"); return; }
+            const btn = event.target; btn.innerText = "🔍 Validasi Server..."; btn.disabled = true;
+            try {
+                const resp = await fetch(`${URL_VALIDASI}?action=checkStatus&nama=${encodeURIComponent(nama)}`);
+                const status = await resp.text();
+                if(status === "AKTIF") {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab2').classList.add('active');
+                } else {
+                    alert("AKSES DITOLAK! Status: TERBLOKIR.");
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                }
+            } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
+            return;
+        }
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab'+n).classList.add('active');
+    }
+
+    async function mulaiUjian() {
+        isBypass = true;
+        try { const s = await navigator.mediaDevices.getUserMedia({video:true}); document.getElementById('videoPreview').srcObject = s; } catch(e){}
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab3').classList.add('active');
+        document.getElementById('examHeader').style.display = 'flex';
+        document.getElementById('displayNama').innerText = document.getElementById('namaSiswa').value;
+        document.getElementById('displayMapelHeader').innerText = NAMA_MAPEL;
+        renderSoal(); startTimer();
+        setTimeout(() => { isBypass = false; setupSecurity(); }, 5000);
+    }
+
+    function setupSecurity() {
+        window.onblur = () => { if(!isBypass) handleViolation(); };
+        document.addEventListener('visibilitychange', () => { if(document.hidden && !isBypass) handleViolation(); });
+    }
+
+    function handleViolation() {
+        violationCount++; playAlarm();
+        const nama = document.getElementById('namaSiswa').value.trim().toUpperCase();
+        document.getElementById('lifeCounter').innerText = `Pelanggaran: ${violationCount}/3`;
+        document.getElementById('overlay').style.display = 'block';
+        if(violationCount >= MAX_VIOLATIONS) {
+            fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
+            document.getElementById('btnTutupMandiri').style.display = 'none';
+            document.getElementById('inputGuruArea').style.display = 'block';
+            document.getElementById('inputGuruArea').innerHTML = `
+                <h2 style="color:red">ANDA TERBLOKIR</h2>
+                <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
+                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+        }
+    }
+
+    function tutupOverlay() { document.getElementById('overlay').style.display = 'none'; stopAlarm(); }
+
+    function startTimer() { setInterval(() => { if(timeLeft > 0){ timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timer').innerText=`${m}:${s<10?'0'+s:s}`; } }, 1000); }
+
+    function finishExam() {
+        isBypass = true;
+        if (SoalPG.some((_, i) => savedData.pg['q'+i] === undefined)) { alert("Pilihan Ganda belum lengkap!"); return; }
+        if(confirm("Yakin ingin mengumpulkan semua jawaban?")) {
+            const btn = document.getElementById('btnKirim'); btn.disabled = true; btn.innerText = "MENGIRIM...";
+            const payload = { 
+                nama: document.getElementById('namaSiswa').value.trim().toUpperCase(), 
+                mapel: NAMA_MAPEL, 
+                pg: savedData.pg, 
+                uraian: savedData.uraian 
+            };
+            fetch(SCRIPT_URL_JAWABAN, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => { alert("Jawaban Berhasil Terkirim!"); localStorage.removeItem(SESSION_KEY); location.reload(); })
+            .catch(() => { alert("Gagal!"); btn.disabled = false; isBypass = false; });
+        }
+    }
+    window.onload = () => { if (localStorage.getItem(SESSION_KEY)) renderSoal(); };
+</script>
+</body>
+</html>

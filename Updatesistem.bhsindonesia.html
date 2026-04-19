@@ -200,7 +200,7 @@
         localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
     }
 
-   function saveUraian(u, txt) { 
+    function saveUraian(u, txt) { 
         savedData.uraian['u'+u] = txt; 
         localStorage.setItem(SESSION_KEY, JSON.stringify(savedData)); 
     }
@@ -261,9 +261,9 @@
                     document.getElementById('tab2').classList.add('active');
                 } else {
                     alert("AKSES DITOLAK! Status: TERBLOKIR.");
-                    // PERBAIKAN: Link WA dengan nama otomatis
-                    const pesanBlokirAwal = `Izin Admin, nama saya ${nama} terblokir di sistem.`;
-                    window.location.href = `https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanBlokirAwal)}`;
+                    // PERBAIKAN 1: Menggunakan encodeURIComponent agar pesan tidak kosong
+                    const pesanAwal = `Izin Admin, nama saya ${nama} terblokir.`;
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanAwal)}`;
                 }
             } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
             return;
@@ -299,14 +299,15 @@
             document.getElementById('btnTutupMandiri').style.display = 'none';
             document.getElementById('inputGuruArea').style.display = 'block';
             
-            // PERBAIKAN: Tombol WA dengan pesan otomatis nama siswa
-            const pesanTerblokir = `Izin Admin, nama saya ${nama} terblokir karena pelanggaran 3 kali.`;
+            // PERBAIKAN 2: Menambahkan teks pesan sesuai permintaan Bapak/Ibu
+            const pesanSopan = `Izin Admin, nama saya ${nama}. Saya telah melanggar aturan dari panitia ujian. Mohon untuk membuka blokirnya.`;
+            
             document.getElementById('inputGuruArea').innerHTML = `
                 <h2 style="color:red">ANDA TERBLOKIR</h2>
                 <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
-                <a href="https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanTerblokir)}" 
+                <a href="https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanSopan)}" 
                    style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;text-align:center;margin-top:10px;">
-                   HUBUNGI ADMIN (WA)
+                   HUBUNGI ADMIN
                 </a>`;
         }
     }
@@ -335,3 +336,4 @@
 </script>
 </body>
 </html>
+   

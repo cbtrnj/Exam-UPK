@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance Server - RNJ</title>
+  <style>
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #0f172a; /* Warna biru gelap server */
+      color: #f8fafc;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      background: #1e293b;
+      padding: 30px 20px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    /* Ikon Animasi Gear */
+    .icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+      display: inline-block;
+      animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #38bdf8;
+      margin: 0 0 10px 0;
+      letter-spacing: 1px;
+    }
+
+    .status-badge {
+      background: #0369a1;
+      color: #e0f2fe;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .server-info {
+      background: #0f172a;
+      padding: 15px;
+      border-radius: 12px;
+      border-left: 4px solid #38bdf8;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .server-info b {
+      color: #38bdf8;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .time-box {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .footer {
+      margin-top: 25px;
+      font-size: 0.75rem;
+      color: #64748b;
+      border-top: 1px solid #334155;
+      padding-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="icon">⚙️</div>
+    <br>
+    <div class="status-badge">Maintenance Mode</div>
+    <h1>SERVER MAINTENANCE</h1>
+    
+    <p>Kami sedang melakukan integrasi <b>Inti Server Utama</b> untuk meningkatkan stabilitas ujian Anda.</p>
+
+    <div class="server-info">
+      <b>Status:</b>
+      Sedang memasukkan data inti server... <br>
+      <b>Target:</b>
+      UPK PAKET C RNJ <br>
+      <b>Lokasi:</b>
+      JAKARTA - CIKARANG
+    </div>
+
+    <div class="time-box">
+      Estimasi selesai dalam 3 jam ke depan.
+    </div>
+
+    <div class="footer">
+      Integra Exam Sys V.02.1 <br>
+      <b>@Ristek Nusantara Jaya</b>
+    </div>
+  </div>
+
+</body>
+</html>

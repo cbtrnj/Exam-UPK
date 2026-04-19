@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ujian Rabu - Ultra Slim</title>
+  <style>
+    /* Menghilangkan margin bawaan browser agar tidak ada ruang kosong di pinggir */
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f4f7ff;
+      margin: 0;
+      padding: 5px; /* Margin luar sangat tipis */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 340px; /* Slim agar pas di genggaman HP */
+      text-align: center;
+      background: #fff;
+      padding: 10px 8px; /* Padding dalam diperkecil */
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .hari {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #007bff;
+      margin: 0;
+    }
+
+    .warning-text {
+      font-size: 0.7rem;
+      color: #d9534f;
+      font-weight: bold;
+      margin: 2px 0 6px 0;
+      display: block;
+    }
+
+    /* Area Jurusan yang sangat rapat */
+    .section {
+      margin-bottom: 6px; 
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid;
+    }
+
+    .ipa-box { border-color: #007bff; background-color: #f8fbff; }
+    .ips-box { border-color: #fd7e14; background-color: #fffaf5; }
+
+    .section h2 { 
+      font-size: 0.75rem; 
+      margin: 2px 0 5px 0; 
+      color: #333;
+    }
+
+    /* Tombol Super Slim */
+    .btn {
+      display: block;
+      width: 95%;
+      margin: 3px auto; /* Jarak antar tombol hanya 3px */
+      padding: 6px; /* Tinggi tombol dipersempit */
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+    .btn-ipa { background-color: #007bff; }
+    .btn-ips { background-color: #fd7e14; }
+
+    .btn-break {
+      background-color: #f2f2f2;
+      color: #888;
+      pointer-events: none;
+      font-size: 0.7rem;
+      border: 0.5px solid #ddd;
+    }
+
+    /* Footer ramping agar langsung muncul di layar */
+    .footer {
+      margin-top: 6px;
+      padding-top: 4px;
+      border-top: 1px solid #eee;
+      font-size: 0.7rem;
+      color: #999;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="hari">RABU</div>
+    <span class="warning-text">⚠️ Hati-hati, Jangan Salah Pilih!</span>
+
+    <div class="section ipa-box">
+      <h2>JURUSAN IPA</h2>
+      <a href="#" class="btn btn-ipa">Bahasa Inggris</a>
+      <a href="#" class="btn btn-ipa">Biologi</a>
+      <div class="btn btn-break">☕ ISTIRAHAT</div>
+      <a href="#" class="btn btn-ipa">Prakarya</a>
+    </div>
+
+    <div class="section ips-box">
+      <h2>JURUSAN IPS</h2>
+      <a href="#" class="btn btn-ips">Bahasa Inggris</a>
+      <a href="#" class="btn btn-ips">Ekonomi</a>
+      <div class="btn btn-break">☕ ISTIRAHAT</div>
+      <a href="#" class="btn btn-ips">Prakarya</a>
+    </div>
+
+    <div class="footer">
+      Integra Exam V.02.1
+      @Ristek Nusantara Jaya
+    </div>
+  </div>
+
+</body>
+</html>

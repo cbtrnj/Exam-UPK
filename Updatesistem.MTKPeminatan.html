@@ -476,7 +476,9 @@ Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah peny
                     document.getElementById('tab2').classList.add('active');
                 } else {
                     alert("AKSES DITOLAK! Status: TERBLOKIR.");
-                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                    // PERBAIKAN 1: Menggunakan encodeURIComponent agar pesan tidak kosong
+                    const pesanAwal = `Izin Admin, nama saya ${nama} terblokir.`;
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanAwal)}`;
                 }
             } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
             return;
@@ -511,10 +513,17 @@ Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah peny
             fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
             document.getElementById('btnTutupMandiri').style.display = 'none';
             document.getElementById('inputGuruArea').style.display = 'block';
+            
+            // PERBAIKAN 2: Menambahkan teks pesan sesuai permintaan Bapak/Ibu
+            const pesanSopan = `Izin Admin, nama saya ${nama}. Saya telah melanggar aturan dari panitia ujian. Mohon untuk membuka blokirnya.`;
+            
             document.getElementById('inputGuruArea').innerHTML = `
                 <h2 style="color:red">ANDA TERBLOKIR</h2>
                 <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
-                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+                <a href="https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanSopan)}" 
+                   style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;text-align:center;margin-top:10px;">
+                   HUBUNGI ADMIN
+                </a>`;
         }
     }
 
@@ -542,3 +551,4 @@ Berapakah luas maksimum trapesium tersebut (dalam m cm²)? Tuliskan langkah peny
 </script>
 </body>
 </html>
+   

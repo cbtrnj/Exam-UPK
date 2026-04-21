@@ -96,7 +96,7 @@
                 <img src="https://i.imgur.com/J1mKppg.png" class="logo">
                 <h1 class="school-name">PKBM Ristek Nusantara Jaya</h1>
                 <div class="exam-title">UJIAN PENDIDIKAN KESETARAAN</div>
-                <span class="exam-badge" id="mapelTitle">FISIKA</span>
+                <span class="exam-badge" id="mapelTitle">MATEMATIKA</span>
             </div>
             <input type="text" id="namaSiswa" placeholder="NAMA LENGKAP (KAPITAL)" oninput="this.value = this.value.toUpperCase()">
             <input type="text" id="tokenUjian" placeholder="TOKEN UJIAN" oninput="this.value = this.value.toUpperCase()">
@@ -125,16 +125,16 @@
 
 <script>
     // --- 1. CONFIGURATION ---
-    const NAMA_MAPEL = "FISIKA"; 
+    const NAMA_MAPEL = "MATEMATIKA"; 
     const SCRIPT_URL_JAWABAN = "https://script.google.com/macros/s/AKfycbxLJ2bAt0OpZpPmoVm8zrZXyv94_DDfQLLzY1N5YxWwSbLU6IYVSac9cjDv_fL1rVyM/exec"; 
     const URL_VALIDASI = "https://script.google.com/macros/s/AKfycby1W4MGcLMB-_55o7q52syNp1X6ViUgVatshMA5G0ZuBsKbt9zr7TZES-49oKIFYzjv/exec";
     
     const WA_ADMIN = "6285888157682";
     const TOKEN_VALID = "RISTEK2026";
-    const SESSION_KEY = "UPK_MASTER12_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
+    const SESSION_KEY = "UPK_MASTER14_" + NAMA_MAPEL.replace(/\s+/g, '_'); 
 
     // --- 2. BANK SOAL ---
-      const SoalPG = [
+     const SoalPG = [
 [
 `Bagian dari metode ilmiah yang merupakan dugaan sementara dari suatu kegiatan ilmiah yang perlu diuji kebenarannya melalui penelitian ilmiah dengan cara seksama dikenal dengan istilah`,
 [
@@ -658,8 +658,6 @@ Dapat dipastikan bahwa jenis partikel tersebut dan arah medan magnet B di dalam 
 
 "Dua kawat penghantar dialiri arus listrik dengan arah dan besar seperti gambar di bawah<br><br><img src='https://i.imgur.com/vPCfTkW.png' style='max-width:100%;'><br>Nilai induksi magnet di titik Q adalah ..."
 ];
-
-
     // --- 3. CORE SYSTEM ---
     let violationCount = 0, MAX_VIOLATIONS = 3, timeLeft = 90 * 60, isBypass = false;
     let savedData = JSON.parse(localStorage.getItem(SESSION_KEY)) || { pg: {}, uraian: {} };
@@ -731,7 +729,9 @@ Dapat dipastikan bahwa jenis partikel tersebut dan arah medan magnet B di dalam 
                     document.getElementById('tab2').classList.add('active');
                 } else {
                     alert("AKSES DITOLAK! Status: TERBLOKIR.");
-                    window.location.href = `https://wa.me/${WA_ADMIN}?text=Izin%20Admin,%20nama%20saya%20${nama}%20terblokir.`;
+                    // PERBAIKAN 1: Menggunakan encodeURIComponent agar pesan tidak kosong
+                    const pesanAwal = `Izin Admin, nama saya ${nama} terblokir.`;
+                    window.location.href = `https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanAwal)}`;
                 }
             } catch(e) { alert("Error Server!"); } finally { btn.innerText = "Lanjut"; btn.disabled = false; }
             return;
@@ -766,10 +766,17 @@ Dapat dipastikan bahwa jenis partikel tersebut dan arah medan magnet B di dalam 
             fetch(`${URL_VALIDASI}?action=blockSiswa&nama=${encodeURIComponent(nama)}`);
             document.getElementById('btnTutupMandiri').style.display = 'none';
             document.getElementById('inputGuruArea').style.display = 'block';
+            
+            // PERBAIKAN 2: Menambahkan teks pesan sesuai permintaan Bapak/Ibu
+            const pesanSopan = `Izin Admin, nama saya ${nama}. Saya telah melanggar aturan dari panitia ujian. Mohon untuk membuka blokirnya.`;
+            
             document.getElementById('inputGuruArea').innerHTML = `
                 <h2 style="color:red">ANDA TERBLOKIR</h2>
                 <p>Silakan hubungi pengawas ujian untuk membuka blokir.</p>
-                <a href="https://wa.me/${WA_ADMIN}" style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;">HUBUNGI ADMIN</a>`;
+                <a href="https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesanSopan)}" 
+                   style="background:#25D366;color:white;padding:15px;display:block;border-radius:12px;text-decoration:none;font-weight:700;text-align:center;margin-top:10px;">
+                   HUBUNGI ADMIN
+                </a>`;
         }
     }
 
@@ -797,3 +804,4 @@ Dapat dipastikan bahwa jenis partikel tersebut dan arah medan magnet B di dalam 
 </script>
 </body>
 </html>
+   
